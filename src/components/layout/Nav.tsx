@@ -15,6 +15,8 @@ const ITEMS = [
 ] as const;
 
 type ItemId = (typeof ITEMS)[number]["id"];
+/** Sections without a nav item (e.g. "approach") mark nothing as current. */
+type SectionId = ItemId | (string & {});
 
 /** The line, in px from the top, that decides the nav theme (Homepage R02: 44px). */
 const THEME_LINE = 44;
@@ -31,7 +33,7 @@ export function Nav() {
   const pathname = usePathname();
   const otherLocale = locale === "pt" ? "en" : "pt";
   const [light, setLight] = useState(false);
-  const [active, setActive] = useState<ItemId>("hero");
+  const [active, setActive] = useState<SectionId>("hero");
   const [open, setOpen] = useState(false);
   const menuId = useId();
   const menuButton = useRef<HTMLButtonElement>(null);
@@ -56,12 +58,12 @@ export function Nav() {
           break;
         }
       }
-      let current: ItemId = "hero";
+      let current: SectionId = "hero";
       document.querySelectorAll<HTMLElement>("[data-nav-id]").forEach((s) => {
-        if (s.getBoundingClientRect().top < mid) current = s.dataset.navId as ItemId;
+        if (s.getBoundingClientRect().top < mid) current = s.dataset.navId ?? current;
       });
       setLight(surface === "light");
-      setActive((alias as ItemId | undefined) ?? current);
+      setActive(alias ?? current);
     };
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(read);
@@ -131,10 +133,12 @@ export function Nav() {
   );
 
   return (
+    // The nav strip spans the full width: only its controls take the pointer,
+    // so content scrolling under the empty part stays hoverable and clickable.
     <div className="pointer-events-none sticky top-0 z-40 h-0">
       <nav
         aria-label={t("label")}
-        className={`pointer-events-auto absolute inset-x-0 top-0 flex items-center justify-between gap-6 px-(--page-margin) py-3 md:py-5 ${transition} ${light ? "text-ink" : "text-paper"}`}
+        className={`pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between gap-6 [&_a]:pointer-events-auto [&_button]:pointer-events-auto [&>div]:pointer-events-auto px-(--page-margin) py-3 md:py-5 ${transition} ${light ? "text-ink" : "text-paper"}`}
       >
         <a
           href="#hero"

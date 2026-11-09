@@ -11,7 +11,12 @@ Temporary progress log. Permanent rules live in `CLAUDE.md`.
 - [x] **M2 — Night→Day + About + Experience** (2026-11-09): sticky scroll stage with clip-path scrub (hard cut at 50% with reduced motion), `Portrait` placeholder slot, `PortraitReveal` radial mask (mouse / press-and-hold / 44px toggle), traits T.01–T.03, experience block from the CV, hero eyebrow with the current stack.
   - Validated in Playwright at 360/390/768/1440, PT + EN: no console errors, no horizontal scroll, both portrait frames at the same y on every width, nav theme and active item follow the visible layer (motion and reduced motion), mask 150px on hover / full frame on hold and toggle, no-JS stacks both layers.
   - Bugs found and fixed: sticky stage scrolled away (260vh was on the wrong parent); the global reduced-motion reset turned every style change into a one-frame transition (now `transition: none`); the highlighter overlapped the previous line (now a sized gradient, `highlight` utility).
-- [ ] M3 — Projects + Lab + Approach
+- [x] **M3 — Projects + Lab + Approach** (2026-11-09): editorial project index from `projects.ts` with the floating 4:3 preview (lerp 0.14, tilt ≤ 4°, edge flip, 200ms crossfade, keyboard anchoring, images above titles on touch), `StatusMark` (status by shape), Lab with the controlled broken grid (CSS 3D cube, pointer crosshair, sound score — all placeholders), Approach with stepped columns.
+  - Validated in Playwright (1440 desktop, iPhone 13, Pixel 7, reduced motion): preview shows/crossfades/settles/stops, other rows fade to 25%, flips left near the edge, keyboard focus anchors right; touch shows all 6 images inline and no float; Lab crosshair + cube follow the pointer; nav theme/active right on every section (none on Approach); no overflow, no console errors. M1/M2 regressions re-run clean.
+  - Bug found and fixed: the full-width nav strip captured the pointer, blocking hover/clicks on content scrolling under its empty area (present since M1).
+  - Only Koinonia and Via Hebraica link out (real sites, new tab); other rows stay plain until their case studies exist (M4).
+  - Lab: E.02/E.03 shown as concepts with no year (the design claimed "Prototype 2026" / "Archived 2025"); "Read the study" links removed — no studies exist. The cat's perch on E.01 waits for the single CatAssistant (M5).
+  - The floating preview uses a 1px hairline instead of the prototype's drop shadow ("no shadows" rule).
 - [ ] M4 — Case study template (Koinonia first)
 - [ ] M5 — Cat assistant, Contact, Footer, SEO, audit, deploy guide
 
@@ -28,7 +33,9 @@ Temporary progress log. Permanent rules live in `CLAUDE.md`.
 3. Portrait photos (real + "cybernetic" alternate, aligned 4:5) — placeholders until then.
 4. Final domain → `NEXT_PUBLIC_SITE_URL`.
 5. Homepage R02 mobile screenshots (the PDF sent was Case Study Mobile R01 — used for M4 and the cat silhouette).
-6. Portrait photos: drop both 4:5 files in `public/portrait/` and fill `src/content/portrait.ts` (same crop, aligned).
+6. Lab entries: real experiments (title, question, status, year, media) or confirm the placeholders.
+7. Project covers (4:3) → `cover` in `src/content/projects.ts`.
+8. Portrait photos: drop both 4:5 files in `public/portrait/` and fill `src/content/portrait.ts` (same crop, aligned).
 
 ## Decisions taken
 - Static export over OpenNext (no runtime needed; OpenNext also pins Next ≥16.4.5).

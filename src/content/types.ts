@@ -26,6 +26,17 @@ export interface CaseStudyChapter {
   body: Localized<string[]>;
 }
 
+/** Tag keys, translated in messages (`tags.*`). */
+export type TagKey = "web" | "pwa" | "product" | "personal" | "ai" | "data" | "research" | "retail" | "personalTools";
+
+/** A real image for a project or lab entry. Until it exists, the UI draws an editorial placeholder. */
+export interface MediaImage {
+  src: string;
+  width: number;
+  height: number;
+  alt: Localized;
+}
+
 export interface Project {
   slug: string;
   /** Editorial index, e.g. "P.01". */
@@ -35,8 +46,10 @@ export interface Project {
   nameLang?: "pt" | "en";
   status: ProjectStatus;
   year?: number;
-  tags: string[];
+  tags: TagKey[];
   summary: Localized;
+  /** 4:3 cover used by the index preview. */
+  cover?: MediaImage;
   role?: Localized;
   stack?: string[];
   links?: ProjectLink[];
@@ -45,5 +58,21 @@ export interface Project {
   /** Where the facts came from — for maintainers, never rendered. */
   source: string;
   /** false = status/year/summary come from the design prototype and await confirmation. */
+  confirmed: boolean;
+}
+
+/** Experimental Lab entry (Homepage R02 · Lab). */
+export interface LabEntry {
+  index: string; // "E.01"
+  /** The frame study drawn in place of media: 3D cube, pointer trace or sound score. */
+  frame: "cube" | "pointer" | "sound";
+  aspect: "1/1" | "3/4" | "16/9";
+  status: ProjectStatus;
+  year?: number;
+  topic: Localized;
+  title: Localized;
+  body: Localized;
+  media?: MediaImage;
+  source: string;
   confirmed: boolean;
 }

@@ -6,9 +6,12 @@ import { Nav } from "@/components/layout/Nav";
 import { Hero } from "@/components/sections/Hero";
 import { DayNightTransition } from "@/components/sections/DayNightTransition";
 import { About } from "@/components/sections/About";
+import { Projects } from "@/components/sections/Projects";
+import { Lab } from "@/components/sections/Lab";
+import { Approach } from "@/components/sections/Approach";
 
 // Section order (CLAUDE.md): Hero → Night→Day → About → Projects → Lab → Approach → Contact.
-// M2: Hero, transition, About. Projects, Lab, Approach, Contact arrive in M3–M5.
+// M3: everything up to Approach. Contact and the cat assistant arrive in M5.
 export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
@@ -21,6 +24,9 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         <Hero />
         <DayNightTransition />
         <About />
+        <Projects />
+        <Lab />
+        <Approach />
       </main>
     </>
   );

@@ -41,7 +41,9 @@ Surfaces: Hero dark → Night→Day transition → About light → Projects ligh
 ## Components
 - Server Components by default. `"use client"` only for interaction, browser APIs or animation (Nav theme, DayNightTransition, PortraitReveal, ProjectIndex floating image, CatAssistant).
 - Folders: `components/layout` (primitives), `components/sections` (home), `components/case-study`, `components/media`, `components/cat`. Extract a component for real reuse or a clear responsibility, not per element.
-- Project markup is generated from `src/content/projects.ts`; never hand-duplicate project copy.
+- Project and Lab markup are generated from `src/content/projects.ts` and `src/content/lab.ts`; never hand-duplicate their copy. Real media goes in `cover` / `media` (`MediaImage`); without it the UI draws the editorial placeholder.
+- Never link to a destination that does not exist (no dead "#" links, no "read the study" without a study).
+- Fixed/sticky overlays that span the width (the nav strip) must be `pointer-events: none`, with only their controls re-enabled.
 
 ## Motion
 - Durations: fast 160 (hover/focus), base 320 (states/panels), slow 640 (entrances/reveal). One easing: `--ease-out-soft` `cubic-bezier(0.2,0.7,0.1,1)`.

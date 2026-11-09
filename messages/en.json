@@ -98,5 +98,62 @@
     "learning": "Learning",
     "education": "Education",
     "expected": "expected {year}"
+  },
+  "tags": {
+    "web": "Web",
+    "pwa": "PWA",
+    "product": "Product",
+    "personal": "Personal project",
+    "ai": "AI",
+    "data": "Data",
+    "research": "Research",
+    "retail": "Retail",
+    "personalTools": "Personal tools"
+  },
+  "projects": {
+    "label": "(02) Selected projects",
+    "note": "Six projects at different stages, each documented with what exists today. Some statuses are still provisional.",
+    "image": "Project image",
+    "placeholder": "placeholder",
+    "visit": "opens the site in a new tab",
+    "listLabel": "Projects"
+  },
+  "lab": {
+    "label": "(03) Experimental Lab",
+    "title": "Lab",
+    "intro": "Small things built to answer one question each. Not products — yet.",
+    "meta": "{count} entries · ongoing · updated 11.2026",
+    "drop": "placeholder · media pending",
+    "ground": "ground plane · y 0",
+    "hesitation": "hesitation · 640ms",
+    "playhead": "playhead · “why does it”"
+  },
+  "approach": {
+    "label": "(04) Approach",
+    "title": "How a question becomes a thing.",
+    "note": "Five moves, in order — then again. The last step feeds the first.",
+    "back": "back to 01",
+    "steps": [
+      {
+        "title": "Observe",
+        "text": "Notice what people actually do, not what they say they do."
+      },
+      {
+        "title": "Understand",
+        "text": "Find the real question under the request."
+      },
+      {
+        "title": "Experiment",
+        "text": "Build the smallest thing that can prove me wrong."
+      },
+      {
+        "title": "Build",
+        "text": "Turn what survived into something people can use."
+      },
+      {
+        "title": "Improve",
+        "text": "Ship, watch, adjust — and start observing again."
+      }
+    ]
   }
 }

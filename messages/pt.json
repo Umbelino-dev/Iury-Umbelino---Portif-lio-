@@ -98,5 +98,62 @@
     "learning": "Estudando",
     "education": "Formação",
     "expected": "previsão {year}"
+  },
+  "tags": {
+    "web": "Web",
+    "pwa": "PWA",
+    "product": "Produto",
+    "personal": "Projeto pessoal",
+    "ai": "IA",
+    "data": "Dados",
+    "research": "Pesquisa",
+    "retail": "Varejo",
+    "personalTools": "Ferramentas pessoais"
+  },
+  "projects": {
+    "label": "(02) Projetos selecionados",
+    "note": "Seis projetos em estágios diferentes, cada um documentado com o que existe hoje. Alguns status ainda são provisórios.",
+    "image": "Imagem do projeto",
+    "placeholder": "placeholder",
+    "visit": "abre o site em nova aba",
+    "listLabel": "Projetos"
+  },
+  "lab": {
+    "label": "(03) Laboratório experimental",
+    "title": "Lab",
+    "intro": "Pequenas coisas feitas para responder uma pergunta cada. Não são produtos — ainda.",
+    "meta": "{count} entradas · em andamento · atualizado 11.2026",
+    "drop": "placeholder · mídia pendente",
+    "ground": "plano do chão · y 0",
+    "hesitation": "hesitação · 640ms",
+    "playhead": "cursor · “por que ele”"
+  },
+  "approach": {
+    "label": "(04) Abordagem",
+    "title": "Como uma pergunta vira uma coisa.",
+    "note": "Cinco movimentos, em ordem — e de novo. O último alimenta o primeiro.",
+    "back": "volta ao 01",
+    "steps": [
+      {
+        "title": "Observar",
+        "text": "Perceber o que as pessoas fazem de verdade, não o que dizem que fazem."
+      },
+      {
+        "title": "Entender",
+        "text": "Encontrar a pergunta real por baixo do pedido."
+      },
+      {
+        "title": "Experimentar",
+        "text": "Construir a menor coisa capaz de provar que estou errado."
+      },
+      {
+        "title": "Construir",
+        "text": "Transformar o que sobreviveu em algo que as pessoas possam usar."
+      },
+      {
+        "title": "Melhorar",
+        "text": "Entregar, observar, ajustar — e voltar a observar."
+      }
+    ]
   }
 }

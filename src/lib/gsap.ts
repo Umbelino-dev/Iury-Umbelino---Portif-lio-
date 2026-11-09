@@ -3,9 +3,10 @@
 import { gsap } from "gsap";
 import { CustomEase } from "gsap/CustomEase";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { SplitText } from "gsap/SplitText";
 import { useGSAP } from "@gsap/react";
 
-gsap.registerPlugin(ScrollTrigger, CustomEase, useGSAP);
+gsap.registerPlugin(ScrollTrigger, CustomEase, SplitText, useGSAP);
 
 /** The project's single easing — mirrors --ease-out-soft in globals.css. */
 export const EASE = CustomEase.create("soft", "0.2,0.7,0.1,1");
@@ -23,4 +24,4 @@ export const MQ = {
   touch: "(hover: none)",
 } as const;
 
-export { gsap, ScrollTrigger, useGSAP };
+export { gsap, ScrollTrigger, SplitText, useGSAP };

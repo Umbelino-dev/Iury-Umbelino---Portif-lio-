@@ -14,6 +14,7 @@ export function LabFrame({ children, cube = false, className = "" }: { children:
   return (
     <div
       ref={el}
+      data-cursor="none"
       className={`group/frame relative overflow-hidden border border-[#2a2a2a] transition-colors duration-(--duration-base) hover:border-gray-600 [--h:0] [--mx:50%] [--my:50%] ${className}`}
       onPointerMove={(e) => {
         const node = el.current;

@@ -16,6 +16,7 @@ export async function Projects() {
   const t = await getTranslations("projects");
   const ts = await getTranslations("status");
   const tt = await getTranslations("tags");
+  const tc = await getTranslations("cursor");
 
   const rows: ProjectRow[] = projects.map((p, i) => {
     const status = ts(p.status);
@@ -30,6 +31,7 @@ export async function Projects() {
       href: caseHref ?? live?.href,
       external: Boolean(live),
       externalLabel: t("visit"),
+      cursorLabel: caseHref ? tc("project") : live ? tc("visit") : undefined,
       meta: (
         <span className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
           <StatusMark status={p.status} label={status} className="text-ink" />

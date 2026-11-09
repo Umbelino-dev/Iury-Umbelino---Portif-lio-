@@ -22,7 +22,7 @@ type Pose = "idle" | "left" | "right" | "near";
  * - Touch: breathing + blink only. Reduced motion: fully static.
  * Work happens only while the hero is on screen and the tab is visible.
  */
-export function CatObserver({ className, label }: { className?: string; label: string }) {
+export function CatObserver({ className, label, cursorLabel }: { className?: string; label: string; cursorLabel?: string }) {
   const root = useRef<HTMLButtonElement>(null);
 
   useGSAP(
@@ -165,6 +165,7 @@ export function CatObserver({ className, label }: { className?: string; label: s
       onClick={() => window.dispatchEvent(new Event(CAT_OPEN))}
       className={`cursor-pointer ${className ?? ""}`}
       data-cat-root="observer"
+      data-cursor-label={cursorLabel}
     >
       <CatFigure className="block h-full w-full overflow-visible" />
     </button>

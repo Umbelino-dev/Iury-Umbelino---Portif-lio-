@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useId, useReducer, useRef, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useId, useReducer, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import { gsap, MQ } from "@/lib/gsap";
 import { CatFigure } from "./CatFigure";
+import { SectionRail } from "./SectionRail";
 import { CAT_OPEN, IDLE_MS, transition, type CatEvent, type CatState } from "./states";
 
 export interface AssistantChip {
@@ -34,6 +35,18 @@ export interface AssistantUI {
 type Message = { from: "cat" | "you"; text: string };
 
 const MOBILE = "(max-width: 767px)";
+/**
+ * Rail mode (home only): the cat rides a hairline rail in the right page margin.
+ * From 1440px the margin is wide enough (≥50px) to hold the 44px cat without
+ * covering copy; below that it keeps the bottom-right dock.
+ */
+const RAIL = "(min-width: 1440px) and (hover: hover) and (pointer: fine)";
+const READING_LINE = 0.4; // the rail cat holds 40% of the viewport height
+const subscribeRail = (cb: () => void) => {
+  const mq = window.matchMedia(RAIL);
+  mq.addEventListener("change", cb);
+  return () => mq.removeEventListener("change", cb);
+};
 const REPLY_MS = 650;
 
 const reducer = (s: CatState, e: CatEvent) => transition(s, e);
@@ -41,8 +54,9 @@ const normalize = (s: string) => s.toLowerCase().normalize("NFD").replace(/\p{Di
 
 /**
  * The cat, states S2–S5 (Cat Journey R03). On the home page it starts as the hero's
- * observer (CatObserver) and jumps to the dock when the hero leaves; on a case study
- * it starts docked. The docked cat is the closed assistant button; opening grows a
+ * observer (CatObserver) and jumps when the hero leaves: onto the rail from 1440px
+ * (it hangs there, riding the reading line, and slides down to curl up when idle),
+ * or to the bottom-right dock below that. On a case study it starts docked. The docked cat is the closed assistant button; opening grows a
  * glass panel out of it (desktop) or slides a bottom sheet up (mobile). It never
  * opens by itself.
  */
@@ -80,6 +94,8 @@ export function CatAssistant({
   const titleId = useId();
   const open = state === "awaken";
   const small = context === "case";
+  const rail = useSyncExternalStore(subscribeRail, () => context === "home" && window.matchMedia(RAIL).matches, () => false);
+  const isRail = () => context === "home" && window.matchMedia(RAIL).matches;
 
   const reduced = () => window.matchMedia(MQ.reduced).matches;
   const mobile = () => window.matchMedia(MOBILE).matches;
@@ -87,8 +103,81 @@ export function CatAssistant({
     Array.from(document.querySelectorAll<HTMLElement>('[data-cat-root="observer"]')).find((el) => el.offsetParent !== null);
   const parts = () => {
     const q = (n: string) => dockInner.current?.querySelector<SVGGElement>(`[data-cat="${n}"]`) ?? null;
-    return { svg: dockInner.current?.querySelector("svg") ?? null, body: q("body"), head: q("head"), eyes: q("eyes"), ears: q("ears") };
+    return {
+      svg: dockInner.current?.querySelector("svg") ?? null,
+      body: q("body"),
+      head: q("head"),
+      eyes: q("eyes"),
+      ears: q("ears"),
+      tail: q("tail"),
+      paws: q("paws"),
+    };
   };
+  /** Dock offset (px) that puts the cat's centre on the reading line. */
+  const railY = () => {
+    const d = dock.current;
+    if (!d) return 0;
+    const r = d.getBoundingClientRect();
+    const base = r.top + r.height / 2 - (Number(gsap.getProperty(d, "y")) || 0);
+    return window.innerHeight * READING_LINE - base;
+  };
+
+  // Leaving rail mode (resize): the cat goes back to the corner.
+  useEffect(() => {
+    if (!rail && dock.current) gsap.set(dock.current, { y: 0 });
+  }, [rail]);
+
+  // ── S3 on the rail: hang, ride the page, climb back to the reading line ──
+  useEffect(() => {
+    if (!rail || state !== "cling") return;
+    const d = dock.current;
+    if (!d) return;
+    const { eyes, tail } = parts();
+    const base = railY();
+    const rm = reduced();
+    // Climb up (from the corner after sleep) or settle after the jump.
+    gsap.to(d, { y: base, duration: rm ? 0 : 0.4, ease: "power2.out" });
+    // Eyes turn toward the text, to the left of the rail.
+    if (eyes) gsap.to(eyes, { x: -2.5, duration: rm ? 0 : 0.3 });
+    if (rm) {
+      return () => {
+        if (eyes) gsap.set(eyes, { x: 0 });
+      };
+    }
+    // Scrolling drags the cat with the page; it then climbs back to the line
+    // (lerp 0.12). The rAF runs only while it is still moving.
+    const span = window.innerHeight * 0.25;
+    const setY = gsap.quickSetter(d, "y", "px");
+    let offset = 0;
+    let lastY = window.scrollY;
+    let frame = 0;
+    const tick = () => {
+      offset += (0 - offset) * 0.12;
+      setY(base + offset);
+      if (tail) gsap.set(tail, { rotation: gsap.utils.clamp(-30, 30, offset * 0.3), svgOrigin: "80 118" });
+      if (Math.abs(offset) > 0.5) {
+        frame = requestAnimationFrame(tick);
+      } else {
+        frame = 0;
+        setY(base);
+        if (tail) gsap.to(tail, { rotation: 0, duration: 0.5, ease: "elastic.out(1, 0.4)" });
+      }
+    };
+    const onScroll = () => {
+      const y = window.scrollY;
+      gsap.killTweensOf(d, "y");
+      offset = gsap.utils.clamp(-span, span, offset - (y - lastY));
+      lastY = y;
+      if (!frame) frame = requestAnimationFrame(tick);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(frame);
+      gsap.killTweensOf(d, "y");
+      if (eyes) gsap.to(eyes, { x: 0, duration: 0.2 });
+    };
+  }, [rail, state]);
 
   // ── Hero visibility drives S1 ⇄ S2 (home only) ───────────────────────────
   useEffect(() => {
@@ -170,7 +259,9 @@ export function CatAssistant({
       // Opened from the hero slot: the cat moves to the dock first, instantly.
       gsap.set(fromHero, { autoAlpha: 0 });
     }
-    gsap.set(d, { autoAlpha: 1 });
+    // Opened from the rail: the cat drops to the corner, where the panel grows from it.
+    const lift = Number(gsap.getProperty(d, "y")) || 0;
+    gsap.set(d, { autoAlpha: 1, y: 0 });
     gsap.set(p, { autoAlpha: 1, yPercent: 0, y: 0, clipPath: "none" });
     gsap.set(scrim.current, { autoAlpha: 1 });
     const pr = p.getBoundingClientRect();
@@ -179,6 +270,7 @@ export function CatAssistant({
     panelTl.current?.kill();
     const tl = gsap.timeline({ onComplete: () => title.current?.focus() });
     panelTl.current = tl;
+    if (lift && !rm) tl.fromTo(inner, { y: lift }, { y: 0, duration: 0.24, ease: "power2.in" }, 0);
 
     if (rm) {
       tl.fromTo([p, scrim.current], { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.16 }).set(inner, { y: perchY });
@@ -257,7 +349,7 @@ export function CatAssistant({
     const d = dock.current;
     const inner = dockInner.current;
     if (!d || !inner) return;
-    const { svg, body, head, eyes } = parts();
+    const { svg, body, head, eyes, tail, paws } = parts();
     const first = !mounted.current;
     mounted.current = true;
     const rm = reduced();
@@ -271,10 +363,24 @@ export function CatAssistant({
       if (eyes) gsap.to(eyes, { scaleY: asleep ? 0.1 : 1, duration: rm ? 0 : 0.2 });
       if (body) gsap.to(body, { scaleY: asleep ? 0.82 : 1, duration: rm ? 0 : 0.52, ease: "power2.in" });
       if (head) gsap.to(head, { y: asleep ? 6 : 0, rotation: asleep ? -4 : 0, svgOrigin: "50 62", duration: rm ? 0 : 0.52 });
+      // Tail: curls in when asleep; settles with a little whip otherwise (the jump drives its own).
+      if (tail && state !== "jump") {
+        gsap.to(tail, {
+          rotation: asleep ? 26 : 0,
+          svgOrigin: "80 118",
+          duration: rm ? 0 : asleep ? 0.6 : 0.7,
+          ease: asleep ? "power2.out" : "elastic.out(1, 0.4)",
+        });
+      }
+      // Paws grip the rail only while hanging there.
+      const gripping = isRail() && state === "cling";
+      if (paws && state !== "jump") gsap.to(paws, { opacity: gripping ? 1 : 0, duration: rm ? 0 : 0.16 });
 
       const hero = heroCat();
       // S1 → S2: one arc from the hero slot to the dock.
       if (state === "jump") {
+        // Rail mode: the landing spot is on the rail, at the reading line.
+        if (isRail()) gsap.set(d, { y: railY() });
         if (first || !hero) {
           gsap.set(d, { autoAlpha: 1 });
           if (hero) gsap.set(hero, { autoAlpha: 0 });
@@ -292,19 +398,29 @@ export function CatAssistant({
           return;
         }
         gsap.set(hero, { autoAlpha: 0 });
-        gsap
-          .timeline({ onComplete: () => send({ type: "LANDED" }) })
-          .fromTo(inner, { x: dx, scale: hr.width / dr.width }, { x: 0, scale: 1, duration: 0.42, ease: "power1.inOut" }, 0)
-          .fromTo(inner, { y: dy }, { y: 0, duration: 0.42, ease: "back.in(1.4)" }, 0) // rises, then falls onto the dock
-          .to(svg, { scaleX: 1.08, scaleY: 0.9, duration: 0.07, ease: "power1.out" })
-          .to(svg, { scaleX: 1, scaleY: 1, duration: 0.07 });
+        const tl = gsap.timeline();
+        tl.set(inner, { x: dx, y: dy, scale: hr.width / dr.width })
+          // Anticipation: a short crouch before the leap.
+          .to(svg, { scaleX: 1.1, scaleY: 0.86, duration: 0.1, ease: "power2.out" })
+          .addLabel("air")
+          .to(inner, { x: 0, scale: 1, duration: 0.42, ease: "power1.inOut" }, "air")
+          .to(inner, { y: 0, duration: 0.42, ease: "back.in(1.4)" }, "air") // rises, then falls onto its perch
+          // Stretched in flight, tail trailing behind.
+          .to(svg, { scaleX: 0.9, scaleY: 1.14, duration: 0.18, ease: "power1.out" }, "air")
+          .to(svg, { scaleX: 1, scaleY: 1, duration: 0.22 }, "air+=0.2");
+        if (tail) tl.to(tail, { rotation: -28, svgOrigin: "80 118", duration: 0.2 }, "air");
+        if (paws && isRail()) tl.to(paws, { opacity: 1, duration: 0.08 }, "air+=0.34"); // reaches for the rail
+        // Landing: squash, the tail whips forward; cling's pose settles it.
+        tl.to(svg, { scaleX: 1.1, scaleY: 0.88, duration: 0.07, ease: "power1.out" }, "air+=0.42");
+        if (tail) tl.to(tail, { rotation: 18, duration: 0.1 }, "<");
+        tl.to(svg, { scaleX: 1, scaleY: 1, duration: 0.14, ease: "power2.out" }).call(() => send({ type: "LANDED" }));
         return;
       }
 
       // S2–S4 → S1: reverse jump back into the hero slot.
       if (state === "observer" && from !== "observer") {
         const back = () => {
-          gsap.set(d, { autoAlpha: 0 });
+          gsap.set(d, { autoAlpha: 0, y: 0 });
           gsap.set(inner, { x: 0, y: 0, scale: 1 });
           if (hero) gsap.to(hero, { autoAlpha: 1, duration: rm ? 0.16 : 0.12 });
         };
@@ -335,6 +451,8 @@ export function CatAssistant({
       if (state === "cling" || state === "sleep") {
         gsap.set(d, { autoAlpha: 1 });
         if (hero) gsap.set(hero, { autoAlpha: 0 });
+        // Release: eyes close first (200ms), then it slides down the rail to curl in the corner.
+        if (state === "sleep") gsap.to(d, { y: 0, duration: rm ? 0 : 0.52, delay: rm ? 0 : 0.2, ease: "power2.in" });
       }
 
     }, root);
@@ -474,8 +592,8 @@ export function CatAssistant({
     else gsap.to(panel.current, { y: 0, duration: 0.2 });
   };
 
-  const disc = small ? "size-11" : "size-14";
-  const catSize = small ? "w-[26px]" : "w-10";
+  const disc = small || rail ? "size-11" : "size-14";
+  const catSize = small ? "w-[26px]" : rail ? "w-[30px]" : "w-10";
 
   return (
     <div ref={root} data-cat-assistant={state}>
@@ -487,10 +605,13 @@ export function CatAssistant({
         className="invisible fixed inset-0 z-[60] bg-transparent opacity-0 max-md:bg-ink/40"
       />
 
-      {/* The dock: the curled cat is the closed assistant button (S3/S4). */}
+      {rail && <SectionRail shown={state !== "observer"} />}
+
+      {/* The dock: the curled cat is the closed assistant button (S3/S4). In rail mode it sits on the rail. */}
       <div
         ref={dock}
-        className="invisible fixed right-[max(1rem,env(safe-area-inset-right))] bottom-[calc(1rem+env(safe-area-inset-bottom))] z-[70] opacity-0"
+        data-cat-dock
+        className={`invisible fixed z-[70] opacity-0 ${rail ? "right-1 bottom-4" : "right-[max(1rem,env(safe-area-inset-right))] bottom-[calc(1rem+env(safe-area-inset-bottom))]"}`}
       >
         <div ref={dockInner} className="relative">
           <button

@@ -45,7 +45,7 @@ export const experience = {
   publishEmployer: true,
   employer: "Giassi Supermercados",
   role: { pt: "Assistente de TI", en: "IT Assistant" } satisfies Localized,
-  period: { pt: "abr 2026 — atual", en: "Apr 2026 — present" } satisfies Localized,
+  period: { pt: "abr 2026 – atual", en: "Apr 2026 – present" } satisfies Localized,
   /** Every line is a CV bullet (rev. 6), reworded only for length. */
   highlights: [
     {
@@ -71,10 +71,10 @@ export const experience = {
   ] satisfies Localized[],
   /** The path inside the company, newest first (CV §Experiência). */
   path: [
-    { role: { pt: "Assistente de TI", en: "IT Assistant" }, period: "04.2026 —" },
-    { role: { pt: "Auxiliar Administrativo — TI", en: "Administrative Assistant — IT" }, period: "01.2026 – 03.2026" },
-    { role: { pt: "Operador de Caixas — Logística", en: "Warehouse Operator — Logistics" }, period: "11.2025 – 12.2025" },
-    { role: { pt: "Jovem Aprendiz — Centro de Distribuição", en: "Apprentice — Distribution Centre" }, period: "04.2024 – 07.2025" },
+    { role: { pt: "Assistente de TI", en: "IT Assistant" }, period: "04.2026 –" },
+    { role: { pt: "Auxiliar Administrativo, TI", en: "Administrative Assistant, IT" }, period: "01.2026 – 03.2026" },
+    { role: { pt: "Operador de Caixas, Logística", en: "Warehouse Operator, Logistics" }, period: "11.2025 – 12.2025" },
+    { role: { pt: "Jovem Aprendiz, Centro de Distribuição", en: "Apprentice, Distribution Centre" }, period: "04.2024 – 07.2025" },
   ] satisfies { role: Localized; period: string }[],
   stack: {
     daily: ["SQL", "PL/SQL", "Oracle", "PL/SQL Developer", "DOX · Pascal Script", "ReportBuilder", "Softdesk"],

@@ -47,18 +47,18 @@ export const projects: Project[] = [
       cover: {
         id: "cover",
         aspect: "1200/630",
-        label: { pt: "Capa — marca", en: "Cover — brand" },
+        label: { pt: "Capa · marca", en: "Cover · brand" },
         caption: {
-          pt: "Fig. 01 — A marca do Koinonia: gestão de pessoas, presença e cuidado para igrejas e comunidades. Uma produção SOU Studio.",
-          en: "Fig. 01 — Koinonia's brand: people, attendance and care management for churches and communities. A SOU Studio production.",
+          pt: "Fig. 01. A marca do Koinonia: gestão de pessoas, presença e cuidado para igrejas e comunidades. Uma produção SOU Studio.",
+          en: "Fig. 01. Koinonia's brand: people, attendance and care management for churches and communities. A SOU Studio production.",
         },
         image: {
           src: "/media/koinonia-cover.webp",
           width: 1200,
           height: 630,
           alt: {
-            pt: "Logo do Koinonia — quatro figuras em verde, amarelo e coral formando um círculo — com o texto “Gestão de pessoas, presença e cuidado para igrejas e comunidades”.",
-            en: "Koinonia logo — four figures in green, yellow and coral forming a circle — with the line “People, attendance and care management for churches and communities”.",
+            pt: "Logo do Koinonia: quatro figuras em verde, amarelo e coral formando um círculo, com o texto “Gestão de pessoas, presença e cuidado para igrejas e comunidades”.",
+            en: "Koinonia logo: four figures in green, yellow and coral forming a circle, with the line “People, attendance and care management for churches and communities”.",
           },
         },
       },
@@ -85,11 +85,11 @@ export const projects: Project[] = [
           highlight: { pt: "A direção foi minha.", en: "The direction was mine." },
           body: {
             pt: [
-              "Não comecei por um editor de código. Comecei por um briefing para a IA, com uma exigência na primeira página: nada de protótipo visual — uma aplicação real, usável pela liderança.",
+              "Não comecei por um editor de código. Comecei por um briefing para a IA, com uma exigência na primeira página: nada de protótipo visual. Uma aplicação real, que a liderança pudesse usar.",
               "A partir daí, o trabalho foi direção: cada rodada foi um plano escrito por mim, executado pela IA e conferido antes da próxima. A IA encurtou a distância entre a ideia e algo testável. Decidir o que testar continuou sendo meu.",
             ],
             en: [
-              "I didn't start in a code editor. I started with a brief for the AI, with one demand on the first page: no visual prototype — a real application the leaders could use.",
+              "I didn't start in a code editor. I started with a brief for the AI, with one demand on the first page: no visual prototype. A real application the leaders could use.",
               "From there, the work was direction: every round was a plan I wrote, the AI carried out, and I checked before the next one. AI shortened the distance between an idea and something testable. Deciding what to test stayed with me.",
             ],
           },
@@ -177,11 +177,11 @@ export const projects: Project[] = [
           title: { pt: "Uma fila de cuidado, não uma lista de presença.", en: "A care queue, not an attendance list." },
           body: {
             pt: [
-              "O Radar de Cuidado classifica cada pessoa pelo risco de afastamento — frequência recente e tempo desde o último encontro — e transforma isso numa fila de ação: contatar, registrar o cuidado feito, acompanhar.",
+              "O Radar de Cuidado classifica cada pessoa pelo risco de afastamento, a partir da frequência recente e do tempo desde o último encontro. Depois vira uma fila de ação: contatar, registrar o cuidado, acompanhar.",
               "Quem é novo não é punido: com menos de três encontros válidos, a pessoa aparece como “histórico insuficiente”, nunca como risco. Em volta do Radar: chamada rápida, aniversários, mensagens de WhatsApp com modelos, agenda com escalas, pequenos grupos, financeiro e várias organizações isoladas na mesma plataforma.",
             ],
             en: [
-              "The Care Radar ranks each person by risk of drifting away — recent attendance and time since the last meeting — and turns it into an action queue: reach out, log the care given, follow up.",
+              "The Care Radar ranks each person by risk of drifting away, using recent attendance and time since the last meeting. That becomes an action queue: reach out, log the care given, follow up.",
               "Newcomers aren't penalised: with fewer than three valid meetings, a person shows as “not enough history”, never as at risk. Around the Radar: quick roll call, birthdays, WhatsApp messages from templates, a calendar with rotas, small groups, finances and several isolated organisations on one platform.",
             ],
           },
@@ -191,8 +191,8 @@ export const projects: Project[] = [
               aspect: "1200/630",
               label: { pt: "Mapa do sistema", en: "System map" },
               caption: {
-                pt: "Fig. 02 — O mapa do sistema: pessoas, encontros, cuidado e gestão num só lugar.",
-                en: "Fig. 02 — The system map: people, meetings, care and management in one place.",
+                pt: "Fig. 02. O mapa do sistema: pessoas, encontros, cuidado e gestão num só lugar.",
+                en: "Fig. 02. The system map: people, meetings, care and management in one place.",
               },
               image: {
                 src: "/media/koinonia-map.webp",
@@ -209,8 +209,8 @@ export const projects: Project[] = [
               aspect: "1200/630",
               label: { pt: "Marca e ícone", en: "Brand and icon" },
               caption: {
-                pt: "Fig. 03 — Marca, paleta e ícone do app instalável (PWA).",
-                en: "Fig. 03 — Brand, palette and the installable app's (PWA) icon.",
+                pt: "Fig. 03. Marca, paleta e ícone do app instalável (PWA).",
+                en: "Fig. 03. Brand, palette and the installable app's (PWA) icon.",
               },
               image: {
                 src: "/media/koinonia-brand.webp",

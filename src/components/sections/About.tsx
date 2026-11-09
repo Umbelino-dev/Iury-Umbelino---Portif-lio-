@@ -13,6 +13,7 @@ type Trait = { index: string; word: [string, string]; text: string };
  */
 export async function About() {
   const t = await getTranslations("about");
+  const tc = await getTranslations("cursor");
   const locale = (await getLocale()) as Locale;
   const traits = t.raw("traits") as Trait[];
   const label = "text-label font-medium tracking-label uppercase text-gray-600";
@@ -28,7 +29,7 @@ export async function About() {
       <div className="page-grid items-start gap-y-16">
         <div className="col-span-4 flex flex-col gap-7 md:col-span-4 md:col-start-2 md:row-start-1">
           <p className={label}>{t("label")}</p>
-          <h2 id="about-title" className="font-display text-[clamp(2rem,1.55rem+1.9vw,3.25rem)] leading-none font-semibold tracking-[-0.025em]">
+          <h2 id="about-title" data-split className="font-display text-[clamp(2rem,1.55rem+1.9vw,3.25rem)] leading-none font-semibold tracking-[-0.025em]">
             {t("title")}
           </h2>
           <p className="max-w-[36ch] text-[clamp(1.0625rem,1rem+0.3vw,1.25rem)] leading-normal text-pretty">{t("lead")}</p>
@@ -40,7 +41,7 @@ export async function About() {
               base={<Portrait variant="base" />}
               alternate={<Portrait variant="alternate" />}
               caption={t("caption")}
-              labels={{ showMachine: t("showMachine"), showPortrait: t("showPortrait") }}
+              labels={{ showMachine: t("showMachine"), showPortrait: t("showPortrait"), cursor: tc("machine") }}
             />
           </div>
         </div>

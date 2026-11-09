@@ -28,7 +28,7 @@ export function Chapter({
   placeholder: string;
 }) {
   const n = String(number).padStart(2, "0");
-  const label = `${n} — ${chapter.label[locale]}`;
+  const label = `${n} · ${chapter.label[locale]}`;
   const title = chapter.title[locale];
   const mark = chapter.highlight?.[locale];
   const at = mark ? title.indexOf(mark) : -1;
@@ -47,6 +47,7 @@ export function Chapter({
         <div className="flex min-w-0 flex-col gap-[clamp(1.75rem,3vw,2.75rem)] md:col-span-2">
           <h2
             id={headingId}
+            data-split
             className="max-w-[15ch] font-display text-[clamp(2rem,1rem+4.6vw,6rem)] leading-[0.94] font-bold tracking-[-0.04em] text-balance"
           >
             {at >= 0 && mark ? (
@@ -117,7 +118,7 @@ export function Chapter({
                 locale={locale}
                 sizes="(min-width: 768px) 46vw, 100vw"
                 tone={i % 2 === 0 ? "ink" : "stone"}
-                spec={{ left: `${figureLabel} ${String(i + 2).padStart(2, "0")} — ${fig.label[locale]}`, right: `${fig.aspect.replace("/", ":")} · ${placeholder}` }}
+                spec={{ left: `${figureLabel} ${String(i + 2).padStart(2, "0")} · ${fig.label[locale]}`, right: `${fig.aspect.replace("/", ":")} · ${placeholder}` }}
               />
               <figcaption className="px-(--page-margin) text-caption text-gray-600 max-md:pr-12 md:px-0">{fig.caption[locale]}</figcaption>
             </figure>

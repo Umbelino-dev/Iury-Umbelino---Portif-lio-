@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Rail mode: the cat rides a rail in the right page margin (CatAssistant RAIL). */
+@custom-variant rail (@media (min-width: 1440px) and (hover: hover) and (pointer: fine));
+
 /*
  * Design tokens — source: Claude Design "Direção Criativa R01" (02 — Design system).
  * Seven colours, two families, one grid, one rule. See CLAUDE.md §Design tokens.
@@ -19,7 +22,8 @@
   --color-transparent: transparent;
 
   /* Type families ----------------------------------------------------- */
-  --font-display: var(--font-space-grotesk), system-ui, sans-serif;
+  --font-display: var(--font-bricolage), system-ui, sans-serif;
+  --font-serif: var(--font-instrument-serif), Georgia, serif;
   --font-sans: var(--font-ibm-plex-sans), system-ui, sans-serif;
   --font-mono: ui-monospace, "SFMono-Regular", Menlo, monospace;
 
@@ -192,8 +196,9 @@
  * the failsafe reveals the lines if the script never runs.
  */
 @media (prefers-reduced-motion: no-preference) {
-  .js [data-hero-line] {
-    transform: translateY(105%);
+  .js [data-glyph],
+  .js [data-join] {
+    opacity: 0;
     animation: hero-failsafe 0.01s 3s forwards;
   }
   .js [data-hero-fade] {
@@ -206,30 +211,6 @@
     transform: none;
     opacity: 1;
   }
-}
-
-/* Night → Day stage, enabled by TransitionMotion. Stacked layers until then. */
-[data-transition][data-enhanced],
-[data-transition][data-enhanced] > section {
-  /* The sticky stage's parent must be the tall one, or the stage scrolls away. */
-  height: 260vh;
-}
-[data-transition][data-enhanced] [data-stage] {
-  position: sticky;
-  top: 0;
-  height: 100dvh;
-  overflow: hidden;
-}
-[data-transition][data-enhanced] [data-layer] {
-  position: absolute;
-  inset: 0;
-  min-height: 0;
-}
-[data-transition][data-enhanced] [data-layer="day"] {
-  clip-path: inset(100% 0% 0% 0%);
-}
-[data-transition][data-enhanced] [data-horizon] {
-  display: block;
 }
 
 /* Lab: the 12 columns stay visible behind the broken grid (4 on mobile). */
@@ -258,4 +239,13 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .cat-z { animation: none; opacity: 1; }
+}
+
+/* Custom cursor (components/layout/Cursor.tsx): only while it is mounted on a fine pointer. */
+html.has-cursor,
+html.has-cursor * {
+  cursor: none;
+}
+html.has-cursor :is(input, textarea, select, [contenteditable="true"]) {
+  cursor: auto;
 }

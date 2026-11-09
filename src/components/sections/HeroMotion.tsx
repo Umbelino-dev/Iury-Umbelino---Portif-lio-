@@ -4,10 +4,11 @@ import { useRef, type ReactNode } from "react";
 import { gsap, MQ, useGSAP } from "@/lib/gsap";
 
 /**
- * The hero's single opening reveal (Homepage R02 · intro): the three display lines
- * rise from their masks, 900ms, 110ms apart. Children are server-rendered; the
- * hidden start state is applied by CSS only when JS runs and motion is allowed
- * (see `.js [data-hero-line]` in globals.css), so nothing is lost without JS.
+ * The hero's opening: the name's glyphs rise one by one (line 1, then line 2),
+ * then the y's tail draws down into the b's stem, then the statement and meta
+ * fade in. Children are server-rendered; the hidden start state is CSS that only
+ * applies when JS runs and motion is allowed (`.js [data-glyph]` in globals.css),
+ * with a 3s failsafe. The positioning line above is never hidden (LCP).
  */
 export function HeroMotion({ children, className }: { children: ReactNode; className?: string }) {
   const scope = useRef<HTMLDivElement>(null);
@@ -16,14 +17,15 @@ export function HeroMotion({ children, className }: { children: ReactNode; class
     () => {
       const mm = gsap.matchMedia();
       mm.add(MQ.motion, () => {
-        const lines = gsap.utils.toArray<HTMLElement>("[data-hero-line]");
-        gsap.fromTo(
-          lines,
-          // `y: 0` discards the CSS start offset GSAP would otherwise parse as a px base.
-          { yPercent: 105, y: 0 },
-          // No clearProps: the inline end state must keep overriding the CSS start state.
-          { yPercent: 0, y: 0, duration: 0.9, stagger: 0.11, delay: 0.12 },
+        const glyphs = gsap.utils.toArray<SVGPathElement>("[data-glyph]");
+        const tl = gsap.timeline({ delay: 0.1 });
+        tl.fromTo(
+          glyphs,
+          { y: 140, autoAlpha: 0 },
+          { y: 0, autoAlpha: 1, duration: 0.9, stagger: 0.045 },
         );
+        // The join draws from the y down into the b (transform-origin is its top edge).
+        tl.fromTo("[data-join]", { scaleY: 0, autoAlpha: 1, transformOrigin: "50% 0%" }, { scaleY: 1, autoAlpha: 1, duration: 0.42 }, 0.75);
         gsap.fromTo(
           "[data-hero-fade]",
           { autoAlpha: 0 },

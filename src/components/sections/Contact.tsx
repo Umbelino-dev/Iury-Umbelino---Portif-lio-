@@ -31,7 +31,7 @@ export async function Contact() {
           <p>{t("open")}</p>
         </div>
 
-        <h2 id="contact-title" lang="en" className="font-display text-[clamp(3.25rem,0.9rem+10vw,11.875rem)] leading-[0.88] font-bold tracking-[-0.045em] text-balance">
+        <h2 id="contact-title" lang="en" data-split className="font-display text-[clamp(3.25rem,0.9rem+10vw,11.875rem)] leading-[0.88] font-bold tracking-[-0.045em] text-balance">
           {site.tagline.lead} {site.tagline.accent.replace(" next.", "")} <span className="text-signal">next.</span>
         </h2>
 

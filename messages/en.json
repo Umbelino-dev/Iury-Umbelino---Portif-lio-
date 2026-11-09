@@ -1,8 +1,8 @@
 {
   "meta": {
-    "title": "Iury Umbelino — Curiosity builds what comes next.",
-    "description": "Iury Umbelino designs and builds AI products, prototypes and small experiments — each one starting from a real question.",
-    "ogAlt": "Iury Umbelino — Curiosity builds what comes next. A black cat with lime eyes beside the name."
+    "title": "Iury Umbelino · Curiosity builds what comes next.",
+    "description": "Iury Umbelino builds AI products, prototypes and small experiments. Each one starts with a question.",
+    "ogAlt": "Iury Umbelino, Curiosity builds what comes next. The name drawn as lettering, with the y joined to the b."
   },
   "nav": {
     "label": "Primary",
@@ -12,7 +12,7 @@
     "lab": "Lab",
     "contact": "Contact",
     "switchLocale": "View in Portuguese",
-    "home": "Iury Umbelino — home",
+    "home": "Iury Umbelino, home",
     "menu": "Menu",
     "skip": "Skip to content",
     "localeShort": "PT",
@@ -27,40 +27,27 @@
     "live": "Live"
   },
   "hero": {
-    "intro": "I design and build AI products, prototypes and small experiments — each one starting from a real question. This is where I document what I'm learning.",
+    "intro": "I build products with AI. Each one starts with a question.",
     "cta": "Meet the person",
-    "edition": "Edition 01 — 2026",
+    "edition": "Edition 01 · 2026",
     "topics": "AI · Products · Experiments",
     "index": "(00) Index",
     "scroll": "Scroll",
     "stack": "IT Assistant · SQL/PL-SQL · AI & Products"
   },
-  "transition": {
-    "night": {
-      "label": "What a machine sees",
-      "title": "A pattern of signals, prompts and parameters."
-    },
-    "day": {
-      "label": "What's actually there",
-      "titleLead": "A person who keeps asking",
-      "titleAccent": "why."
-    },
-    "horizonNight": "Night — possibility",
-    "horizonDay": "Day — evidence"
-  },
   "portrait": {
-    "specimenBase": "Specimen 01 / Portrait — base",
-    "specimenAlt": "Specimen 01 / Portrait — alternate (cybernetic)",
+    "specimenBase": "Specimen 01 / Portrait",
+    "specimenAlt": "Specimen 01 / Portrait, machine version",
     "metaBase": "4:5 · sRGB · 2400×3000",
-    "metaAlt": "aligned to base · Δ 0px",
-    "srcBase": "src: original photograph",
-    "srcAlt": "src: derived from base",
-    "placeholder": "Placeholder for Iury Umbelino's portrait — the photograph goes here."
+    "metaAlt": "aligned to the portrait · Δ 0px",
+    "srcBase": "src: photograph",
+    "srcAlt": "src: derived from the photograph",
+    "placeholder": "Iury Umbelino's portrait goes here."
   },
   "about": {
     "label": "(01) About",
-    "title": "I'm Iury. I learn by building — and build to learn.",
-    "lead": "Most of what I make starts as a question I can't stop thinking about. This portfolio is where I document what I find.",
+    "title": "I'm Iury. I learn by building. I build to learn.",
+    "lead": "Most of what I make starts as a question I can't let go of. This is where I show what I found.",
     "traits": [
       {
         "index": "T.01",
@@ -68,7 +55,7 @@
           "Tech-",
           "nology"
         ],
-        "text": "AI is my main material right now — assistants, agents and tools that make information genuinely useful."
+        "text": "AI is my main material right now. Assistants, agents and tools that make information actually useful."
       },
       {
         "index": "T.02",
@@ -76,7 +63,7 @@
           "Crea-",
           "tivity"
         ],
-        "text": "I care about how things feel, not only how they work. The interface is part of the solution."
+        "text": "I care how things feel, not only how they work. The interface is part of the answer."
       },
       {
         "index": "T.03",
@@ -84,17 +71,17 @@
           "Curio-",
           "sity"
         ],
-        "text": "I'd rather ship an honest prototype than polish a guess. Every project teaches something specific."
+        "text": "I'd rather ship an honest prototype than polish a guess. Every project teaches me one specific thing."
       }
     ],
-    "caption": "Specimen 01 — move over the image, or press and hold on touch, to see the machine reading.",
-    "showMachine": "Show machine reading",
-    "showPortrait": "Show portrait"
+    "caption": "Specimen 01. Hover, or press and hold, to see the machine.",
+    "showMachine": "See the machine",
+    "showPortrait": "See the portrait"
   },
   "experience": {
     "label": "(01.1) Experience",
     "title": "Where curiosity becomes routine.",
-    "lead": "Two and a half years at Giassi Supermercados, from apprentice to the IT team. Today I support internal systems with real data and real users.",
+    "lead": "Two and a half years at Giassi Supermercados. I joined as an apprentice and now work in IT, looking after internal systems with real data and real users.",
     "highlights": "What I do",
     "path": "Path",
     "stack": "Daily tools",
@@ -115,7 +102,7 @@
   },
   "projects": {
     "label": "(02) Selected projects",
-    "note": "Six projects at different stages, each documented with what exists today. Some statuses are still provisional.",
+    "note": "Six projects at different stages. Each one shows only what exists today. Some statuses may still change.",
     "image": "Project image",
     "placeholder": "placeholder",
     "visit": "opens the site in a new tab",
@@ -124,7 +111,7 @@
   "lab": {
     "label": "(03) Experimental Lab",
     "title": "Lab",
-    "intro": "Small things built to answer one question each. Not products — yet.",
+    "intro": "Small things, built to answer one question each. Not products yet.",
     "meta": "{count} entries · ongoing · updated 11.2026",
     "drop": "placeholder · media pending",
     "ground": "ground plane · y 0",
@@ -134,12 +121,12 @@
   "approach": {
     "label": "(04) Approach",
     "title": "How a question becomes a thing.",
-    "note": "Five moves, in order — then again. The last step feeds the first.",
+    "note": "Five steps, in this order. The last one leads back to the first.",
     "back": "back to 01",
     "steps": [
       {
         "title": "Observe",
-        "text": "Notice what people actually do, not what they say they do."
+        "text": "See what people do, not what they say they do."
       },
       {
         "title": "Understand",
@@ -147,7 +134,7 @@
       },
       {
         "title": "Experiment",
-        "text": "Build the smallest thing that can prove me wrong."
+        "text": "Build the smallest thing that could prove me wrong."
       },
       {
         "title": "Build",
@@ -155,12 +142,12 @@
       },
       {
         "title": "Improve",
-        "text": "Ship, watch, adjust — and start observing again."
+        "text": "Ship, watch, adjust. Then look again."
       }
     ]
   },
   "caseStudy": {
-    "label": "(02) Projects — Case study",
+    "label": "(02) Projects / Case study",
     "status": "Status",
     "year": "Year",
     "role": "Role",
@@ -197,7 +184,7 @@
       "log": "Conversation with the cat"
     },
     "home": {
-      "greeting": "Hi — I'm the cat. I know a few things about Iury. What would you like to know?",
+      "greeting": "Hi, I'm the cat. I know a few things about Iury. What would you like to know?",
       "chips": [
         {
           "label": "Who is Iury?",
@@ -208,7 +195,7 @@
             "work",
             "study"
           ],
-          "answer": "An IT Assistant at Giassi Supermercados, working with SQL, PL/SQL and Oracle. He studies Computer Science (UNESC) and Systems Analysis and Development (UNOPAR). He learns by building — and this site is where he documents what he finds."
+          "answer": "An IT Assistant at Giassi Supermercados, working with SQL, PL/SQL and Oracle. He studies Computer Science (UNESC) and Systems Analysis and Development (UNOPAR). He learns by building, and this site shows what he found."
         },
         {
           "label": "AI experience?",
@@ -219,7 +206,7 @@
             "lovable",
             "koinonia"
           ],
-          "answer": "The most complete case is Koinonia: a live product built with AI, where Iury defined the problem, wrote the directives, orchestrated the build and tested the result. At work he uses AI to write rules and automations on the DOX platform."
+          "answer": "The fullest case is Koinonia, a live product built with AI. Iury defined the problem, wrote the directives, ran the build and tested the result. At work he uses AI to write rules and automations on the DOX platform."
         },
         {
           "label": "See projects",
@@ -247,7 +234,7 @@
           "action": "contact"
         }
       ],
-      "fallback": "I'm still a prototype: scripted answers, no language model behind them. Try one of the suggestions."
+      "fallback": "I'm still a prototype. My answers are scripted, with no language model behind them. Try one of the suggestions."
     },
     "cases": {
       "koinonia": {
@@ -261,7 +248,7 @@
               "care",
               "attendance"
             ],
-            "answer": "Because an attendance list says who came, not where to start. The Radar ranks people by risk of drifting away and turns it into a care queue — without flagging newcomers as at risk."
+            "answer": "Because an attendance list says who came, not where to start. The Radar ranks people by risk of drifting away and turns that into a care queue. Newcomers are not flagged as at risk."
           },
           {
             "label": "How was AI used?",
@@ -282,17 +269,17 @@
               "error",
               "test"
             ],
-            "answer": "Silent failures: unpaginated reads that would have broken the Radar past a thousand records, an inverted date filter that hid people who needed care, and no tests. All fixed."
+            "answer": "Silent failures. Unpaginated reads would have broken the Radar past a thousand records. An inverted date filter hid people who needed care. And there were no tests. All fixed."
           }
         ],
-        "fallback": "About this project I can only answer the suggestions above — I'm still a scripted prototype."
+        "fallback": "About this project I can only answer the suggestions above. I'm still a scripted prototype."
       }
     }
   },
   "contact": {
     "label": "(05) Contact",
     "open": "Open to collaborations, roles & good questions",
-    "lead": "Got a question worth building? Write to me — I read every message.",
+    "lead": "Got a question worth building? Write to me.",
     "cta": "Write to Iury",
     "pending": "Contact channels arrive here soon. Meanwhile, the cat answers the basics.",
     "askCat": "Ask the cat",
@@ -307,5 +294,11 @@
     "rights": "© 2026 Iury Umbelino",
     "edition": "Edition 01",
     "top": "Back to top"
+  },
+  "cursor": {
+    "project": "view project",
+    "visit": "visit site",
+    "machine": "see the machine",
+    "ask": "ask me"
   }
 }

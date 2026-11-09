@@ -82,15 +82,18 @@ In the Worker: **Settings → Domains & Routes → Add → Custom domain**, and 
 
 ### Measured performance (lab, before deploy)
 
-Lighthouse 13.6.0 against the production build served by `wrangler dev` (Cloudflare's local assets runtime). Local machine, no CDN and no real network, so field numbers will differ:
+Lighthouse 13.6.0 against the production build served by `wrangler dev` (Cloudflare's local assets runtime). Local machine, no CDN and no real network, so field numbers will differ. Measured after Redesign R2 (2026-11-09):
 
-| Page | Preset | Performance | Accessibility | Best practices | SEO | LCP | CLS |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| `/pt` | mobile (3 runs) | 99–100 | 100 | 100 | 100 | 1.1 s | 0 |
-| `/pt` | desktop | 100 | 100 | 100 | 100 | 0.3 s | 0 |
-| `/en` | desktop | 100 | 100 | 100 | 100 | 0.8 s | 0 |
-| `/pt/projects/koinonia` | mobile | 100 | 100 | 100 | 100 | 1.1 s | 0 |
-| `/pt/projects/koinonia` | desktop | 100 | 100 | 100 | 100 | 0.7 s | 0 |
+| Page | Preset | Performance | Accessibility | Best practices | SEO | LCP | CLS | TBT |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `/pt` | mobile (3 runs) | 96 / 99 / 98 | 100 | 100 | 100 | 1.1 s | 0 | 140–210 ms |
+| `/pt` | desktop | 99 | 100 | 100 | 100 | 0.9 s | 0 | 10 ms |
+| `/en` | mobile | 98 | 100 | 100 | 100 | 1.1 s | 0 | 170 ms |
+| `/en` | desktop | 99 | 100 | 100 | 100 | 0.9 s | 0 | 20 ms |
+| `/pt/projects/koinonia` | mobile | 96 | 100 | 100 | 100 | 1.1 s | 0 | 230 ms |
+| `/pt/projects/koinonia` | desktop | 100 | 100 | 100 | 100 | 0.8 s | 0 | 0 ms |
+
+Before R2 the home page scored 99–100 on mobile (TBT 80–110 ms). The added cursor, cat rail and title reveals cost about 50–100 ms of blocking time on Lighthouse's throttled mobile CPU.
 
 ---
 
@@ -103,4 +106,4 @@ Lighthouse 13.6.0 against the production build served by `wrangler dev` (Cloudfl
 - **Portraits:** the real photo and the cyborg version are aligned in `scripts/images.mjs` (eye positions → scale + offset) and cropped to the same 4:5 box, so the reveal mask shows the same face. Replacing either photo means re-measuring `ALIGN`.
 - **The cat's answers** are scripted (`messages/*.json → assistant`). No language model is involved. A real one would need its own Worker, because this site has no server.
 
-Fonts (Space Grotesk, IBM Plex Sans) are self-hosted under the SIL Open Font License 1.1.
+Fonts (Bricolage Grotesque, IBM Plex Sans, Instrument Serif) are self-hosted under the SIL Open Font License 1.1. The hero name is lettered from Bricolage by `scripts/lettering.py` (see `CLAUDE.md`).

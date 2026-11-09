@@ -44,11 +44,11 @@ export async function Portrait({ variant, numeral = true }: { variant: Variant; 
         <span className={`absolute ${y} left-1/2 -ml-[22px] h-px w-11 ${dark ? "bg-paper-300" : "bg-[#3f3d39]"}`} />
         <span className={`absolute ${y} left-1/2 -mt-[22px] h-11 w-px ${dark ? "bg-paper-300" : "bg-[#3f3d39]"}`} />
         <span className={`absolute ${yLabel} left-[calc(50%+30px)] normal-case`}>{image.src ? "x 0.500 · y 0.220" : "x 0.500 · y 0.310"}</span>
-        <div className="absolute inset-x-5 top-4 flex justify-between gap-4">
+        <div className="absolute inset-x-5 top-4 flex justify-between gap-4 rail:right-16">
           <span>{variant === "alternate" ? t("specimenAlt") : t("specimenBase")}</span>
           <span className="hidden normal-case sm:inline">{variant === "alternate" ? t("metaAlt") : image.src ? `4:5 · ${image.width}×${image.height}` : t("metaBase")}</span>
         </div>
-        <span className="absolute right-5 bottom-4 normal-case">{variant === "alternate" ? t("srcAlt") : t("srcBase")}</span>
+        <span className="absolute right-5 bottom-4 normal-case rail:right-16">{variant === "alternate" ? t("srcAlt") : t("srcBase")}</span>
         {numeral && (
           <span
             className={`absolute bottom-1 left-4 font-display text-[clamp(5.5rem,15vw,16rem)] leading-[0.8] font-bold tracking-[-0.05em] normal-case ${dark ? "text-paper" : "text-ink"} ${image.src ? "opacity-90" : ""}`}

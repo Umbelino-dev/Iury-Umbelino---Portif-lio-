@@ -39,7 +39,7 @@ No trailing slash. Without it, the build falls back to `http://localhost:3000`, 
 
 Every push to the production branch builds and deploys.
 
-1. In the Cloudflare dashboard, open **Workers & Pages → Create → Import a repository**, and connect GitHub to `Umbelino-dev/Iury-Umbelino---Portif-lio-`.
+1. In the Cloudflare dashboard, open **Workers & Pages → Create → Import a repository**, and connect GitHub to `Umbelino-dev/portfolio`.
 2. Build settings:
    - **Git branch:** `main` (or whichever branch you publish from)
    - **Build command:** `npm run build`

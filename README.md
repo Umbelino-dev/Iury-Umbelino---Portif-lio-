@@ -20,7 +20,7 @@ What is already configured in the repo:
 
 | File | What it does |
 | --- | --- |
-| `wrangler.jsonc` | Worker name `iury-umbelino-portfolio`; serves `./out`. Uses `html_handling: "auto-trailing-slash"` so `/pt` serves `pt.html`, and `not_found_handling: "404-page"` so unknown URLs get `404.html` with a 404 status. |
+| `wrangler.jsonc` | Worker name `portfolio` (must match the Worker in the Cloudflare dashboard); serves `./out`. Uses `html_handling: "auto-trailing-slash"` so `/pt` serves `pt.html`, and `not_found_handling: "404-page"` so unknown URLs get `404.html` with a 404 status. |
 | `public/_redirects` | `/ → /pt` (302): Portuguese is the default language. |
 | `public/_headers` | Security headers on every response, plus a one-year immutable cache for hashed files in `/_next/static/*`. |
 | `src/app/sitemap.ts`, `src/app/robots.ts` | Generated at build time as `/sitemap.xml` and `/robots.txt`. |

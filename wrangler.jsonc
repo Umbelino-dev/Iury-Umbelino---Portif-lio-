@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "iury-umbelino-portfolio",
+  "name": "portfolio", // must match the Worker connected in Cloudflare (Workers Builds refuses a mismatch)
   "compatibility_date": "2026-10-01",
   // Static assets only: no Worker script runs. `npm run build` writes ./out.
   "assets": {

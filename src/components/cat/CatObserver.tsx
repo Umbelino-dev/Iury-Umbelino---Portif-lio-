@@ -22,7 +22,29 @@ type Pose = "idle" | "left" | "right" | "near";
  * - Touch: breathing + blink only. Reduced motion: fully static.
  * Work happens only while the hero is on screen and the tab is visible.
  */
-export function CatObserver({ className, label, cursorLabel }: { className?: string; label: string; cursorLabel?: string }) {
+/**
+ * Where the letters are, seen from this slot. "left": perched on the final "o",
+ * the name runs to its left (desktop). "up": under the name, beside the statement
+ * (mobile). Each slot runs its scroll timeline only at its own breakpoint.
+ */
+type Look = "left" | "up";
+const SLOT: Record<Look, string> = { left: "(min-width: 768px)", up: "(max-width: 767px)" };
+const LOOK: Record<Look, { lean: number; head: number; gx: number; gy: number }> = {
+  left: { lean: -6, head: -13, gx: -2.6, gy: -0.8 },
+  up: { lean: -3, head: -9, gx: -1.6, gy: -2.4 },
+};
+
+export function CatObserver({
+  className,
+  label,
+  cursorLabel,
+  look = "left",
+}: {
+  className?: string;
+  label: string;
+  cursorLabel?: string;
+  look?: Look;
+}) {
   const root = useRef<HTMLButtonElement>(null);
 
   useGSAP(
@@ -150,9 +172,39 @@ export function CatObserver({ className, label, cursorLabel }: { className?: str
         };
       });
 
+      // Scroll: the cat notices the letters. As the hero scrolls away it leans in
+      // and looks at the name, then settles back and crouches, the anticipation
+      // of its jump (CatAssistant takes over at 60%). Scrubbed with a little lag
+      // so it follows the reader without feeling bolted to the scrollbar.
+      mm.add(`${MQ.motion} and ${SLOT[look]}`, () => {
+        const hero = document.getElementById("hero");
+        const [lean] = q<HTMLElement>("[data-cat-lean]");
+        const [lookG] = q<SVGGElement>('[data-cat="look"]');
+        const [gaze] = q<SVGGElement>('[data-cat="gaze"]');
+        if (!hero || !lean || !lookG || !gaze) return;
+        const k = LOOK[look];
+        gsap.set(lean, { transformOrigin: "50% 100%" });
+        gsap.set(lookG, { svgOrigin: "50 62" });
+        gsap
+          .timeline({
+            defaults: { ease: "sine.inOut" },
+            scrollTrigger: { trigger: hero, start: "top top", end: "60% top", scrub: 0.6 },
+          })
+          // 0 → 0.45: lean in, head turns, eyes find the letters (eyes a beat early).
+          .to(gaze, { x: k.gx, y: k.gy, duration: 0.3 }, 0)
+          .to(lookG, { rotation: k.head, y: 1, duration: 0.45 }, 0.05)
+          .to(lean, { rotation: k.lean, x: look === "left" ? -2 : -1, duration: 0.45 }, 0.05)
+          // 0.5 → 0.8: settles back, still glancing at the name.
+          .to(lean, { rotation: 0, x: 0, duration: 0.3 }, 0.5)
+          .to(lookG, { rotation: k.head * 0.3, y: 0, duration: 0.3 }, 0.5)
+          .to(gaze, { x: k.gx * 0.4, y: 0, duration: 0.3 }, 0.5)
+          // 0.8 → 1: crouch before the leap.
+          .to(lean, { scaleY: 0.9, scaleX: 1.05, duration: 0.2, ease: "power2.in" }, 0.8);
+      });
+
       return () => mm.revert();
     },
-    { scope: root },
+    { scope: root, dependencies: [look] },
   );
 
   return (
@@ -167,7 +219,9 @@ export function CatObserver({ className, label, cursorLabel }: { className?: str
       data-cat-root="observer"
       data-cursor-label={cursorLabel}
     >
-      <CatFigure className="block h-full w-full overflow-visible" />
+      <span data-cat-lean className="block h-full w-full">
+        <CatFigure className="block h-full w-full overflow-visible" />
+      </span>
     </button>
   );
 }

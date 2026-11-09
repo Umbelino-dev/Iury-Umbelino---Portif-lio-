@@ -1,20 +1,34 @@
+import type { CSSProperties } from "react";
 import { getTranslations } from "next-intl/server";
 import { site } from "@/content/profile";
 import { CatObserver } from "@/components/cat/CatObserver";
 import { NameMark } from "@/components/hero/NameMark";
+import { anchors, viewBox } from "@/components/hero/name-paths";
 import { HeroMotion } from "./HeroMotion";
 
 /**
  * 01 · Hero. The name is the experience: "Iury / Umbelino" is lettered as one
- * SVG mark (scripts/lettering.py) where the y's tail runs into the b's stem.
- * y = why, b = build: "Curiosity builds" written into the letters.
+ * SVG mark (scripts/lettering.py) where the y's stem runs straight down and
+ * becomes the b's stem. y = why, b = build: "Curiosity builds" in the letters.
  *
  * The mark has a padded viewBox and no overflow masks, so no descender can clip.
- * The statement and the cat are placed in the mark's own coordinates (container
- * query units), so they keep their spot at every width: the statement in the
- * space right of "Iury", the cat perched on the final "o".
+ * Desktop: the statement and the cat are placed in the mark's own coordinates
+ * (anchors exported by the script), so they keep their spot at every width.
+ * Mobile (< 768px) has its own composition: name, then the statement with the
+ * cat beside it, then the positioning line and the link.
  * Accent points: "next." and the cat's eyes (2 of 2).
  */
+const [, , markW, markH] = viewBox.split(" ").map(Number) as [number, number, number, number];
+/** Desktop placement, in % of the mark, straight from the lettering geometry. */
+const markVars = {
+  "--mark-ratio": (markW / markH).toFixed(4),
+  "--stmt-left": `${anchors.line1Right + 5}%`, // a clear gap after the y's stem
+  "--stmt-top": `${anchors.xHeight1}%`, // the x-height of "ury"
+  "--stmt-max": `${100 - anchors.line1Right - 7}%`,
+  "--o-center": `${anchors.oCenter}%`,
+  "--o-bottom": `${100 - anchors.oTop}%`,
+} as CSSProperties;
+
 export async function Hero() {
   const t = await getTranslations("hero");
   const ta = await getTranslations("assistant.ui");
@@ -35,29 +49,46 @@ export async function Hero() {
         mark leads and About peeks in below. Desktop: a full-height poster with the
         positioning line at the top and the name at the bottom.
       */}
-      <HeroMotion className="relative z-10 mx-auto flex w-full max-w-(--container-page) flex-1 flex-col gap-10 px-(--page-margin) md:justify-between">
+      <HeroMotion className="relative z-10 mx-auto flex w-full max-w-(--container-page) flex-1 flex-col gap-12 px-(--page-margin) md:justify-between md:gap-10">
         <div className="flex flex-col gap-5 md:order-2">
-          {/* Width also follows the viewport height, so the whole mark fits on short screens. */}
-          <div data-hero-mark className="@container relative w-full md:w-[clamp(50%,calc((100svh-24rem)*2.18),100%)]">
+          {/* Width also follows the viewport height (by the mark's own ratio), so the whole mark fits on short screens. */}
+          <div
+            data-hero-mark
+            style={markVars}
+            className="@container relative w-full md:w-[clamp(50%,calc((100svh-24rem)*var(--mark-ratio)),100%)]"
+          >
             <h1 id="hero-name" className="text-paper">
               <span className="sr-only">Iury Umbelino</span>
               <NameMark className="block h-auto w-full" />
             </h1>
-            {/* Right of "Iury": the mark's line 1 ends at 48% of its width. */}
-            <p
-              lang="en"
-              data-hero-fade
-              className="absolute top-[11%] left-[53%] max-w-[44%] font-serif text-[max(1rem,4.4cqw)] leading-[1.02] tracking-[-0.01em] text-paper italic"
-            >
-              {site.tagline.lead}
-              <br />
-              what comes <span className="text-signal">next.</span>
-            </p>
-            {/* Perched on the final "o" (centre 93%, top 64% of the mark). */}
+            {/*
+              Mobile: the statement is its own row under the name, with the cat at the
+              row's end looking up at the letters. Desktop: the row dissolves
+              (md:contents) and the statement sits in the space right of "Iury".
+            */}
+            <div className="mt-8 flex items-end justify-between gap-6 md:contents">
+              <p
+                lang="en"
+                data-hero-fade-md
+                className="font-serif text-[clamp(1.5rem,1rem+2.4vw,1.75rem)] leading-[1.08] tracking-[-0.01em] text-paper italic md:absolute md:top-(--stmt-top) md:left-(--stmt-left) md:max-w-(--stmt-max) md:text-[max(1rem,4.4cqw)] md:leading-[1.02]"
+              >
+                {site.tagline.lead}
+                <br />
+                what comes <span className="text-signal">next.</span>
+              </p>
+              <CatObserver
+                label={ta("open")}
+                cursorLabel={tc("ask")}
+                look="up"
+                className="mb-1 aspect-[4/5] w-12 flex-none md:hidden"
+              />
+            </div>
+            {/* Desktop: perched on the final "o" (anchors from the lettering script). */}
             <CatObserver
               label={ta("open")}
               cursorLabel={tc("ask")}
-              className="absolute bottom-[36%] left-[93%] aspect-[4/5] w-[max(2.75rem,7.5cqw)] -translate-x-1/2"
+              look="left"
+              className="absolute bottom-(--o-bottom) left-(--o-center) hidden aspect-[4/5] w-[max(2.75rem,7.5cqw)] -translate-x-1/2 md:block"
             />
           </div>
           <div
@@ -73,7 +104,7 @@ export async function Hero() {
           {/* Visible from the first paint (no fade): this is the mobile LCP text. */}
           <div className="col-span-4 flex flex-col gap-4 md:col-span-6 lg:col-span-5">
             <p className="text-label font-medium tracking-label text-gray-500 uppercase">{t("stack")}</p>
-            <p className="max-w-[30ch] text-[clamp(1.1875rem,1rem+0.6vw,1.5rem)] leading-[1.35] text-pretty text-paper">
+            <p className="max-w-[30ch] text-[clamp(1.1875rem,1rem+0.6vw,1.5rem)] leading-[1.45] md:leading-[1.35] text-pretty text-paper">
               {t("intro")}
             </p>
             <a

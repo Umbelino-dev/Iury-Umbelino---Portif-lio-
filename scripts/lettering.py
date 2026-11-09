@@ -1,13 +1,16 @@
 """
 Letters the name "Iury / Umbelino" as SVG paths with the y→b ligature.
 
-Concept: the "y" of Iury keeps its own hooked tail; where the hook ends, the
-stroke drops straight down and becomes the stem of the "b" in Umbelino. The
-question ("why") flows into "build" — Curiosity builds. Both letters stay whole
-and legible; the only added shape is the short stem that joins them.
+Concept: the "y" of Iury and the "b" of Umbelino share one stem. Bricolage's y
+is a u-shape whose right stem drops and hooks left; here the hook is replaced by
+the same stem continuing straight down, on the same axis and with the same width
+as the b's stem (144 vs 145 font units), and the two outlines are merged into a
+single path (boolean union), so there is no seam, overlap or step. The question
+("why") flows into "build". Curiosity builds.
 
-Dev-only and reproducible. Needs Python with fonttools, brotli and uharfbuzz:
-    python -m venv .venv && .venv/bin/pip install fonttools brotli uharfbuzz
+Dev-only and reproducible. Needs Python with fonttools, brotli, uharfbuzz and
+skia-pathops:
+    python -m venv .venv && .venv/bin/pip install fonttools brotli uharfbuzz skia-pathops
     .venv/bin/python scripts/lettering.py
 Writes src/components/hero/name-paths.ts (paths in SVG coordinates, no clipping:
 the viewBox includes every ascender, overshoot and the descender).
@@ -15,6 +18,7 @@ the viewBox includes every ascender, overshoot and the descender).
 import json
 from pathlib import Path
 
+import pathops
 import uharfbuzz as hb
 from fontTools.pens.boundsPen import BoundsPen
 from fontTools.pens.recordingPen import RecordingPen
@@ -29,7 +33,7 @@ OUT = ROOT / "src/components/hero/name-paths.ts"
 AXES = {"wght": 720, "wdth": 88, "opsz": 96}  # bold, slightly condensed, display optical size
 LINE = 880  # baseline-to-baseline in font units (tight, editorial)
 TRACK = -12  # extra tracking per glyph, font units
-OVERLAP = 24  # how far the descender reaches into the u stem and the b stem (no seams)
+OVERLAP = 24  # how far the y stem reaches into the b stem before the union (no seam)
 PAD = 24  # breathing room inside the viewBox
 
 font = TTFont(SRC)
@@ -84,16 +88,17 @@ b = cmap[ord("b")]
 _, y_x = line1[3]
 _, b_x = line2[2]
 
-# The y's hook ends at its left-most, lowest points; the b's stem is its left vertical.
-hook = [(px, py) for px, py in points(y) if py < 0]
-hook_left = min(px for px, _ in hook)
-hook_bottom = min(py for _, py in hook)
-b_left, b_right = stem_x(b, 520, 700, right=False)
+# The y's right stem and the b's stem (font units, measured on the outlines).
+# Both are straight vertical runs in the outlines: y from (294|438, 527) down,
+# b from (30|175, 688) down. Asserted so a font update cannot silently break them.
+Y_STEM = (294, 438)
+B_STEM = (30, 175)
+_yp, _bp = {(round(px), round(py)) for px, py in points(y)}, {(round(px), round(py)) for px, py in points(b)}
+assert {(294, 527), (438, 527), (438, 158)} <= _yp, "y stem moved"
+assert {(30, 688), (175, 688), (30, 0)} <= _bp, "b stem moved"
 b_top = bounds(b)[3]
-# Put the b stem's left edge under the hook's left edge.
-shift = (y_x + hook_left) - (b_x + b_left)
-desc_left = y_x + hook_left
-desc_right = desc_left + (b_right - b_left)
+# Put the two stems on one axis: centre the b stem under the y stem.
+shift = (y_x + (Y_STEM[0] + Y_STEM[1]) / 2) - (b_x + (B_STEM[0] + B_STEM[1]) / 2)
 
 # Font units → SVG: y down. Line 1 baseline at A, line 2 at A + LINE.
 asc = max(bounds(cmap[ord(c)])[3] for c in "Iury")
@@ -107,21 +112,61 @@ def path(name, dx, base):
     return pen.getCommands()
 
 
+def draw_y(pen, depth):
+    """Bricolage's y with the hook replaced by a straight stem down to `depth`.
+
+    Every point above the baseline is the font's own outline. Below the bowl, the
+    inner edge of the stem continues at the stem's own x (294) instead of turning
+    into the hook. The bowl's underside is split exactly where it meets that edge
+    (quadratic de Casteljau at t = 0.8), so the crotch is a clean corner.
+    """
+    # Drawn at the b stem's exact width (145), centred on the y's own stem (144):
+    # half a unit each side, so the shared stem has one width from top to bottom.
+    half = (B_STEM[1] - B_STEM[0]) / 2
+    mid = (Y_STEM[0] + Y_STEM[1]) / 2
+    left, right = mid - half, mid + half
+    p0, p1, p2 = (307, 238), (306, 166), (287, 122.5)  # first quad of the bowl's underside
+    t = 0.8
+    q1 = (p1[0] + t * (p2[0] - p1[0]), p1[1] + t * (p2[1] - p1[1]))
+    pen.moveTo((right, depth))
+    pen.lineTo((left, depth))
+    pen.lineTo((left, 141))  # = the underside curve at t = 0.8 (x 293.9)
+    pen.qCurveTo(q1, p2)
+    pen.qCurveTo((268, 79), (206, 40), (166, 40))
+    pen.qCurveTo((118, 40), (56, 92), (26, 195), (26, 273))
+    pen.lineTo((26, 527))
+    pen.lineTo((170, 527))
+    pen.lineTo((170, 307))
+    pen.qCurveTo((170, 234), (196, 168), (227, 168))
+    pen.qCurveTo((245, 168), (271, 190), (287, 234), (left, 297), (left, 338))
+    pen.lineTo((left, 527))
+    pen.lineTo((right, 527))
+    pen.closePath()
+
+
+def to_svg(p):
+    pen = SVGPathPen(None)
+    p.draw(pen)
+    return pen.getCommands()
+
+
 glyphs = []
 for ch, (name, x) in zip("Iury", line1):
+    if ch == "y":
+        continue
     glyphs.append({"id": f"l1-{ch}", "line": 1, "d": path(name, x, A)})
 for ch, (name, x) in zip("Umbelino", line2):
+    if ch == "b":
+        continue
     glyphs.append({"id": f"l2-{ch}", "line": 2, "d": path(name, x + shift, B)})
 
-# The joining stem: from inside the end of the hook down into the top of the b stem.
-d_top = A - (hook_bottom + 60)  # starts inside the hook stroke (font y is up; svg y is down)
-d_bot = B - b_top + OVERLAP
-descender = {
-    "x": round(desc_left, 2),
-    "y": round(d_top, 2),
-    "width": round(desc_right - desc_left, 2),
-    "height": round(d_bot - d_top, 2),
-}
+# The ligature: y (stem reaching into the b) ∪ b, as one outline.
+depth = -(LINE - b_top) - OVERLAP  # font units below line 1's baseline
+py, pb = pathops.Path(), pathops.Path()
+draw_y(TransformPen(py.getPen(), (1, 0, 0, -1, y_x, A)), depth)
+gs[b].draw(TransformPen(pb.getPen(), (1, 0, 0, -1, b_x + shift, B)))
+yb = pathops.op(py, pb, pathops.PathOp.UNION)
+ligature = {"id": "yb", "d": to_svg(yb)}
 
 xs = []
 for name, x in line1:
@@ -133,6 +178,19 @@ for name, x in line2:
 desc = min(bounds(cmap[ord(c)])[1] for c in "Umbelino")  # overshoot below line 2
 minx, maxx = min(xs) - PAD, max(xs) + PAD
 view = [round(minx, 2), 0, round(maxx - minx, 2), round(B - desc + PAD, 2)]
+W, H = view[2], view[3]
+pct_x = lambda v: round((v - minx) / W * 100, 2)
+pct_y = lambda v: round(v / H * 100, 2)
+o_name, o_x = line2[7]
+o_b = bounds(o_name)
+# Where things sit, in % of the mark, so the page never guesses coordinates.
+anchors = {
+    "line1Right": pct_x(y_x + bounds(y)[2]),  # right edge of "Iury"
+    "xHeight1": pct_y(A - bounds(y)[3]),  # top of "ury" on line 1
+    "oCenter": pct_x(o_x + shift + (o_b[0] + o_b[2]) / 2),
+    "oTop": pct_y(B - o_b[3]),
+    "stem": [pct_x(y_x + Y_STEM[0]), pct_x(y_x + Y_STEM[1])],
+}
 
 OUT.parent.mkdir(parents=True, exist_ok=True)
 OUT.write_text(
@@ -140,8 +198,10 @@ OUT.write_text(
     f"// Bricolage Grotesque {AXES}, line {LINE}, tracking {TRACK}.\n"
     f"export const viewBox = {json.dumps(' '.join(str(v) for v in view))};\n"
     f"export const glyphs = {json.dumps(glyphs, indent=2)} as const;\n"
-    f"/** The y→b ligature: the y's descender, which is also the b's stem. */\n"
-    f"export const descender = {json.dumps(descender)} as const;\n"
+    f"/** The y→b ligature: one outline, the y's stem continuing into the b's stem. */\n"
+    f"export const ligature = {json.dumps(ligature)} as const;\n"
+    f"/** Positions in % of the mark (x of width, y of height). */\n"
+    f"export const anchors = {json.dumps(anchors)} as const;\n"
 )
 tmp.unlink()
-print("viewBox", view, "shift", round(shift, 1), "descender", descender)
+print("viewBox", view, "shift", round(shift, 1), "stems", Y_STEM, B_STEM, "depth", depth, "anchors", anchors)

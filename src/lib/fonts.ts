@@ -35,7 +35,7 @@ export const serif = localFont({
   src: [{ path: "../fonts/InstrumentSerif-Italic.woff2", weight: "400", style: "italic" }],
   variable: "--font-instrument-serif",
   display: "swap",
-  preload: false,
+  preload: true, // the statement is in the first screen (in flow on phones): avoid a swap shift
   adjustFontFallback: "Times New Roman",
   fallback: ["Georgia", "serif"],
 });

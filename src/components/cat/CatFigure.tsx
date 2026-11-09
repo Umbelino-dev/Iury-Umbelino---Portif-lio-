@@ -5,7 +5,7 @@
  *
  * Parts carry `data-cat` hooks so animation code can target them without
  * knowing the markup. Pivots (SVG user units, viewBox 0 0 100 125):
- * body → (50,125) · head → (50,62) neck · eyes → (50,40) · tail → (80,118).
+ * body → (50,125) · head and look → (50,62) neck · eyes → (50,40) · tail → (80,118).
  * `paws` are hidden by default: they show only while the cat grips the rail.
  */
 export function CatFigure({ className }: { className?: string }) {
@@ -23,16 +23,21 @@ export function CatFigure({ className }: { className?: string }) {
           strokeWidth="1"
         />
       </g>
+      {/* look / gaze wrap head / eyes so scroll and pointer motion add up instead of fighting. */}
+      <g data-cat="look">
       <g data-cat="head">
         <g data-cat="ears">
           <path d="M22 30 L27 4 L46 18 Z" fill="#1f1f1f" stroke="#333333" strokeWidth="1" strokeLinejoin="round" />
           <path d="M78 30 L73 4 L54 18 Z" fill="#1f1f1f" stroke="#333333" strokeWidth="1" strokeLinejoin="round" />
         </g>
         <rect x="18" y="14" width="64" height="48" rx="20" fill="#1f1f1f" stroke="#333333" strokeWidth="1" />
-        <g data-cat="eyes">
-          <circle cx="39" cy="40" r="3.8" fill="#c8f169" />
-          <circle cx="61" cy="40" r="3.8" fill="#c8f169" />
+        <g data-cat="gaze">
+          <g data-cat="eyes">
+            <circle cx="39" cy="40" r="3.8" fill="#c8f169" />
+            <circle cx="61" cy="40" r="3.8" fill="#c8f169" />
+          </g>
         </g>
+      </g>
       </g>
       {/* Front paws gripping the rail (one above the other, like climbing a pole). */}
       <g data-cat="paws" opacity="0">

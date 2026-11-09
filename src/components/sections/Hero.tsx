@@ -30,11 +30,13 @@ export async function Hero() {
         {/* Intro (top-left, away from the name) + edition metadata */}
         <div className="grid grid-cols-4 gap-x-(--page-gutter) gap-y-6 md:grid-cols-12">
           <div data-hero-fade className="col-span-4 flex flex-col gap-5 md:col-span-6 lg:col-span-5">
-            <p className="max-w-[44ch] text-[clamp(1rem,0.9rem+0.45vw,1.1875rem)] leading-[1.55] text-pretty text-paper-300">
+            {/* Eyebrow: what Iury does today, before the editorial line. */}
+            <p className="text-label font-medium tracking-label text-gray-500 uppercase">{t("stack")}</p>
+            <p className="-mt-1 max-w-[44ch] text-[clamp(1rem,0.9rem+0.45vw,1.1875rem)] leading-[1.55] text-pretty text-paper-300">
               {t("intro")}
             </p>
             <a
-              href="#about"
+              href="#transition"
               className="flex min-h-11 items-center gap-2.5 self-start border-b border-paper text-ui font-medium transition-colors duration-(--duration-fast) hover:border-paper-0 hover:text-paper-0"
             >
               {t("cta")} <span aria-hidden="true">↓</span>

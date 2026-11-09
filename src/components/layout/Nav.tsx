@@ -4,6 +4,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { site } from "@/content/profile";
+import { SURFACE_EVENT } from "./surface";
 
 const ITEMS = [
   { id: "hero", key: "index" },
@@ -41,25 +42,43 @@ export function Nav() {
     const read = () => {
       frame = 0;
       const mid = window.innerHeight / 2;
+      // Hit-test the line under the nav: respects clip-path, so the Night→Day
+      // stage reports whichever layer is actually visible there.
       let surface = "dark";
-      document.querySelectorAll<HTMLElement>("[data-surface]").forEach((s) => {
-        const b = s.getBoundingClientRect();
-        if (b.top <= THEME_LINE && b.bottom > THEME_LINE) surface = s.dataset.surface ?? "dark";
-      });
+      let alias: string | undefined;
+      const x = Math.min(window.innerWidth - 1, Math.max(0, window.innerWidth / 2));
+      for (const el of document.elementsFromPoint(x, THEME_LINE)) {
+        if (el.closest("nav")) continue;
+        const owner = el.closest<HTMLElement>("[data-surface]");
+        if (owner) {
+          surface = owner.dataset.surface ?? "dark";
+          alias = owner.dataset.navAs; // e.g. the Night→Day stage: night = Index, day = About
+          break;
+        }
+      }
       let current: ItemId = "hero";
       document.querySelectorAll<HTMLElement>("[data-nav-id]").forEach((s) => {
         if (s.getBoundingClientRect().top < mid) current = s.dataset.navId as ItemId;
       });
       setLight(surface === "light");
-      setActive(current);
+      setActive((alias as ItemId | undefined) ?? current);
     };
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(read);
     };
+    // A surface change can land after this frame's scroll read; re-read once it has painted.
+    let late = 0;
+    const onSurface = () => {
+      cancelAnimationFrame(late);
+      late = requestAnimationFrame(() => (late = requestAnimationFrame(read)));
+    };
     read();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
+    window.addEventListener(SURFACE_EVENT, onSurface);
     return () => {
+      cancelAnimationFrame(late);
+      window.removeEventListener(SURFACE_EVENT, onSurface);
       cancelAnimationFrame(frame);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);

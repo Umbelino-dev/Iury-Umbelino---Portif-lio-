@@ -8,7 +8,9 @@ Temporary progress log. Permanent rules live in `CLAUDE.md`.
   - Validated in Playwright at 390/768/1440: no console errors or failed requests, no horizontal scroll, h1 = "Iury Umbelino", keyboard order and ≥44px targets, mobile menu (Esc + focus return), locale switch, reduced motion and no-JS render the final state, cat turns toward the pointer and ignores text.
   - Deviations from the design: h1 now reads the full name (design hid "Umbelino" from AT); on mobile the cat sits beside "Iury" because "Umbelino" fills the width; dropped the "cat · 3D pending" prototype label.
   - Nav links to #about/#projects/#lab/#contact point to sections that land in M2–M5.
-- [ ] M2 — Night→Day transition + About
+- [x] **M2 — Night→Day + About + Experience** (2026-11-09): sticky scroll stage with clip-path scrub (hard cut at 50% with reduced motion), `Portrait` placeholder slot, `PortraitReveal` radial mask (mouse / press-and-hold / 44px toggle), traits T.01–T.03, experience block from the CV, hero eyebrow with the current stack.
+  - Validated in Playwright at 360/390/768/1440, PT + EN: no console errors, no horizontal scroll, both portrait frames at the same y on every width, nav theme and active item follow the visible layer (motion and reduced motion), mask 150px on hover / full frame on hold and toggle, no-JS stacks both layers.
+  - Bugs found and fixed: sticky stage scrolled away (260vh was on the wrong parent); the global reduced-motion reset turned every style change into a one-frame transition (now `transition: none`); the highlighter overlapped the previous line (now a sized gradient, `highlight` utility).
 - [ ] M3 — Projects + Lab + Approach
 - [ ] M4 — Case study template (Koinonia first)
 - [ ] M5 — Cat assistant, Contact, Footer, SEO, audit, deploy guide
@@ -26,9 +28,11 @@ Temporary progress log. Permanent rules live in `CLAUDE.md`.
 3. Portrait photos (real + "cybernetic" alternate, aligned 4:5) — placeholders until then.
 4. Final domain → `NEXT_PUBLIC_SITE_URL`.
 5. Homepage R02 mobile screenshots (the PDF sent was Case Study Mobile R01 — used for M4 and the cat silhouette).
-6. Hero intro copy comes from the design ("I design and build AI products…"). The audit suggested making the current role visible in the first screen — Iury to decide.
+6. Portrait photos: drop both 4:5 files in `public/portrait/` and fill `src/content/portrait.ts` (same crop, aligned).
 
 ## Decisions taken
 - Static export over OpenNext (no runtime needed; OpenNext also pins Next ≥16.4.5).
 - Status `live` replaces the design's `Completed` (a product in use is not "completed").
 - Tagline stays English in both locales.
+- Hero keeps the poetic intro, with an eyebrow showing the current stack (Iury, 2026-11-09).
+- The About traits copy (T.01–T.03) is the design's, translated; it states intent, not achievements.

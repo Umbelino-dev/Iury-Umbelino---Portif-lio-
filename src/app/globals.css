@@ -131,6 +131,18 @@
   }
 }
 
+/*
+ * The accent on light surfaces: a highlighter behind ink (never text colour).
+ * A sized gradient instead of a plain background, so the mark stays inside the
+ * line box even with tight display leading, and repeats per line when it wraps.
+ */
+@utility highlight {
+  background: linear-gradient(var(--color-signal), var(--color-signal)) no-repeat 0 60% / 100% 0.9em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  padding-inline: 0.08em;
+}
+
 @utility surface-dark {
   background: var(--color-ink);
   color: var(--color-paper);
@@ -142,12 +154,17 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  /*
+   * `transition: none`, not a tiny duration: with the default `transition-property: all`
+   * a 0.01ms duration turns every style change into a one-frame transition, which
+   * makes computed styles (and hit-testing) lag a frame behind.
+   */
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    transition: none !important;
     scroll-behavior: auto !important;
   }
 }
@@ -189,4 +206,28 @@
     transform: none;
     opacity: 1;
   }
+}
+
+/* Night → Day stage, enabled by TransitionMotion. Stacked layers until then. */
+[data-transition][data-enhanced],
+[data-transition][data-enhanced] > section {
+  /* The sticky stage's parent must be the tall one, or the stage scrolls away. */
+  height: 260vh;
+}
+[data-transition][data-enhanced] [data-stage] {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  overflow: hidden;
+}
+[data-transition][data-enhanced] [data-layer] {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+}
+[data-transition][data-enhanced] [data-layer="day"] {
+  clip-path: inset(100% 0% 0% 0%);
+}
+[data-transition][data-enhanced] [data-horizon] {
+  display: block;
 }

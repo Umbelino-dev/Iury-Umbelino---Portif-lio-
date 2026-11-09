@@ -34,7 +34,9 @@ Type scale (`text-*`, fluid 375→1440): `display-xxl` 208→64, `display-xl` 12
 
 Layout: `page-grid` utility = 12 cols (gutter 24, margin up to 56, max 1440) / 4 cols mobile (gutter 16, margin 20). Asymmetric: text 7 cols, air 5 — never centred by default. Spacing base 8; sections 160 desktop / 96 mobile. Radius 0, 1px rules, no shadows, no decorative gradients, no rounded cards. Pill + glass only for floating controls (nav, assistant). Project status is encoded by shape (StatusMark), not colour.
 
-Surfaces: Hero dark → Night→Day transition → About light → Projects light → Lab dark → Approach light → Contact dark. Case study: light editorial. Mark light sections `data-surface="light"` (switches focus ring to ink).
+Accent on light: use the `highlight` utility (sized gradient that stays inside tight display leading), never `bg-signal` on inline text.
+
+Surfaces: Hero dark → Night→Day transition → About light → Projects light → Lab dark → Approach light → Contact dark. Case study: light editorial. Mark light sections `data-surface="light"` (switches focus ring to ink). The nav hit-tests the line 44px from the top, so clipped layers report correctly; `data-nav-as` on a layer overrides the active item; dispatch `SURFACE_EVENT` (`components/layout/surface.ts`) when a surface changes without scrolling.
 
 ## Components
 - Server Components by default. `"use client"` only for interaction, browser APIs or animation (Nav theme, DayNightTransition, PortraitReveal, ProjectIndex floating image, CatAssistant).
@@ -46,7 +48,8 @@ Surfaces: Hero dark → Night→Day transition → About light → Projects ligh
 - Animate only transform, opacity, clip-path, mask. Never layout properties.
 - Use `useGSAP` (scoped context, auto-revert) and `gsap.matchMedia()` with `MQ` from `@/lib/gsap`. Kill ScrollTriggers, listeners and observers on unmount.
 - Content is present in the server HTML. Entrance start states live in CSS under `.js` (class added by an inline script in `[locale]/layout.tsx`) inside `prefers-reduced-motion: no-preference`, with a 3s CSS failsafe; GSAP then animates with `fromTo` (zero any `y` GSAP would parse from the CSS) and no `clearProps`.
-- `prefers-reduced-motion`: no jumps, lerps or breathing; 160ms fades or hard cuts (Night→Day cuts at 50%).
+- `prefers-reduced-motion`: no jumps, lerps or breathing; instant swaps or hard cuts (Night→Day cuts at 50%). The global reset uses `transition: none` — never a tiny duration (it makes computed styles lag a frame).
+- Scroll stages: the element with the tall height must be the sticky element's direct parent.
 - No always-on rAF loops: loops start on interaction and stop on idle or `visibilitychange`. Custom cursor is optional sugar for `(pointer: fine)` only.
 
 ## The cat

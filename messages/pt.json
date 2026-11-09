@@ -29,6 +29,74 @@
     "edition": "Edição 01 — 2026",
     "topics": "IA · Produtos · Experimentos",
     "index": "(00) Índice",
-    "scroll": "Rolar"
+    "scroll": "Rolar",
+    "stack": "Assistente de TI · SQL/PL-SQL · IA & Produtos"
+  },
+  "transition": {
+    "night": {
+      "label": "O que uma máquina vê",
+      "title": "Um padrão de sinais, prompts e parâmetros."
+    },
+    "day": {
+      "label": "O que realmente está ali",
+      "titleLead": "Uma pessoa que não para de perguntar",
+      "titleAccent": "por quê."
+    },
+    "horizonNight": "Noite — possibilidade",
+    "horizonDay": "Dia — evidência"
+  },
+  "portrait": {
+    "specimenBase": "Espécime 01 / Retrato — base",
+    "specimenAlt": "Espécime 01 / Retrato — alternativo (cibernético)",
+    "metaBase": "4:5 · sRGB · 2400×3000",
+    "metaAlt": "alinhado à base · Δ 0px",
+    "srcBase": "fonte: fotografia original",
+    "srcAlt": "fonte: derivado da base",
+    "placeholder": "Espaço reservado para o retrato de Iury Umbelino — a fotografia entra aqui."
+  },
+  "about": {
+    "label": "(01) Sobre",
+    "title": "Sou o Iury. Aprendo construindo — e construo para aprender.",
+    "lead": "Quase tudo o que faço começa com uma pergunta que não sai da minha cabeça. Este portfólio é onde documento o que encontro.",
+    "traits": [
+      {
+        "index": "T.01",
+        "word": [
+          "Tecno-",
+          "logia"
+        ],
+        "text": "IA é o meu principal material agora — assistentes, agentes e ferramentas que tornam a informação realmente útil."
+      },
+      {
+        "index": "T.02",
+        "word": [
+          "Cria-",
+          "tividade"
+        ],
+        "text": "Me importo com como as coisas são sentidas, não só com como funcionam. A interface faz parte da solução."
+      },
+      {
+        "index": "T.03",
+        "word": [
+          "Curio-",
+          "sidade"
+        ],
+        "text": "Prefiro entregar um protótipo honesto a polir um palpite. Cada projeto ensina algo específico."
+      }
+    ],
+    "caption": "Espécime 01 — passe o mouse sobre a imagem, ou toque e segure, para ver a leitura da máquina.",
+    "showMachine": "Ver leitura da máquina",
+    "showPortrait": "Ver retrato"
+  },
+  "experience": {
+    "label": "(01.1) Experiência",
+    "title": "Onde a curiosidade vira rotina.",
+    "lead": "Dois anos e meio no Giassi Supermercados, de Jovem Aprendiz à área de Tecnologia. Hoje sustento sistemas internos com dados reais e usuários reais.",
+    "highlights": "O que faço",
+    "path": "Trajetória",
+    "stack": "Uso no dia a dia",
+    "learning": "Estudando",
+    "education": "Formação",
+    "expected": "previsão {year}"
   }
 }

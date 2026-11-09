@@ -29,6 +29,74 @@
     "edition": "Edition 01 — 2026",
     "topics": "AI · Products · Experiments",
     "index": "(00) Index",
-    "scroll": "Scroll"
+    "scroll": "Scroll",
+    "stack": "IT Assistant · SQL/PL-SQL · AI & Products"
+  },
+  "transition": {
+    "night": {
+      "label": "What a machine sees",
+      "title": "A pattern of signals, prompts and parameters."
+    },
+    "day": {
+      "label": "What's actually there",
+      "titleLead": "A person who keeps asking",
+      "titleAccent": "why."
+    },
+    "horizonNight": "Night — possibility",
+    "horizonDay": "Day — evidence"
+  },
+  "portrait": {
+    "specimenBase": "Specimen 01 / Portrait — base",
+    "specimenAlt": "Specimen 01 / Portrait — alternate (cybernetic)",
+    "metaBase": "4:5 · sRGB · 2400×3000",
+    "metaAlt": "aligned to base · Δ 0px",
+    "srcBase": "src: original photograph",
+    "srcAlt": "src: derived from base",
+    "placeholder": "Placeholder for Iury Umbelino's portrait — the photograph goes here."
+  },
+  "about": {
+    "label": "(01) About",
+    "title": "I'm Iury. I learn by building — and build to learn.",
+    "lead": "Most of what I make starts as a question I can't stop thinking about. This portfolio is where I document what I find.",
+    "traits": [
+      {
+        "index": "T.01",
+        "word": [
+          "Tech-",
+          "nology"
+        ],
+        "text": "AI is my main material right now — assistants, agents and tools that make information genuinely useful."
+      },
+      {
+        "index": "T.02",
+        "word": [
+          "Crea-",
+          "tivity"
+        ],
+        "text": "I care about how things feel, not only how they work. The interface is part of the solution."
+      },
+      {
+        "index": "T.03",
+        "word": [
+          "Curio-",
+          "sity"
+        ],
+        "text": "I'd rather ship an honest prototype than polish a guess. Every project teaches something specific."
+      }
+    ],
+    "caption": "Specimen 01 — move over the image, or press and hold on touch, to see the machine reading.",
+    "showMachine": "Show machine reading",
+    "showPortrait": "Show portrait"
+  },
+  "experience": {
+    "label": "(01.1) Experience",
+    "title": "Where curiosity becomes routine.",
+    "lead": "Two and a half years at Giassi Supermercados, from apprentice to the IT team. Today I support internal systems with real data and real users.",
+    "highlights": "What I do",
+    "path": "Path",
+    "stack": "Daily tools",
+    "learning": "Learning",
+    "education": "Education",
+    "expected": "expected {year}"
   }
 }

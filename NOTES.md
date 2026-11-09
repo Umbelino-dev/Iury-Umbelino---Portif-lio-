@@ -48,6 +48,7 @@ Temporary progress log. Permanent rules live in `CLAUDE.md`.
 
 - [x] **Hero refinement** (2026-11-09):
   - Ligature rebuilt: Bricolage's y is a u-shape whose right stem (x 294–438) hooks left to x 10; the old join hung a rectangle from the hook's end, hence the sharp bend and the off-axis stem. Now the hook is replaced by the right stem continuing straight down (depth −216), drawn at the b stem's exact width (145) on the same axis, and y ∪ b is one outline (skia-pathops union). Line 2 shift went from −257 to +26.5 units. Checked at 3× zoom: no step, gap or double edge. Trade-off: without the hook the y reads more like a u with a long stem; the ligature is what makes it a y.
+  - Follow-up (Iury: the straight y looked like a u): the u-bowl is gone. The y's left arm now curves down into the straight stem (outer edge meets it at −40, inner at 120, a V-shaped counter), so it reads as a y; the stem still runs straight into the b.
   - Mobile hero: own composition below 768px (name → statement left-aligned with the cat at the row's end → stack line, intro, link). Centered statement tested and rejected (fights the left-aligned name and intro). Checked at 360/375/390/414/430: no overflow, no overlaps, statement 2 lines at 24.6–26.3px.
   - Cat in the hero: scrubbed ScrollTrigger (start top, end 60%, scrub 0.6): eyes, head and body turn toward the name, settle, then crouch before the jump. Reduced motion: static.
   - Instrument Serif is now preloaded (the in-flow statement caused CLS 0.001 on mobile from the font swap; now 0).

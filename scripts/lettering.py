@@ -2,10 +2,11 @@
 Letters the name "Iury / Umbelino" as SVG paths with the y→b ligature.
 
 Concept: the "y" of Iury and the "b" of Umbelino share one stem. Bricolage's y
-is a u-shape whose right stem drops and hooks left; here the hook is replaced by
-the same stem continuing straight down, on the same axis and with the same width
-as the b's stem (144 vs 145 font units), and the two outlines are merged into a
-single path (boolean union), so there is no seam, overlap or step. The question
+is a u-shape whose right stem drops and hooks left. Here the y keeps the font's
+terminals and left arm, the arm curves down into the right stem (no u-bowl), and
+the stem runs straight down on the same axis and at the same width as the b's
+stem (145 font units). The two outlines are merged into a single path (boolean
+union), so there is no seam, overlap or step. The question
 ("why") flows into "build". Curiosity builds.
 
 Dev-only and reproducible. Needs Python with fonttools, brotli, uharfbuzz and
@@ -35,6 +36,8 @@ LINE = 880  # baseline-to-baseline in font units (tight, editorial)
 TRACK = -12  # extra tracking per glyph, font units
 OVERLAP = 24  # how far the y stem reaches into the b stem before the union (no seam)
 PAD = 24  # breathing room inside the viewBox
+ARM_OUTER = -40  # where the y's curved arm meets the stem, outer edge (font units)
+ARM_INNER = 120  # ... and inner edge (the bottom of the counter)
 
 font = TTFont(SRC)
 inst = instantiateVariableFont(font, AXES)
@@ -113,32 +116,28 @@ def path(name, dx, base):
 
 
 def draw_y(pen, depth):
-    """Bricolage's y with the hook replaced by a straight stem down to `depth`.
+    """A y drawn for the ligature: the font's left arm and top terminals, a
+    straight right stem that runs down to `depth` (into the b), and no u-bowl.
 
-    Every point above the baseline is the font's own outline. Below the bowl, the
-    inner edge of the stem continues at the stem's own x (294) instead of turning
-    into the hook. The bowl's underside is split exactly where it meets that edge
-    (quadratic de Casteljau at t = 0.8), so the crotch is a clean corner.
+    Bricolage's own y is a u with a hooked tail; with the hook straightened it
+    read as a u. Here the left arm leaves its vertical and curves down and to the
+    right into the stem (outer edge meeting it below the baseline, inner edge
+    meeting it at 120), so the counter closes in a V-shaped crotch and the letter
+    reads as a y: curved arm, straight stem.
     """
-    # Drawn at the b stem's exact width (145), centred on the y's own stem (144):
-    # half a unit each side, so the shared stem has one width from top to bottom.
+    # The stem at the b stem's exact width (145), centred on the y's own stem (144).
     half = (B_STEM[1] - B_STEM[0]) / 2
     mid = (Y_STEM[0] + Y_STEM[1]) / 2
     left, right = mid - half, mid + half
-    p0, p1, p2 = (307, 238), (306, 166), (287, 122.5)  # first quad of the bowl's underside
-    t = 0.8
-    q1 = (p1[0] + t * (p2[0] - p1[0]), p1[1] + t * (p2[1] - p1[1]))
+    arm_l, arm_r = 26, 170  # the font's left arm (x), straight down to 330
     pen.moveTo((right, depth))
     pen.lineTo((left, depth))
-    pen.lineTo((left, 141))  # = the underside curve at t = 0.8 (x 293.9)
-    pen.qCurveTo(q1, p2)
-    pen.qCurveTo((268, 79), (206, 40), (166, 40))
-    pen.qCurveTo((118, 40), (56, 92), (26, 195), (26, 273))
-    pen.lineTo((26, 527))
-    pen.lineTo((170, 527))
-    pen.lineTo((170, 307))
-    pen.qCurveTo((170, 234), (196, 168), (227, 168))
-    pen.qCurveTo((245, 168), (271, 190), (287, 234), (left, 297), (left, 338))
+    pen.lineTo((left, ARM_OUTER))  # outer edge of the arm joins the stem here
+    pen.qCurveTo((150, 10), (arm_l, 140), (arm_l, 330))
+    pen.lineTo((arm_l, 527))
+    pen.lineTo((arm_r, 527))
+    pen.lineTo((arm_r, 330))
+    pen.qCurveTo((172, 220), (left, ARM_INNER))  # inner edge: the V of the counter
     pen.lineTo((left, 527))
     pen.lineTo((right, 527))
     pen.closePath()

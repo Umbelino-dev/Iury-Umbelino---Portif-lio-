@@ -63,9 +63,10 @@ export async function Contact() {
                   href={c.href}
                   target={c.kind === "email" ? undefined : "_blank"}
                   rel={c.kind === "email" ? undefined : "noopener noreferrer"}
-                  className="grid grid-cols-[5.5rem_minmax(0,1fr)_auto] items-baseline gap-4 border-t border-[#2a2a2a] py-4.5 transition-colors duration-(--duration-fast) hover:text-signal"
+                  // Mobile: label above the value, so a full email address fits on one line.
+                  className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-4 gap-y-1 border-t border-[#2a2a2a] py-4.5 transition-colors duration-(--duration-fast) hover:text-signal md:grid-cols-[5.5rem_minmax(0,1fr)_auto]"
                 >
-                  <span className="font-mono text-[11px] tracking-[0.04em] text-gray-500 uppercase">{t(`kinds.${c.kind}`)}</span>
+                  <span className="col-span-2 font-mono text-[11px] tracking-[0.04em] text-gray-500 uppercase md:col-span-1">{t(`kinds.${c.kind}`)}</span>
                   <span className="font-display text-[clamp(1.125rem,1rem+0.5vw,1.5rem)] font-medium tracking-[-0.01em] [overflow-wrap:anywhere]">{c.label}</span>
                   <span aria-hidden="true" className="text-lg">↗</span>
                 </a>

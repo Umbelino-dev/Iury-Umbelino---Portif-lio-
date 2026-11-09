@@ -22,8 +22,8 @@ export interface ProjectLink {
 /** A figure or cover: a real image when `image` exists, otherwise the editorial placeholder. */
 export interface MediaSlot {
   id: string;
-  /** Desktop aspect; mobile may reflow (cover 16:9 → 4:3, 3:4 → 4:5). */
-  aspect: "16/9" | "4/3" | "3/4";
+  /** Desktop aspect; mobile may reflow (cover 16:9 → 4:3, 3:4 → 4:5). "1200/630" never reflows (brand pieces with text). */
+  aspect: "16/9" | "4/3" | "3/4" | "1200/630";
   /** Mono spec label on the placeholder, e.g. "Painel". */
   label: Localized;
   caption: Localized;
@@ -65,6 +65,7 @@ export type TagKey = "web" | "pwa" | "product" | "personal" | "ai" | "data" | "r
 
 /** A real image for a project or lab entry. Until it exists, the UI draws an editorial placeholder. */
 export interface MediaImage {
+  /** `/media/<name>.webp` — the loader resolves the width variants. */
   src: string;
   width: number;
   height: number;
@@ -82,8 +83,8 @@ export interface Project {
   year?: number;
   tags: TagKey[];
   summary: Localized;
-  /** 4:3 cover used by the index preview. */
-  cover?: MediaImage;
+  /** Cover used by the index preview (4:3 frame). */
+  cover?: MediaImage & { fit?: "cover" | "contain"; background?: string };
   role?: Localized;
   stack?: string[];
   links?: ProjectLink[];

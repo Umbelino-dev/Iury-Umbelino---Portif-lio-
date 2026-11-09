@@ -31,6 +31,10 @@ Temporary progress log. Permanent rules live in `CLAUDE.md`.
   - Bugs found and fixed: an effect returning `scrollIntoView()` (a Promise in current Chromium) crashed the page on the first chip; a keypress waking the cat mid-close killed the close animation (panel stuck open, focus lost).
   - Not done: Lighthouse / Core Web Vitals not measured (no Lighthouse in this environment). Real-device testing pending.
 
+- [x] **Final polish** (2026-11-09): real portraits (aligned + cropped together, reveal verified), Koinonia cover + Fig. 02 Mapa do sistema + Fig. 03 Marca (native 1200:630, captions describe only what is shown; the Radar slot was dropped — no real screenshot), "O que aprendi" in Iury's words (EN translated), contacts published (email, LinkedIn, GitHub) + assistant contact chip, image pipeline with WebP variants and a custom next/image loader, dock no longer covers the reveal toggle, contact rows stack on mobile.
+  - Lighthouse 13.6 via `wrangler dev` (lab): see README table — home mobile went from 89 (LCP 3.7 s: the intro faded in after hydration) to 99–100 (LCP 1.1 s) by keeping the intro visible from first paint; everything else 100.
+  - `wrangler dev` confirmed `/` → 302 `/pt`, security headers, immutable cache on `/_next/static`, 404 page.
+
 ## Answers from Iury (2026-11-09)
 - Giassi, DOX, SQL and PL/SQL may be named publicly → `experience.publishEmployer = true`.
 - Contacts stay hidden; Iury will send the real email and LinkedIn.
@@ -39,15 +43,8 @@ Temporary progress log. Permanent rules live in `CLAUDE.md`.
 - M1 starts only after Iury sends Homepage R02 screenshots (desktop + mobile). Received so far: desktop Hero and desktop Night→Day transition (start state).
 
 ## Still open
-- Koinonia: review the first-person copy (chapters 02–03), 2–3 real lessons for "O que aprendi", screenshots for the cover (16:9), Fig. 02 Painel (4:3) and Fig. 03 Radar (3:4). Confirm it is fine to describe the audit findings publicly.
-1. Real email + LinkedIn.
-2. Koinonia and Via Hebraica: role, stack, screenshots.
-3. Portrait photos (real + "cybernetic" alternate, aligned 4:5) — placeholders until then.
-4. Final domain → `NEXT_PUBLIC_SITE_URL`.
-5. Homepage R02 mobile screenshots (the PDF sent was Case Study Mobile R01 — used for M4 and the cat silhouette).
-6. Lab entries: real experiments (title, question, status, year, media) or confirm the placeholders.
-7. Project covers (4:3) → `cover` in `src/content/projects.ts`.
-8. Portrait photos: drop both 4:5 files in `public/portrait/` and fill `src/content/portrait.ts` (same crop, aligned).
+- Deploy (Iury): Cloudflare account, connect the repo, set `NEXT_PUBLIC_SITE_URL` (build variable), custom domain — steps in README.
+- Optional later: a real screenshot of the Care Radar (Fig. 04), Via Hebraica case study, real Lab experiments, field CWV after deploy, test on physical phones.
 
 ## Decisions taken
 - Static export over OpenNext (no runtime needed; OpenNext also pins Next ≥16.4.5).

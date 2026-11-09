@@ -6,12 +6,14 @@ const DESKTOP: Record<MediaSlot["aspect"], string> = {
   "16/9": "md:aspect-video",
   "4/3": "md:aspect-[4/3]",
   "3/4": "md:aspect-[3/4]",
+  "1200/630": "md:aspect-[1200/630]",
 };
 /** Mobile reflow (Case Study Mobile R01 · M3/M5): 16:9 → 4:3, 3:4 → 4:5. */
 const MOBILE: Record<MediaSlot["aspect"], string> = {
   "16/9": "aspect-[4/3]",
   "4/3": "aspect-[4/3]",
   "3/4": "aspect-[4/5]",
+  "1200/630": "aspect-[1200/630]", // brand pieces carry text: never reflowed or cropped
 };
 const TONE = {
   paper: { bg: "bg-[#d3cfc5]", fg: "text-ink", meta: "text-[#3f3d39]", line: "bg-[#3f3d39]" },
@@ -30,6 +32,7 @@ export function MediaFrame({
   tone = "paper",
   numeral,
   priority = false,
+  sizes = "(min-width: 768px) 90vw, 100vw",
 }: {
   slot: MediaSlot;
   locale: Locale;
@@ -37,6 +40,7 @@ export function MediaFrame({
   tone?: keyof typeof TONE;
   numeral?: string;
   priority?: boolean;
+  sizes?: string;
 }) {
   const t = TONE[tone];
   return (
@@ -48,7 +52,7 @@ export function MediaFrame({
           width={slot.image.width}
           height={slot.image.height}
           priority={priority}
-          sizes="(min-width: 768px) 90vw, 100vw"
+          sizes={sizes}
           className="absolute inset-0 h-full w-full object-cover"
         />
       ) : (

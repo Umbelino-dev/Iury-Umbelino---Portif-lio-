@@ -103,7 +103,8 @@ export function PortraitReveal({
           {alternate}
         </div>
       </div>
-      <figcaption className="flex flex-wrap items-center justify-between gap-4 pr-(--page-margin) md:pr-(--page-margin)">
+      {/* Right padding clears the docked cat (56px + 16px margin), so it never covers the toggle. */}
+      <figcaption className="flex flex-wrap items-center justify-between gap-4 pr-22">
         <span className="max-w-[36ch] text-caption text-gray-600">{caption}</span>
         <button
           type="button"

@@ -21,11 +21,11 @@ export interface ContactLink {
   publish: boolean;
 }
 
-/** Contacts listed in the CV. Hidden on purpose: Iury will send the final email/LinkedIn (2026-11-09). */
+/** Contacts confirmed by Iury for publication (2026-11-09). */
 export const contacts: ContactLink[] = [
-  { kind: "email", label: "iuryumbelino1@gmail.com", href: "mailto:iuryumbelino1@gmail.com", publish: false },
-  { kind: "linkedin", label: "in/iuryumbelino", href: "https://www.linkedin.com/in/iuryumbelino", publish: false },
-  { kind: "github", label: "@Umbelino-dev", href: "https://github.com/Umbelino-dev", publish: false },
+  { kind: "email", label: "iuryumbelino1@gmail.com", href: "mailto:iuryumbelino1@gmail.com", publish: true },
+  { kind: "linkedin", label: "in/iuryumbelino", href: "https://www.linkedin.com/in/iuryumbelino/", publish: true },
+  { kind: "github", label: "@Umbelino-dev", href: "https://github.com/Umbelino-dev", publish: true },
 ];
 
 export const education: { course: Localized; school: string; expected: number }[] = [

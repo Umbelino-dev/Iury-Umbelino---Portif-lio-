@@ -9,7 +9,7 @@ export interface AssistantChip {
   label: string;
   answer: string;
   keywords: string[];
-  action?: "projects";
+  action?: "projects" | "contact";
 }
 export interface AssistantScript {
   greeting: string;
@@ -430,16 +430,17 @@ export function CatAssistant({
     replyTimer.current = window.setTimeout(() => {
       setTyping(false);
       setMessages((m) => [...m, { from: "cat", text: match ? match.answer : script.fallback }]);
-      if (match?.action === "projects") {
+      if (match?.action) {
+        const target = match.action; // "projects" | "contact" — both are home sections
         window.setTimeout(() => {
           if (context === "home") {
             close();
             window.setTimeout(
-              () => document.getElementById("projects")?.scrollIntoView({ behavior: reduced() ? "auto" : "smooth" }),
+              () => document.getElementById(target)?.scrollIntoView({ behavior: reduced() ? "auto" : "smooth" }),
               350,
             );
           } else {
-            window.location.assign(projectsHref);
+            window.location.assign(target === "projects" ? projectsHref : projectsHref.replace("#projects", "#contact"));
           }
         }, 700);
       }

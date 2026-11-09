@@ -233,6 +233,21 @@
           ],
           "answer": "Te levo até lá.",
           "action": "projects"
+        },
+        {
+          "label": "Como falar com ele?",
+          "keywords": [
+            "contato",
+            "email",
+            "e-mail",
+            "linkedin",
+            "github",
+            "falar",
+            "contratar",
+            "vaga"
+          ],
+          "answer": "Por e-mail, iuryumbelino1@gmail.com, ou pelo LinkedIn (in/iuryumbelino). O GitHub é @Umbelino-dev. Te levo até a seção de contato.",
+          "action": "contact"
         }
       ],
       "fallback": "Ainda sou um protótipo: respostas roteirizadas, sem modelo de linguagem por trás. Tente uma das sugestões."

@@ -97,12 +97,25 @@ export function Chapter({
       </div>
 
       {chapter.figures && (
-        <div className="flex flex-col gap-10 md:flex-row md:flex-wrap md:items-end md:gap-6 md:px-(--page-margin)">
+        <div
+          className={`flex flex-col gap-10 md:gap-6 md:px-(--page-margin) ${
+            // Same-ratio figures share the width equally; mixed ratios keep the design's 1.6 : 1 rhythm.
+            new Set(chapter.figures.map((f) => f.aspect)).size === 1
+              ? "md:grid md:grid-cols-2"
+              : "md:flex-row md:flex-wrap md:items-end"
+          }`}
+        >
           {chapter.figures.map((fig, i) => (
-            <figure key={fig.id} className={`flex min-w-0 flex-col gap-3 ${i === 0 ? "md:flex-[1.6_1_420px]" : "md:flex-[1_1_260px]"}`}>
+            <figure
+              key={fig.id}
+              className={`flex min-w-0 flex-col gap-3 ${
+                new Set(chapter.figures?.map((f) => f.aspect)).size === 1 ? "" : i === 0 ? "md:flex-[1.6_1_420px]" : "md:flex-[1_1_260px]"
+              }`}
+            >
               <MediaFrame
                 slot={fig}
                 locale={locale}
+                sizes="(min-width: 768px) 46vw, 100vw"
                 tone={i % 2 === 0 ? "ink" : "stone"}
                 spec={{ left: `${figureLabel} ${String(i + 2).padStart(2, "0")} — ${fig.label[locale]}`, right: `${fig.aspect.replace("/", ":")} · ${placeholder}` }}
               />

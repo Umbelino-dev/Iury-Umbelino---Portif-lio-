@@ -66,12 +66,31 @@ NEXT_PUBLIC_SITE_URL=https://your-domain.com npm run deploy
 
 In the Worker: **Settings → Domains & Routes → Add → Custom domain**, and enter the domain. The domain has to be on Cloudflare DNS. Then set `NEXT_PUBLIC_SITE_URL` to that domain and redeploy.
 
+### Before going live (checklist)
+
+1. Set `NEXT_PUBLIC_SITE_URL` as a **build variable**, to the final domain.
+2. Deploy, then open `/sitemap.xml` and check that every URL uses that domain.
+3. Paste the home URL into LinkedIn's Post Inspector (and a WhatsApp chat) to refresh the preview.
+4. Optionally add the domain in Google Search Console and submit `/sitemap.xml`.
+
 ### Checking a deploy
 
 - `/` redirects to `/pt`, and `/en` shows the English edition.
 - `/pt/projects/koinonia` loads. Any unknown URL shows the bilingual 404.
 - `/sitemap.xml` lists both languages with absolute URLs on your domain.
 - Paste the URL into LinkedIn's Post Inspector or a WhatsApp chat: the preview shows `og-image.png`.
+
+### Measured performance (lab, before deploy)
+
+Lighthouse 13.6.0 against the production build served by `wrangler dev` (Cloudflare's local assets runtime). Local machine, no CDN and no real network, so field numbers will differ:
+
+| Page | Preset | Performance | Accessibility | Best practices | SEO | LCP | CLS |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `/pt` | mobile (3 runs) | 99–100 | 100 | 100 | 100 | 1.1 s | 0 |
+| `/pt` | desktop | 100 | 100 | 100 | 100 | 0.3 s | 0 |
+| `/en` | desktop | 100 | 100 | 100 | 100 | 0.8 s | 0 |
+| `/pt/projects/koinonia` | mobile | 100 | 100 | 100 | 100 | 1.1 s | 0 |
+| `/pt/projects/koinonia` | desktop | 100 | 100 | 100 | 100 | 0.7 s | 0 |
 
 ---
 
@@ -80,7 +99,8 @@ In the Worker: **Settings → Domains & Routes → Add → Custom domain**, and 
 - Facts live in `src/content/` (`profile.ts`, `projects.ts`, `lab.ts`, `portrait.ts`). UI strings live in `messages/{pt,en}.json`.
 - Nothing is invented. A fact without a source stays `undefined` and the UI hides it. Items copied from the design prototype carry `confirmed: false`.
 - **Contacts:** set `publish: true` on an entry in `contacts` (`src/content/profile.ts`). The Contact section switches from "coming soon" to the email button and links on its own.
-- **Images:** add files under `public/` and fill `src` / `width` / `height` in the matching content entry (`portrait`, `cover`, `media`). Until then, the editorial placeholders render.
+- **Images:** put the source in `assets/media/`, add it to `scripts/images.mjs`, run `npm run images` (writes WebP variants at 640/960/1280/1920 to `public/media/`), then reference `/media/<name>.webp` with its width/height in the content entry. The custom loader (`src/lib/image-loader.ts`) builds the `srcset`. Never put unprocessed images in `public/`. Without an image, the editorial placeholder renders.
+- **Portraits:** the real photo and the cyborg version are aligned in `scripts/images.mjs` (eye positions → scale + offset) and cropped to the same 4:5 box, so the reveal mask shows the same face. Replacing either photo means re-measuring `ALIGN`.
 - **The cat's answers** are scripted (`messages/*.json → assistant`). No language model is involved. A real one would need its own Worker, because this site has no server.
 
 Fonts (Space Grotesk, IBM Plex Sans) are self-hosted under the SIL Open Font License 1.1.

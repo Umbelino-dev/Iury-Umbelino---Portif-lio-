@@ -29,15 +29,18 @@ export function ProjectImage({
   const numeral = project.index.replace("P.", "");
 
   if (project.cover) {
+    const contain = project.cover.fit === "contain";
     return (
-      <Image
-        src={project.cover.src}
-        alt={project.cover.alt[locale]}
-        width={project.cover.width}
-        height={project.cover.height}
-        sizes="(min-width: 768px) 380px, 100vw"
-        className="absolute inset-0 h-full w-full object-cover"
-      />
+      <span className="absolute inset-0 block overflow-hidden" style={{ background: project.cover.background }}>
+        <Image
+          src={project.cover.src}
+          alt={project.cover.alt[locale]}
+          width={project.cover.width}
+          height={project.cover.height}
+          sizes="(min-width: 768px) 380px, 100vw"
+          className={`absolute inset-0 h-full w-full ${contain ? "object-contain" : "object-cover"}`}
+        />
+      </span>
     );
   }
 

@@ -231,6 +231,20 @@
           ],
           "answer": "Taking you there.",
           "action": "projects"
+        },
+        {
+          "label": "How to reach him?",
+          "keywords": [
+            "contact",
+            "email",
+            "linkedin",
+            "github",
+            "reach",
+            "hire",
+            "role"
+          ],
+          "answer": "By email, iuryumbelino1@gmail.com, or on LinkedIn (in/iuryumbelino). His GitHub is @Umbelino-dev. Taking you to the contact section.",
+          "action": "contact"
         }
       ],
       "fallback": "I'm still a prototype: scripted answers, no language model behind them. Try one of the suggestions."

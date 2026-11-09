@@ -22,24 +22,44 @@ export const projects: Project[] = [
       en: "Product builder: problem, flow, AI directives, orchestration and testing",
     },
     stack: ["TanStack Start", "React 19", "Supabase", "Tailwind CSS v4", "Vitest"],
+    cover: {
+      src: "/media/koinonia-cover.webp",
+      width: 1200,
+      height: 630,
+      fit: "contain",
+      background: "#fdf8f0",
+      alt: {
+        pt: "Logo do Koinonia: gestão de pessoas, presença e cuidado para igrejas e comunidades.",
+        en: "Koinonia logo: people, attendance and care management for churches and communities.",
+      },
+    },
     links: [{ label: { pt: "Ver o Koinonia", en: "Visit Koinonia" }, href: "https://usekoinonia.com.br" }],
     source: "CV §Projetos; Iury (chat, 2026-11-09); repo Umbelino-dev/koinonia.app (README, docs/PRODUTO.md, docs/AUDITORIA.md, docs/historico, git log)",
     confirmed: true,
     caseStudy: {
       confirmed: true,
-      source: "repo Umbelino-dev/koinonia.app @7aba644 + Iury's role statement",
+      source: "repo Umbelino-dev/koinonia.app @7aba644 + Iury's role statement + Iury's lesson and brand images (2026-11-09)",
       lead: {
         pt: "Uma plataforma web (PWA) para a liderança de comunidades e igrejas acompanhar pessoas, presença e cuidado. Construída com IA, dirigida por mim. Publicada e em uso.",
         en: "A web platform (PWA) for community and church leaders to follow people, attendance and care. Built with AI, directed by me. Published and in use.",
       },
-      builtWith: ["Lovable (IA)"],
+      builtWith: ["Lovable", "Claude"],
       cover: {
         id: "cover",
-        aspect: "16/9",
-        label: { pt: "Capa — tela principal", en: "Cover — main screen" },
+        aspect: "1200/630",
+        label: { pt: "Capa — marca", en: "Cover — brand" },
         caption: {
-          pt: "Fig. 01 — O painel da liderança. Captura a caminho.",
-          en: "Fig. 01 — The leadership dashboard. Screenshot on its way.",
+          pt: "Fig. 01 — A marca do Koinonia: gestão de pessoas, presença e cuidado para igrejas e comunidades. Uma produção SOU Studio.",
+          en: "Fig. 01 — Koinonia's brand: people, attendance and care management for churches and communities. A SOU Studio production.",
+        },
+        image: {
+          src: "/media/koinonia-cover.webp",
+          width: 1200,
+          height: 630,
+          alt: {
+            pt: "Logo do Koinonia — quatro figuras em verde, amarelo e coral formando um círculo — com o texto “Gestão de pessoas, presença e cuidado para igrejas e comunidades”.",
+            en: "Koinonia logo — four figures in green, yellow and coral forming a circle — with the line “People, attendance and care management for churches and communities”.",
+          },
         },
       },
       chapters: [
@@ -167,20 +187,59 @@ export const projects: Project[] = [
           },
           figures: [
             {
-              id: "dashboard",
-              aspect: "4/3",
-              label: { pt: "Painel", en: "Dashboard" },
-              caption: { pt: "Fig. 02 — O painel com o resumo do Radar.", en: "Fig. 02 — The dashboard with the Radar summary." },
+              id: "map",
+              aspect: "1200/630",
+              label: { pt: "Mapa do sistema", en: "System map" },
+              caption: {
+                pt: "Fig. 02 — O mapa do sistema: pessoas, encontros, cuidado e gestão num só lugar.",
+                en: "Fig. 02 — The system map: people, meetings, care and management in one place.",
+              },
+              image: {
+                src: "/media/koinonia-map.webp",
+                width: 1200,
+                height: 630,
+                alt: {
+                  pt: "Mapa do sistema em quatro colunas. Pessoas: cadastro e histórico, períodos de participação, grupos, aniversários. Encontros: eventos, presenças, calendário (.ics), escalas de serviço. Cuidado: Radar de Cuidado, quem está se afastando, relatórios. Gestão: financeiro, prestação de contas, permissões por módulo, aprovação de acesso.",
+                  en: "System map in four columns. People: records and history, participation periods, groups, birthdays. Meetings: events, attendance, calendar (.ics), service rotas. Care: Care Radar, who is drifting away, reports. Management: finances, accountability, per-module permissions, access approval.",
+                },
+              },
             },
             {
-              id: "radar",
-              aspect: "3/4",
-              label: { pt: "Radar de Cuidado", en: "Care Radar" },
-              caption: { pt: "Fig. 03 — A fila de cuidado, ordenada por risco.", en: "Fig. 03 — The care queue, ordered by risk." },
+              id: "brand",
+              aspect: "1200/630",
+              label: { pt: "Marca e ícone", en: "Brand and icon" },
+              caption: {
+                pt: "Fig. 03 — Marca, paleta e ícone do app instalável (PWA).",
+                en: "Fig. 03 — Brand, palette and the installable app's (PWA) icon.",
+              },
+              image: {
+                src: "/media/koinonia-brand.webp",
+                width: 1200,
+                height: 630,
+                alt: {
+                  pt: "Identidade do Koinonia: o símbolo sobre fundo verde, o logotipo, a paleta (#26635B, #63A084, #E9AF4A, #E87656) e o ícone do app em três tamanhos.",
+                  en: "Koinonia identity: the symbol on a green background, the wordmark, the palette (#26635B, #63A084, #E9AF4A, #E87656) and the app icon in three sizes.",
+                },
+              },
             },
           ],
         },
-        // "What I learned" stays out until Iury writes it — never invent lessons.
+        {
+          id: "learned",
+          label: { pt: "O que aprendi", en: "What I learned" },
+          title: { pt: "Aprendi onde a ferramenta acaba.", en: "I learned where the tool ends." },
+          // Iury's own words (chat, 2026-11-09); EN is a faithful translation.
+          body: {
+            pt: [
+              "Comecei o Koinonia usando o Lovable, mas rapidamente encontrei os limites da ferramenta. Migrei o desenvolvimento para o Claude, onde tive menos restrições e mais poder de criação.",
+              "Nesse processo, precisei aprender na prática a tomar decisões de design, implementar integrações de pagamento e realizar validações rigorosas. A IA escreveu o código, mas a minha curadoria e aprendizado contínuo foram o que garantiram que o produto funcionasse de verdade.",
+            ],
+            en: [
+              "I started Koinonia with Lovable, but quickly ran into the tool's limits. I moved development to Claude, where I had fewer restrictions and more room to create.",
+              "Along the way I had to learn, hands-on, how to make design decisions, implement payment integrations and run rigorous validation. The AI wrote the code, but my curation and continuous learning are what made sure the product actually worked.",
+            ],
+          },
+        },
       ],
     },
   },

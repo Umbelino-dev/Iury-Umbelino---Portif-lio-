@@ -8,8 +8,14 @@ const nextConfig: NextConfig = {
   output: "export",
   reactStrictMode: true,
   poweredByHeader: false,
-  // No image optimisation server in a static export: images are pre-sized at build time.
-  images: { unoptimized: true },
+  // No image optimisation server in a static export: `npm run images` pre-builds WebP
+  // variants at these widths and the custom loader points srcset at them.
+  images: {
+    loader: "custom",
+    loaderFile: "./src/lib/image-loader.ts",
+    deviceSizes: [640, 960, 1280, 1920],
+    imageSizes: [],
+  },
 };
 
 export default withNextIntl(nextConfig);

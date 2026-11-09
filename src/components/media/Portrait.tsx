@@ -15,11 +15,15 @@ export async function Portrait({ variant, numeral = true }: { variant: Variant; 
   const t = await getTranslations("portrait");
   const locale = (await getLocale()) as Locale;
   const image = portrait[variant];
-  const dark = variant === "alternate";
+  // Light marks when the layer is dark: the alternate, or any real photo (both are dark).
+  const dark = variant === "alternate" || Boolean(image.src);
   const ink = dark ? "text-paper-300" : "text-[#3f3d39]";
+  // The reading point sits on the face: the eye line of the photos, or the placeholder's head.
+  const y = image.src ? "top-[22%]" : "top-[31%]";
+  const yLabel = image.src ? "top-[calc(22%+8px)]" : "top-[calc(31%+8px)]";
 
   return (
-    <div className={`absolute inset-0 overflow-hidden ${dark ? "bg-ink-800" : "bg-[#d3cfc5]"}`}>
+    <div className={`absolute inset-0 overflow-hidden ${image.src ? "bg-[#1f1f1f]" : dark ? "bg-ink-800" : "bg-[#d3cfc5]"}`}>
       {image.src ? (
         <Image
           src={image.src}
@@ -27,7 +31,7 @@ export async function Portrait({ variant, numeral = true }: { variant: Variant; 
           width={image.width}
           height={image.height}
           sizes="(min-width: 768px) 58vw, 100vw"
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full object-cover object-[50%_20%]"
         />
       ) : (
         <div role="img" aria-label={t("placeholder")} className="absolute inset-0">
@@ -37,17 +41,17 @@ export async function Portrait({ variant, numeral = true }: { variant: Variant; 
 
       <div aria-hidden="true" className={`pointer-events-none absolute inset-0 font-mono text-[11px] tracking-[0.04em] uppercase ${ink}`}>
         {/* Crosshair at the reading point */}
-        <span className={`absolute top-[31%] left-1/2 -ml-[22px] h-px w-11 ${dark ? "bg-paper-300" : "bg-[#3f3d39]"}`} />
-        <span className={`absolute top-[31%] left-1/2 -mt-[22px] h-11 w-px ${dark ? "bg-paper-300" : "bg-[#3f3d39]"}`} />
-        <span className="absolute top-[calc(31%+8px)] left-[calc(50%+30px)] normal-case">x 0.500 · y 0.310</span>
+        <span className={`absolute ${y} left-1/2 -ml-[22px] h-px w-11 ${dark ? "bg-paper-300" : "bg-[#3f3d39]"}`} />
+        <span className={`absolute ${y} left-1/2 -mt-[22px] h-11 w-px ${dark ? "bg-paper-300" : "bg-[#3f3d39]"}`} />
+        <span className={`absolute ${yLabel} left-[calc(50%+30px)] normal-case`}>{image.src ? "x 0.500 · y 0.220" : "x 0.500 · y 0.310"}</span>
         <div className="absolute inset-x-5 top-4 flex justify-between gap-4">
-          <span>{dark ? t("specimenAlt") : t("specimenBase")}</span>
-          <span className="hidden normal-case sm:inline">{dark ? t("metaAlt") : t("metaBase")}</span>
+          <span>{variant === "alternate" ? t("specimenAlt") : t("specimenBase")}</span>
+          <span className="hidden normal-case sm:inline">{variant === "alternate" ? t("metaAlt") : image.src ? `4:5 · ${image.width}×${image.height}` : t("metaBase")}</span>
         </div>
-        <span className="absolute right-5 bottom-4 normal-case">{dark ? t("srcAlt") : t("srcBase")}</span>
+        <span className="absolute right-5 bottom-4 normal-case">{variant === "alternate" ? t("srcAlt") : t("srcBase")}</span>
         {numeral && (
           <span
-            className={`absolute bottom-1 left-4 font-display text-[clamp(5.5rem,15vw,16rem)] leading-[0.8] font-bold tracking-[-0.05em] normal-case ${dark ? "text-paper" : "text-ink"}`}
+            className={`absolute bottom-1 left-4 font-display text-[clamp(5.5rem,15vw,16rem)] leading-[0.8] font-bold tracking-[-0.05em] normal-case ${dark ? "text-paper" : "text-ink"} ${image.src ? "opacity-90" : ""}`}
           >
             01
           </span>

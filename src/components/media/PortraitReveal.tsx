@@ -23,7 +23,7 @@ export function PortraitReveal({
   base: ReactNode;
   alternate: ReactNode;
   caption: string;
-  labels: { showMachine: string; showPortrait: string };
+  labels: { showMachine: string; showPortrait: string; cursor: string };
 }) {
   const frame = useRef<HTMLDivElement>(null);
   const [on, setOn] = useState(false);
@@ -67,6 +67,7 @@ export function PortraitReveal({
     <figure className="flex flex-col gap-4">
       <div
         ref={frame}
+        data-cursor-label={labels.cursor}
         className="relative h-full w-full touch-pan-y overflow-hidden select-none [--r:0px] [--x:50%] [--y:50%]"
         onPointerEnter={(e) => {
           if (mouse(e) && !on) {

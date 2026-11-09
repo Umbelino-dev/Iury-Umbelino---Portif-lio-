@@ -15,6 +15,8 @@ export interface ProjectRow {
   href?: string;
   external?: boolean;
   externalLabel?: string;
+  /** Custom cursor label (fine pointers only). */
+  cursorLabel?: string;
 }
 
 const LERP = 0.14;
@@ -152,6 +154,7 @@ export function ProjectList({ rows, label }: { rows: ProjectRow[]; label: string
               {row.href ? (
                 <a
                   href={row.href}
+                  data-cursor-label={row.cursorLabel}
                   target={row.external ? "_blank" : undefined}
                   rel={row.external ? "noopener noreferrer" : undefined}
                   className={rowClass}

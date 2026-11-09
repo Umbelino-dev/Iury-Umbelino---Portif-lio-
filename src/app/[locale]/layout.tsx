@@ -4,8 +4,10 @@ import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
-import { display, sans } from "@/lib/fonts";
+import { display, sans, serif } from "@/lib/fonts";
 import { site } from "@/content/profile";
+import { Cursor } from "@/components/layout/Cursor";
+import { SplitReveal } from "@/components/layout/SplitReveal";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -17,7 +19,7 @@ export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Pr
   const t = await getTranslations({ locale, namespace: "meta" });
   return {
     metadataBase: new URL(site.url),
-    title: { default: t("title"), template: `%s — ${site.name}` },
+    title: { default: t("title"), template: `%s · ${site.name}` },
     description: t("description"),
     alternates: {
       canonical: `/${locale}`,
@@ -51,7 +53,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
   return (
     <html
       lang={locale === "pt" ? "pt-BR" : "en"}
-      className={`${display.variable} ${sans.variable}`}
+      className={`${display.variable} ${sans.variable} ${serif.variable}`}
       // The inline script below adds `js` before hydration.
       suppressHydrationWarning
     >
@@ -67,6 +69,8 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
           {t("skip")}
         </a>
         <NextIntlClientProvider>{children as ReactNode}</NextIntlClientProvider>
+        <Cursor />
+        <SplitReveal />
       </body>
     </html>
   );

@@ -35,6 +35,25 @@ Temporary progress log. Permanent rules live in `CLAUDE.md`.
   - Lighthouse 13.6 via `wrangler dev` (lab): see README table — home mobile went from 89 (LCP 3.7 s: the intro faded in after hydration) to 99–100 (LCP 1.1 s) by keeping the intro visible from first paint; everything else 100.
   - `wrangler dev` confirmed `/` → 302 `/pt`, security headers, immutable cache on `/_next/static`, 404 page.
 
+- [x] **Redesign R2: creative direction, lettering, copy, cat rail, cursor** (2026-11-09). Report: https://claude.ai/artifact/MChe7Lo1MARkqMD9Hg9bnA (audit, 10 references with verified/not-verified flags, 3 directions, the 3 hero mocks, measurements).
+  - Direction "Publication" with kinetic accents in three places only (name entrance, cat, cursor). Fonts: Bricolage Grotesque (display) + IBM Plex Sans (body) + Instrument Serif italic (statement). Space Grotesk removed.
+  - Hero: the name is an SVG lettering (`scripts/lettering.py` → `src/components/hero/name-paths.ts`) with the y's tail running into the b's stem. Long intro replaced by one positioning line. Statement and cat placed in the mark's coordinates. No descender can clip (checked at 320/390/768/1280/1440/1920). Mobile: name first, hero sized to content.
+  - Night→Day screen removed (components, CSS, `transition.*` messages). Hero CTA → #about.
+  - Copy rewritten PT + EN: 0 em-dashes in UI copy (`npm run copy:check`). Iury's lesson kept verbatim. "Leio todas as mensagens" removed (unverifiable promise).
+  - Cat: tail group + paws in `CatFigure`; `SectionRail` + rail cling from 1440px with a fine pointer (anticipation, stretch, squash, tail whip; rides the page and climbs back to the 40% line; slides down to sleep). Below 1440 the dock stays (the margin is narrower than the 44px cat). Deviation from the plan: the plan said ≥1280.
+  - Cursor (`components/layout/Cursor.tsx`): dot + lagged ring, link / label / text / hidden / press states; labels "ver projeto", "visitar site", "ver a máquina", "pergunte"; native cursor on form fields; not mounted on touch.
+  - Section titles rise word by word (`data-split`, SplitText, no masks; skipped above the fold, with a highlight, and with reduced motion). OG image regenerated with the lettering (built from a scratch HTML page, not a repo script).
+  - Validated: `npm run check`; Playwright regressions M3–M6 + hero (reduced motion, no-JS, EN) + rail + cursor (states, text selection, touch) with no console errors.
+  - Lighthouse 13.6 (wrangler dev): desktop 99–100; mobile /pt 96/99/98 over 3 runs, /en 98, case 96 (TBT 140–230 ms, up from 80–110). A11y / BP / SEO 100, CLS 0 everywhere. Next: defer cursor + SplitText to idle to win TBT back.
+
+- [x] **Hero refinement** (2026-11-09):
+  - Ligature rebuilt: Bricolage's y is a u-shape whose right stem (x 294–438) hooks left to x 10; the old join hung a rectangle from the hook's end, hence the sharp bend and the off-axis stem. Now the hook is replaced by the right stem continuing straight down (depth −216), drawn at the b stem's exact width (145) on the same axis, and y ∪ b is one outline (skia-pathops union). Line 2 shift went from −257 to +26.5 units. Checked at 3× zoom: no step, gap or double edge. Trade-off: without the hook the y reads more like a u with a long stem; the ligature is what makes it a y.
+  - Follow-up (Iury: the straight y looked like a u): the u-bowl is gone. The y's left arm now curves down into the straight stem (outer edge meets it at −40, inner at 120, a V-shaped counter), so it reads as a y; the stem still runs straight into the b.
+  - Mobile hero: own composition below 768px (name → statement left-aligned with the cat at the row's end → stack line, intro, link). Centered statement tested and rejected (fights the left-aligned name and intro). Checked at 360/375/390/414/430: no overflow, no overlaps, statement 2 lines at 24.6–26.3px.
+  - Cat in the hero: scrubbed ScrollTrigger (start top, end 60%, scrub 0.6): eyes, head and body turn toward the name, settle, then crouch before the jump. Reduced motion: static.
+  - Instrument Serif is now preloaded (the in-flow statement caused CLS 0.001 on mobile from the font swap; now 0).
+  - Lighthouse (wrangler dev): /pt mobile 93/95/97 over 3 runs (TBT 180–300 ms), desktop 99; /en mobile 97, desktop 99; case mobile 97. A11y/BP/SEO 100, CLS 0.
+
 ## Answers from Iury (2026-11-09)
 - Giassi, DOX, SQL and PL/SQL may be named publicly → `experience.publishEmployer = true`.
 - Contacts stay hidden; Iury will send the real email and LinkedIn.

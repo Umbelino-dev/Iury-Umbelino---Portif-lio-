@@ -6,9 +6,9 @@
  *     └──────── HERO_ENTERED ─────────┘  └─ACTIVITY──┘
  *  observer | cling | sleep ─OPEN→ awaken ─CLOSE→ sleep
  *
- * Desktop deviation from R03 (see NOTES.md): "cling" is the docked, awake cat in the
- * bottom-right corner — the same dock R03 uses on mobile — instead of a 30px rail,
- * which would overlap copy at medium widths.
+ * "cling" has two places (CatAssistant): the R03 rail from 1440px with a fine pointer
+ * (home only), where the right page margin can hold the cat; otherwise the docked,
+ * awake cat in the bottom-right corner (the dock R03 uses on mobile).
  */
 
 export type CatState = "observer" | "jump" | "cling" | "sleep" | "awaken";

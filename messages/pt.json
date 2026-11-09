@@ -1,8 +1,8 @@
 {
   "meta": {
-    "title": "Iury Umbelino — Curiosity builds what comes next.",
-    "description": "Iury Umbelino projeta e constrói produtos com IA, protótipos e pequenos experimentos — cada um começando por uma pergunta real.",
-    "ogAlt": "Iury Umbelino — Curiosity builds what comes next. Um gato preto de olhos verde-limão ao lado do nome."
+    "title": "Iury Umbelino · Curiosity builds what comes next.",
+    "description": "Iury Umbelino constrói produtos com IA, protótipos e pequenos experimentos. Cada um começa com uma pergunta.",
+    "ogAlt": "Iury Umbelino, Curiosity builds what comes next. O nome desenhado à mão, com o y ligado ao b."
   },
   "nav": {
     "label": "Principal",
@@ -12,7 +12,7 @@
     "lab": "Lab",
     "contact": "Contato",
     "switchLocale": "Ver em inglês",
-    "home": "Iury Umbelino — início",
+    "home": "Iury Umbelino, início",
     "menu": "Menu",
     "skip": "Pular para o conteúdo",
     "localeShort": "EN",
@@ -27,40 +27,27 @@
     "live": "No ar"
   },
   "hero": {
-    "intro": "Projeto e construo produtos com IA, protótipos e pequenos experimentos — cada um começando por uma pergunta real. É aqui que documento o que estou aprendendo.",
+    "intro": "Construo produtos com IA. Cada um começa com uma pergunta.",
     "cta": "Conheça a pessoa",
-    "edition": "Edição 01 — 2026",
+    "edition": "Edição 01 · 2026",
     "topics": "IA · Produtos · Experimentos",
     "index": "(00) Índice",
     "scroll": "Rolar",
     "stack": "Assistente de TI · SQL/PL-SQL · IA & Produtos"
   },
-  "transition": {
-    "night": {
-      "label": "O que uma máquina vê",
-      "title": "Um padrão de sinais, prompts e parâmetros."
-    },
-    "day": {
-      "label": "O que realmente está ali",
-      "titleLead": "Uma pessoa que não para de perguntar",
-      "titleAccent": "por quê."
-    },
-    "horizonNight": "Noite — possibilidade",
-    "horizonDay": "Dia — evidência"
-  },
   "portrait": {
-    "specimenBase": "Espécime 01 / Retrato — base",
-    "specimenAlt": "Espécime 01 / Retrato — alternativo (cibernético)",
+    "specimenBase": "Espécime 01 / Retrato",
+    "specimenAlt": "Espécime 01 / Retrato, versão máquina",
     "metaBase": "4:5 · sRGB · 2400×3000",
-    "metaAlt": "alinhado à base · Δ 0px",
-    "srcBase": "fonte: fotografia original",
-    "srcAlt": "fonte: derivado da base",
-    "placeholder": "Espaço reservado para o retrato de Iury Umbelino — a fotografia entra aqui."
+    "metaAlt": "alinhado ao retrato · Δ 0px",
+    "srcBase": "fonte: fotografia",
+    "srcAlt": "fonte: derivado da fotografia",
+    "placeholder": "Aqui entra o retrato de Iury Umbelino."
   },
   "about": {
     "label": "(01) Sobre",
-    "title": "Sou o Iury. Aprendo construindo — e construo para aprender.",
-    "lead": "Quase tudo o que faço começa com uma pergunta que não sai da minha cabeça. Este portfólio é onde documento o que encontro.",
+    "title": "Sou o Iury. Aprendo construindo. Construo para aprender.",
+    "lead": "Quase tudo que faço começa com uma pergunta que não me larga. Aqui eu mostro o que encontrei.",
     "traits": [
       {
         "index": "T.01",
@@ -68,7 +55,7 @@
           "Tecno-",
           "logia"
         ],
-        "text": "IA é o meu principal material agora — assistentes, agentes e ferramentas que tornam a informação realmente útil."
+        "text": "IA é meu material principal hoje. Assistentes, agentes e ferramentas que deixam a informação útil de verdade."
       },
       {
         "index": "T.02",
@@ -76,7 +63,7 @@
           "Cria-",
           "tividade"
         ],
-        "text": "Me importo com como as coisas são sentidas, não só com como funcionam. A interface faz parte da solução."
+        "text": "Ligo para como as coisas são sentidas, não só para como funcionam. A interface faz parte da solução."
       },
       {
         "index": "T.03",
@@ -84,17 +71,17 @@
           "Curio-",
           "sidade"
         ],
-        "text": "Prefiro entregar um protótipo honesto a polir um palpite. Cada projeto ensina algo específico."
+        "text": "Prefiro um protótipo honesto a um palpite polido. Cada projeto me ensina uma coisa específica."
       }
     ],
-    "caption": "Espécime 01 — passe o mouse sobre a imagem, ou toque e segure, para ver a leitura da máquina.",
-    "showMachine": "Ver leitura da máquina",
-    "showPortrait": "Ver retrato"
+    "caption": "Espécime 01. Passe o mouse, ou toque e segure, para ver a máquina.",
+    "showMachine": "Ver a máquina",
+    "showPortrait": "Ver o retrato"
   },
   "experience": {
     "label": "(01.1) Experiência",
     "title": "Onde a curiosidade vira rotina.",
-    "lead": "Dois anos e meio no Giassi Supermercados, de Jovem Aprendiz à área de Tecnologia. Hoje sustento sistemas internos com dados reais e usuários reais.",
+    "lead": "Dois anos e meio no Giassi Supermercados. Entrei como Jovem Aprendiz e hoje estou na área de Tecnologia, cuidando de sistemas internos com dados e usuários reais.",
     "highlights": "O que faço",
     "path": "Trajetória",
     "stack": "Uso no dia a dia",
@@ -115,7 +102,7 @@
   },
   "projects": {
     "label": "(02) Projetos selecionados",
-    "note": "Seis projetos em estágios diferentes, cada um documentado com o que existe hoje. Alguns status ainda são provisórios.",
+    "note": "Seis projetos em fases diferentes. Cada um mostra só o que existe hoje. Alguns status ainda podem mudar.",
     "image": "Imagem do projeto",
     "placeholder": "placeholder",
     "visit": "abre o site em nova aba",
@@ -124,7 +111,7 @@
   "lab": {
     "label": "(03) Laboratório experimental",
     "title": "Lab",
-    "intro": "Pequenas coisas feitas para responder uma pergunta cada. Não são produtos — ainda.",
+    "intro": "Coisas pequenas, feitas para responder uma pergunta cada. Ainda não são produtos.",
     "meta": "{count} entradas · em andamento · atualizado 11.2026",
     "drop": "placeholder · mídia pendente",
     "ground": "plano do chão · y 0",
@@ -134,16 +121,16 @@
   "approach": {
     "label": "(04) Abordagem",
     "title": "Como uma pergunta vira uma coisa.",
-    "note": "Cinco movimentos, em ordem — e de novo. O último alimenta o primeiro.",
+    "note": "Cinco passos, nessa ordem. O último devolve ao primeiro.",
     "back": "volta ao 01",
     "steps": [
       {
         "title": "Observar",
-        "text": "Perceber o que as pessoas fazem de verdade, não o que dizem que fazem."
+        "text": "Ver o que as pessoas fazem, não o que dizem que fazem."
       },
       {
         "title": "Entender",
-        "text": "Encontrar a pergunta real por baixo do pedido."
+        "text": "Achar a pergunta real por baixo do pedido."
       },
       {
         "title": "Experimentar",
@@ -151,16 +138,16 @@
       },
       {
         "title": "Construir",
-        "text": "Transformar o que sobreviveu em algo que as pessoas possam usar."
+        "text": "Transformar o que sobreviveu em algo que dá para usar."
       },
       {
         "title": "Melhorar",
-        "text": "Entregar, observar, ajustar — e voltar a observar."
+        "text": "Entregar, observar, ajustar. E olhar de novo."
       }
     ]
   },
   "caseStudy": {
-    "label": "(02) Projetos — Estudo de caso",
+    "label": "(02) Projetos / Estudo de caso",
     "status": "Status",
     "year": "Ano",
     "role": "Papel",
@@ -181,7 +168,7 @@
   "assistant": {
     "ui": {
       "title": "Pergunte ao gato",
-      "subtitle": "sabe algumas coisas sobre o Iury · protótipo",
+      "subtitle": "sabe umas coisas sobre o Iury · protótipo",
       "subtitleCase": "pergunte sobre este projeto",
       "open": "Pergunte ao gato sobre o Iury",
       "openCase": "Pergunte ao gato sobre este projeto",
@@ -197,7 +184,7 @@
       "log": "Conversa com o gato"
     },
     "home": {
-      "greeting": "Oi — eu sou o gato. Sei algumas coisas sobre o Iury. O que você quer saber?",
+      "greeting": "Oi, eu sou o gato. Sei umas coisas sobre o Iury. O que você quer saber?",
       "chips": [
         {
           "label": "Quem é o Iury?",
@@ -209,7 +196,7 @@
             "estuda",
             "formação"
           ],
-          "answer": "Assistente de TI no Giassi Supermercados, onde trabalha com SQL, PL/SQL e Oracle. Estuda Ciência da Computação (UNESC) e Análise e Desenvolvimento de Sistemas (UNOPAR). Aprende construindo — e este site é onde documenta o que encontra."
+          "answer": "Assistente de TI no Giassi Supermercados, onde trabalha com SQL, PL/SQL e Oracle. Estuda Ciência da Computação (UNESC) e Análise e Desenvolvimento de Sistemas (UNOPAR). Aprende construindo, e este site mostra o que ele encontrou."
         },
         {
           "label": "Experiência com IA?",
@@ -221,7 +208,7 @@
             "lovable",
             "koinonia"
           ],
-          "answer": "O caso mais completo é o Koinonia: um produto no ar, construído com IA, em que o Iury definiu o problema, escreveu as diretrizes, orquestrou a construção e testou o resultado. No trabalho, usa IA para escrever regras e automações na plataforma DOX."
+          "answer": "O caso mais completo é o Koinonia, um produto no ar feito com IA. O Iury definiu o problema, escreveu as diretrizes, conduziu a construção e testou o resultado. No trabalho, usa IA para escrever regras e automações na plataforma DOX."
         },
         {
           "label": "Ver projetos",
@@ -250,11 +237,11 @@
           "action": "contact"
         }
       ],
-      "fallback": "Ainda sou um protótipo: respostas roteirizadas, sem modelo de linguagem por trás. Tente uma das sugestões."
+      "fallback": "Ainda sou um protótipo. Minhas respostas são roteirizadas, sem modelo de linguagem por trás. Tente uma das sugestões."
     },
     "cases": {
       "koinonia": {
-        "greeting": "Li este estudo de caso. Pergunte por que um Radar, como a IA foi usada ou o que a auditoria encontrou.",
+        "greeting": "Li este estudo de caso. Pergunte por que um Radar, como a IA entrou ou o que a auditoria achou.",
         "chips": [
           {
             "label": "Por que um Radar?",
@@ -265,10 +252,10 @@
               "cuidado",
               "presença"
             ],
-            "answer": "Porque uma lista de presença diz quem veio, não por quem começar. O Radar ordena as pessoas pelo risco de afastamento e transforma isso numa fila de cuidado — sem marcar como risco quem acabou de chegar."
+            "answer": "Porque uma lista de presença diz quem veio, não por quem começar. O Radar ordena as pessoas pelo risco de afastamento e vira uma fila de cuidado. Quem acabou de chegar não é marcado como risco."
           },
           {
-            "label": "Como a IA foi usada?",
+            "label": "Como a IA entrou?",
             "keywords": [
               "ia",
               "ai",
@@ -279,7 +266,7 @@
             "answer": "A IA escreveu o código a partir de um briefing e de planos escritos pelo Iury. Ele dirigiu cada rodada, conferiu o resultado e testou no desktop e no celular."
           },
           {
-            "label": "O que a auditoria encontrou?",
+            "label": "O que a auditoria achou?",
             "keywords": [
               "auditoria",
               "falha",
@@ -287,17 +274,17 @@
               "erro",
               "teste"
             ],
-            "answer": "Falhas silenciosas: leituras sem paginação que deixariam o Radar errado depois de mil registros, um filtro de datas invertido que escondia quem precisava de cuidado, e nenhum teste. Tudo corrigido."
+            "answer": "Falhas silenciosas. Leituras sem paginação deixariam o Radar errado depois de mil registros. Um filtro de datas invertido escondia quem precisava de cuidado. E não havia nenhum teste. Tudo corrigido."
           }
         ],
-        "fallback": "Sobre este projeto, só sei responder às sugestões acima — ainda sou um protótipo roteirizado."
+        "fallback": "Sobre este projeto, só sei responder às sugestões acima. Ainda sou um protótipo roteirizado."
       }
     }
   },
   "contact": {
     "label": "(05) Contato",
     "open": "Aberto a colaborações, vagas e boas perguntas",
-    "lead": "Tem uma pergunta que vale construir? Me escreva — leio todas as mensagens.",
+    "lead": "Tem uma pergunta que vale construir? Me escreve.",
     "cta": "Escreva para o Iury",
     "pending": "Os canais de contato entram aqui em breve. Enquanto isso, o gato responde o básico.",
     "askCat": "Pergunte ao gato",
@@ -312,5 +299,11 @@
     "rights": "© 2026 Iury Umbelino",
     "edition": "Edição 01",
     "top": "Voltar ao topo"
+  },
+  "cursor": {
+    "project": "ver projeto",
+    "visit": "visitar site",
+    "machine": "ver a máquina",
+    "ask": "pergunte"
   }
 }

@@ -25,7 +25,7 @@ export async function Approach() {
         <div className="flex flex-wrap items-end justify-between gap-x-12 gap-y-8 pb-[clamp(3.5rem,6vw,6.5rem)]">
           <div className="flex max-w-[760px] flex-[1_1_420px] flex-col gap-6">
             <p className="text-label font-medium tracking-label text-gray-600 uppercase">{t("label")}</p>
-            <h2 id="approach-title" className="font-display text-[clamp(2rem,1.5rem+2.4vw,3.75rem)] leading-[0.98] font-semibold tracking-[-0.03em]">
+            <h2 id="approach-title" data-split className="font-display text-[clamp(2rem,1.5rem+2.4vw,3.75rem)] leading-[0.98] font-semibold tracking-[-0.03em]">
               {t("title")}
             </h2>
           </div>

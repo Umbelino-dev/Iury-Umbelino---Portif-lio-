@@ -48,7 +48,7 @@ export function ProjectImage({
     <span aria-hidden="true" className={`absolute inset-0 block overflow-hidden ${tone.bg}`}>
       <span className={`absolute inset-x-3.5 top-3 flex justify-between gap-3 font-mono text-[11px] tracking-[0.04em] uppercase ${tone.meta}`}>
         <span>
-          {labels.image} — {project.index}
+          {labels.image} · {project.index}
         </span>
         <span className="hidden normal-case sm:inline [@media(hover:hover)]:inline">4:3 · {labels.placeholder}</span>
       </span>

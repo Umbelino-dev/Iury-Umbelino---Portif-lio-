@@ -80,7 +80,7 @@ export default async function CaseStudyPage({ params }: PageProps<"/[locale]/pro
                   locale={locale}
                   numeral={project.index.replace("P.", "")}
                   priority
-                  spec={{ left: `${cs.cover.label[locale]} — ${project.index}`, right: `16:9 · 3200×1800 · ${t("placeholder")}` }}
+                  spec={{ left: `${cs.cover.label[locale]} · ${project.index}`, right: `16:9 · 3200×1800 · ${t("placeholder")}` }}
                 />
               </div>
               <figcaption className="px-(--page-margin) text-caption text-gray-600 max-md:pr-12 md:px-0">

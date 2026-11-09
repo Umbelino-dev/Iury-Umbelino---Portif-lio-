@@ -1,9 +1,9 @@
-import { display, sans } from "@/lib/fonts";
+import { display, sans, serif } from "@/lib/fonts";
 
 // Global 404 (exported as out/404.html). Bilingual because no locale is known here.
 export default function NotFound() {
   return (
-    <html lang="pt-BR" className={`${display.variable} ${sans.variable}`}>
+    <html lang="pt-BR" className={`${display.variable} ${sans.variable} ${serif.variable}`}>
       <body className="surface-dark min-h-dvh font-sans">
         <main className="page-grid min-h-dvh content-center gap-y-6 py-24">
           <p className="col-span-full font-mono text-label uppercase text-gray-500">Erro 404 · Error 404</p>

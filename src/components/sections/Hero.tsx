@@ -1,21 +1,38 @@
+import type { CSSProperties } from "react";
 import { getTranslations } from "next-intl/server";
 import { site } from "@/content/profile";
 import { CatObserver } from "@/components/cat/CatObserver";
+import { NameMark } from "@/components/hero/NameMark";
+import { anchors, viewBox } from "@/components/hero/name-paths";
 import { HeroMotion } from "./HeroMotion";
 
 /**
- * 01 · Hero — dark editorial (Homepage R02).
- * The name is split over two lines with the tagline beside "Iury"; tension comes
- * from scale (~6:1). Accent points: "next." and the cat's eyes — 2 of 2.
+ * 01 · Hero. The name is the experience: "Iury / Umbelino" is lettered as one
+ * SVG mark (scripts/lettering.py) where the y's stem runs straight down and
+ * becomes the b's stem. y = why, b = build: "Curiosity builds" in the letters.
  *
- * Mobile-first: on 4 columns the cat sits beside "Iury" (the short word) because
- * "Umbelino" at display size fills the width; from md it moves beside "Umbelino".
+ * The mark has a padded viewBox and no overflow masks, so no descender can clip.
+ * Desktop: the statement and the cat are placed in the mark's own coordinates
+ * (anchors exported by the script), so they keep their spot at every width.
+ * Mobile (< 768px) has its own composition: name, then the statement with the
+ * cat beside it, then the positioning line and the link.
+ * Accent points: "next." and the cat's eyes (2 of 2).
  */
+const [, , markW, markH] = viewBox.split(" ").map(Number) as [number, number, number, number];
+/** Desktop placement, in % of the mark, straight from the lettering geometry. */
+const markVars = {
+  "--mark-ratio": (markW / markH).toFixed(4),
+  "--stmt-left": `${anchors.line1Right + 5}%`, // a clear gap after the y's stem
+  "--stmt-top": `${anchors.xHeight1}%`, // the x-height of "ury"
+  "--stmt-max": `${100 - anchors.line1Right - 7}%`,
+  "--o-center": `${anchors.oCenter}%`,
+  "--o-bottom": `${100 - anchors.oTop}%`,
+} as CSSProperties;
+
 export async function Hero() {
   const t = await getTranslations("hero");
   const ta = await getTranslations("assistant.ui");
-  const nameLine =
-    "block font-display font-bold leading-[0.86] tracking-[-0.045em] text-[clamp(4rem,20.5vw,6.5rem)] md:text-[clamp(4.5rem,17.5vw,15.75rem)]";
+  const tc = await getTranslations("cursor");
 
   return (
     <section
@@ -23,22 +40,75 @@ export async function Hero() {
       data-nav-id="hero"
       data-surface="dark"
       aria-labelledby="hero-name"
-      className="relative isolate flex min-h-dvh flex-col justify-end overflow-hidden bg-ink pt-24 pb-6 text-paper md:pt-28"
+      className="relative isolate flex flex-col overflow-hidden bg-ink pt-24 pb-14 text-paper md:min-h-dvh md:pt-28 md:pb-6"
     >
       <HeroBackdrop />
 
-      <HeroMotion className="relative z-10 mx-auto flex w-full max-w-(--container-page) flex-col gap-[clamp(1.25rem,2.4vw,2.5rem)] px-(--page-margin)">
-        {/* Intro (top-left, away from the name) + edition metadata */}
-        <div className="grid grid-cols-4 gap-x-(--page-gutter) gap-y-6 md:grid-cols-12">
-          {/* Visible from the first paint (no fade): this paragraph is the mobile LCP element. */}
-          <div className="col-span-4 flex flex-col gap-5 md:col-span-6 lg:col-span-5">
-            {/* Eyebrow: what Iury does today, before the editorial line. */}
+      {/*
+        Mobile: the name comes first and the hero is as tall as its content, so the
+        mark leads and About peeks in below. Desktop: a full-height poster with the
+        positioning line at the top and the name at the bottom.
+      */}
+      <HeroMotion className="relative z-10 mx-auto flex w-full max-w-(--container-page) flex-1 flex-col gap-12 px-(--page-margin) md:justify-between md:gap-10">
+        <div className="flex flex-col gap-5 md:order-2">
+          {/* Width also follows the viewport height (by the mark's own ratio), so the whole mark fits on short screens. */}
+          <div
+            data-hero-mark
+            style={markVars}
+            className="@container relative w-full md:w-[clamp(50%,calc((100svh-24rem)*var(--mark-ratio)),100%)]"
+          >
+            <h1 id="hero-name" className="text-paper">
+              <span className="sr-only">Iury Umbelino</span>
+              <NameMark className="block h-auto w-full" />
+            </h1>
+            {/*
+              Mobile: the statement is its own row under the name, with the cat at the
+              row's end looking up at the letters. Desktop: the row dissolves
+              (md:contents) and the statement sits in the space right of "Iury".
+            */}
+            <div className="mt-8 flex items-end justify-between gap-6 md:contents">
+              <p
+                lang="en"
+                data-hero-fade-md
+                className="font-serif text-[clamp(1.5rem,1rem+2.4vw,1.75rem)] leading-[1.08] tracking-[-0.01em] text-paper italic md:absolute md:top-(--stmt-top) md:left-(--stmt-left) md:max-w-(--stmt-max) md:text-[max(1rem,4.4cqw)] md:leading-[1.02]"
+              >
+                {site.tagline.lead}
+                <br />
+                what comes <span className="text-signal">next.</span>
+              </p>
+              <CatObserver
+                label={ta("open")}
+                cursorLabel={tc("ask")}
+                look="up"
+                className="mb-1 aspect-[4/5] w-12 flex-none md:hidden"
+              />
+            </div>
+            {/* Desktop: perched on the final "o" (anchors from the lettering script). */}
+            <CatObserver
+              label={ta("open")}
+              cursorLabel={tc("ask")}
+              look="left"
+              className="absolute bottom-(--o-bottom) left-(--o-center) hidden aspect-[4/5] w-[max(2.75rem,7.5cqw)] -translate-x-1/2 md:block"
+            />
+          </div>
+          <div
+            data-hero-fade
+            className="hidden justify-between gap-4 border-t border-[#2a2a2a] pt-3.5 text-label font-medium tracking-label text-gray-500 uppercase md:flex"
+          >
+            <span>{t("index")}</span>
+            <span aria-hidden="true">{t("scroll")}</span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-4 gap-x-(--page-gutter) gap-y-6 md:order-1 md:grid-cols-12">
+          {/* Visible from the first paint (no fade): this is the mobile LCP text. */}
+          <div className="col-span-4 flex flex-col gap-4 md:col-span-6 lg:col-span-5">
             <p className="text-label font-medium tracking-label text-gray-500 uppercase">{t("stack")}</p>
-            <p className="-mt-1 max-w-[44ch] text-[clamp(1rem,0.9rem+0.45vw,1.1875rem)] leading-[1.55] text-pretty text-paper-300">
+            <p className="max-w-[30ch] text-[clamp(1.1875rem,1rem+0.6vw,1.5rem)] leading-[1.45] md:leading-[1.35] text-pretty text-paper">
               {t("intro")}
             </p>
             <a
-              href="#transition"
+              href="#about"
               className="flex min-h-11 items-center gap-2.5 self-start border-b border-paper text-ui font-medium transition-colors duration-(--duration-fast) hover:border-paper-0 hover:text-paper-0"
             >
               {t("cta")} <span aria-hidden="true">↓</span>
@@ -46,59 +116,18 @@ export async function Hero() {
           </div>
           <p
             data-hero-fade
-            className="col-span-4 flex flex-col gap-1.5 text-label font-medium tracking-label text-gray-500 uppercase md:col-span-4 md:col-start-9 md:items-end md:text-right"
+            className="col-span-4 hidden flex-col gap-1.5 text-label font-medium tracking-label text-gray-500 uppercase md:col-span-4 md:col-start-9 md:flex md:items-end md:text-right"
           >
             <span>{t("edition")}</span>
             <span>{t("topics")}</span>
           </p>
-        </div>
-
-        {/* The name. h1 reads "Iury Umbelino"; the visual "Umbelino" line is aria-hidden. */}
-        <div className="flex flex-col">
-          <div className="grid grid-cols-4 items-end gap-x-(--page-gutter) md:grid-cols-12">
-            <div className="col-span-4 flex items-end justify-between gap-4 md:col-span-6">
-              <h1 id="hero-name" className="overflow-hidden pb-[0.04em]">
-                <span data-hero-line className={nameLine}>
-                  Iury
-                </span>
-                <span className="sr-only"> Umbelino</span>
-              </h1>
-              <CatObserver label={ta("open")} className="mb-[0.4rem] aspect-[4/5] w-16 flex-none md:hidden" />
-            </div>
-            <p
-              lang="en"
-              className="col-span-4 order-last mt-5 overflow-hidden font-display text-[clamp(1.75rem,1.2rem+2.4vw,3.75rem)] leading-none font-semibold tracking-[-0.025em] md:order-none md:col-span-6 md:mt-0 md:mb-[2.4vw]"
-            >
-              <span data-hero-line className="block pb-[0.08em]">
-                {site.tagline.lead}
-                <br />
-                what comes <span className="text-signal">next.</span>
-              </span>
-            </p>
-            <div className="col-span-4 flex items-end gap-[clamp(0.75rem,1.6vw,1.75rem)] md:col-span-12">
-              <span aria-hidden="true" data-cat-ignore className="overflow-hidden pb-[0.04em]">
-                <span data-hero-line className={nameLine}>
-                  Umbelino
-                </span>
-              </span>
-              <CatObserver label={ta("open")} className="mb-[2.2vw] hidden aspect-[4/5] w-[clamp(4rem,8.5vw,8.75rem)] flex-none md:block" />
-            </div>
-          </div>
-        </div>
-
-        <div
-          data-hero-fade
-          className="flex justify-between gap-4 border-t border-[#2a2a2a] pt-3.5 text-label font-medium tracking-label text-gray-500 uppercase"
-        >
-          <span>{t("index")}</span>
-          <span aria-hidden="true">{t("scroll")}</span>
         </div>
       </HeroMotion>
     </section>
   );
 }
 
-/** Atmosphere: blueprint grid, coordinates, soft light, grain, vignette. Decorative only. */
+/** Atmosphere: blueprint grid, soft light, grain, vignette. Decorative only. */
 function HeroBackdrop() {
   const grain =
     "url(\"data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")";
@@ -107,11 +136,6 @@ function HeroBackdrop() {
       <div className="absolute -top-44 -right-[6%] h-[420px] w-[62%] bg-[radial-gradient(ellipse_50%_50%_at_60%_50%,rgba(243,241,235,0.11),rgba(243,241,235,0.035)_45%,transparent_72%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_55%_60%_at_68%_52%,rgba(243,241,235,0.075),rgba(243,241,235,0.02)_45%,transparent_75%)]" />
       <div className="hero-grid absolute inset-0" />
-      <div className="absolute inset-0 hidden font-mono text-[10px] tracking-[0.06em] text-gray-600 md:block">
-        <span className="absolute top-[31%] left-[58.33%] flex gap-2"><span className="text-gray-500">+</span>x.07 / y.03</span>
-        <span className="absolute top-[16%] left-[83.33%] flex gap-2"><span className="text-gray-500">+</span>x.11 / y.01</span>
-        <span className="absolute top-[47%] left-[33.33%] flex gap-2"><span className="text-gray-500">+</span>x.05 / y.04</span>
-      </div>
       <div className="absolute inset-0 opacity-[0.07] mix-blend-screen" style={{ backgroundImage: grain, backgroundSize: "240px 240px" }} />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_85%_85%_at_55%_45%,transparent_55%,rgba(0,0,0,0.55)_100%)]" />
     </div>

@@ -10,7 +10,8 @@
     "typecheck": "next typegen && tsc --noEmit",
     "check": "npm run typecheck && npm run lint && npm run build",
     "deploy": "npm run build && wrangler deploy",
-    "images": "node scripts/images.mjs"
+    "images": "node scripts/images.mjs",
+    "copy:check": "node scripts/copy-check.mjs"
   },
   "dependencies": {
     "@gsap/react": "2.1.2",

@@ -19,11 +19,45 @@ export interface ProjectLink {
   href: string;
 }
 
-export interface CaseStudyChapter {
-  /** e.g. "problem", "role", "decisions" — stable id used for anchors. */
+/** A figure or cover: a real image when `image` exists, otherwise the editorial placeholder. */
+export interface MediaSlot {
   id: string;
+  /** Desktop aspect; mobile may reflow (cover 16:9 → 4:3, 3:4 → 4:5). */
+  aspect: "16/9" | "4/3" | "3/4";
+  /** Mono spec label on the placeholder, e.g. "Painel". */
+  label: Localized;
+  caption: Localized;
+  image?: MediaImage;
+}
+
+export interface CaseStudyStep {
   title: Localized;
-  body: Localized<string[]>;
+  text: Localized;
+}
+
+export interface CaseStudyChapter {
+  /** Stable id, used for anchors. */
+  id: "problem" | "build" | "audit" | "product" | "learned" | "results";
+  label: Localized; // "O problema" — numbered by position
+  title: Localized; // display H2, max ~15ch
+  /** Words of the title to mark with the `highlight` utility (light surface accent). */
+  highlight?: Localized;
+  body?: Localized<string[]>;
+  /** Ruled list (index + H3 + one sentence). */
+  steps?: CaseStudyStep[];
+  figures?: MediaSlot[];
+}
+
+export interface CaseStudy {
+  /** false = draft: no page is generated and the index does not link to it. */
+  confirmed: boolean;
+  lead?: Localized;
+  /** Tools the product was built with (e.g. the AI builder) — shown next to the stack. */
+  builtWith?: string[];
+  cover?: MediaSlot;
+  /** Rendered in order; a chapter without body, steps or figures is skipped. */
+  chapters: CaseStudyChapter[];
+  source: string;
 }
 
 /** Tag keys, translated in messages (`tags.*`). */
@@ -53,8 +87,8 @@ export interface Project {
   role?: Localized;
   stack?: string[];
   links?: ProjectLink[];
-  /** Case-study chapters. Omitted until there is verified material. */
-  chapters?: CaseStudyChapter[];
+  /** Case study. Only `confirmed` ones get a page (/[locale]/projects/[slug]). */
+  caseStudy?: CaseStudy;
   /** Where the facts came from — for maintainers, never rendered. */
   source: string;
   /** false = status/year/summary come from the design prototype and await confirmation. */

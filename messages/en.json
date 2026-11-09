@@ -14,7 +14,9 @@
     "home": "Iury Umbelino — home",
     "menu": "Menu",
     "skip": "Skip to content",
-    "localeShort": "PT"
+    "localeShort": "PT",
+    "allProjects": "All projects",
+    "projectsShort": "Projects"
   },
   "status": {
     "concept": "Concept",
@@ -155,5 +157,24 @@
         "text": "Ship, watch, adjust — and start observing again."
       }
     ]
+  },
+  "caseStudy": {
+    "label": "(02) Projects — Case study",
+    "status": "Status",
+    "year": "Year",
+    "role": "Role",
+    "tags": "Tags",
+    "stack": "Stack",
+    "builtWith": "Built with",
+    "back": "All projects",
+    "next": "Next project",
+    "index": "Index",
+    "allProjects": "All projects",
+    "figure": "Fig.",
+    "placeholder": "placeholder",
+    "pending": "screenshot pending",
+    "newTab": "opens in a new tab",
+    "links": "Links",
+    "progress": "Reading progress"
   }
 }

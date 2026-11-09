@@ -14,7 +14,9 @@
     "home": "Iury Umbelino — início",
     "menu": "Menu",
     "skip": "Pular para o conteúdo",
-    "localeShort": "EN"
+    "localeShort": "EN",
+    "allProjects": "Todos os projetos",
+    "projectsShort": "Projetos"
   },
   "status": {
     "concept": "Conceito",
@@ -155,5 +157,24 @@
         "text": "Entregar, observar, ajustar — e voltar a observar."
       }
     ]
+  },
+  "caseStudy": {
+    "label": "(02) Projetos — Estudo de caso",
+    "status": "Status",
+    "year": "Ano",
+    "role": "Papel",
+    "tags": "Tags",
+    "stack": "Stack",
+    "builtWith": "Construído com",
+    "back": "Todos os projetos",
+    "next": "Próximo projeto",
+    "index": "Índice",
+    "allProjects": "Todos os projetos",
+    "figure": "Fig.",
+    "placeholder": "placeholder",
+    "pending": "captura pendente",
+    "newTab": "abre em nova aba",
+    "links": "Links",
+    "progress": "Progresso de leitura"
   }
 }

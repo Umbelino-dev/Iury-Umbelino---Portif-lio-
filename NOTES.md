@@ -17,7 +17,11 @@ Temporary progress log. Permanent rules live in `CLAUDE.md`.
   - Only Koinonia and Via Hebraica link out (real sites, new tab); other rows stay plain until their case studies exist (M4).
   - Lab: E.02/E.03 shown as concepts with no year (the design claimed "Prototype 2026" / "Archived 2025"); "Read the study" links removed — no studies exist. The cat's perch on E.01 waits for the single CatAssistant (M5).
   - The floating preview uses a 1px hairline instead of the prototype's drop shadow ("no shadows" rule).
-- [ ] M4 — Case study template (Koinonia first)
+- [x] **M4 — Case study template + Koinonia** (2026-11-09): typed `CaseStudy` (chapters with body / ruled steps / figures, `MediaSlot` placeholders), route `/[locale]/projects/[slug]` (only confirmed cases), `CaseHero`, sticky-numeral `Chapter`, `MediaFrame`, `NextProject`, reading-progress hairline, `Nav variant="case"`; index row now opens the case study.
+  - Koinonia copy is sourced from the private repo `Umbelino-dev/koinonia.app` @7aba644 (README, docs/PRODUTO.md, docs/AUDITORIA.md, docs/historico, git log: 2026-08-16 → 2026-10-05, 521 commits) plus Iury's role statement. Chapters: problem · how it was built (5 moves) · what curation found (the Sep 2026 audit) · the product. "What I learned" omitted until Iury writes it.
+  - Via Hebraica: `caseStudy.confirmed: false` → no page (404); its index row still opens viahebraica.app.
+  - Validated (1440/768/360/iPhone 13, PT/EN, reduced motion, no-JS): one h1, ordered headings, canonical + hreflang, sticky numeral at 96px on desktop only, mobile text ends 48px from the edge, full-bleed figures, progress 0→1, locale switch keeps the route, back pill → #projects, no overflow, no console errors. M1–M3 regressions clean.
+  - Fixed: the nav wrapped onto two lines on phones (now one line down to 320px, "← Projetos" below 640px).
 - [ ] M5 — Cat assistant, Contact, Footer, SEO, audit, deploy guide
 
 ## Answers from Iury (2026-11-09)
@@ -28,6 +32,7 @@ Temporary progress log. Permanent rules live in `CLAUDE.md`.
 - M1 starts only after Iury sends Homepage R02 screenshots (desktop + mobile). Received so far: desktop Hero and desktop Night→Day transition (start state).
 
 ## Still open
+- Koinonia: review the first-person copy (chapters 02–03), 2–3 real lessons for "O que aprendi", screenshots for the cover (16:9), Fig. 02 Painel (4:3) and Fig. 03 Radar (3:4). Confirm it is fine to describe the audit findings publicly.
 1. Real email + LinkedIn.
 2. Koinonia and Via Hebraica: role, stack, screenshots.
 3. Portrait photos (real + "cybernetic" alternate, aligned 4:5) — placeholders until then.

@@ -19,13 +19,15 @@ export async function Projects() {
 
   const rows: ProjectRow[] = projects.map((p, i) => {
     const status = ts(p.status);
-    const live = p.links?.[0];
+    // A confirmed case study wins; otherwise a live product links to its site; else no link.
+    const caseHref = p.caseStudy?.confirmed ? `/${locale}/projects/${p.slug}` : undefined;
+    const live = caseHref ? undefined : p.links?.[0];
     return {
       slug: p.slug,
       index: p.index,
       name: p.name,
       nameLang: p.nameLang && p.nameLang !== locale ? p.nameLang : undefined,
-      href: live?.href,
+      href: caseHref ?? live?.href,
       external: Boolean(live),
       externalLabel: t("visit"),
       meta: (

@@ -42,6 +42,7 @@ Surfaces: Hero dark → Night→Day transition → About light → Projects ligh
 - Server Components by default. `"use client"` only for interaction, browser APIs or animation (Nav theme, DayNightTransition, PortraitReveal, ProjectIndex floating image, CatAssistant).
 - Folders: `components/layout` (primitives), `components/sections` (home), `components/case-study`, `components/media`, `components/cat`. Extract a component for real reuse or a clear responsibility, not per element.
 - Project and Lab markup are generated from `src/content/projects.ts` and `src/content/lab.ts`; never hand-duplicate their copy. Real media goes in `cover` / `media` (`MediaImage`); without it the UI draws the editorial placeholder.
+- Case studies: `/[locale]/projects/[slug]`, generated only for projects whose `caseStudy.confirmed` is true (`getCaseStudies()` in `src/content/projects.ts`; `dynamicParams = false`). Chapters without body/steps/figures are not rendered — never fill one with invented copy (e.g. "What I learned" stays out until Iury writes it). On mobile, text blocks keep `max-md:pr-12`: the right 48px are the cat lane; figures run full bleed under it.
 - Never link to a destination that does not exist (no dead "#" links, no "read the study" without a study).
 - Fixed/sticky overlays that span the width (the nav strip) must be `pointer-events: none`, with only their controls re-enabled.
 

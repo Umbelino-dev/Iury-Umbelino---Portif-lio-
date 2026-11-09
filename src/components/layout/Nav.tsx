@@ -27,7 +27,7 @@ const THEME_LINE = 44;
  * - active item: the `[data-nav-id]` section crossing the middle of the viewport.
  * One passive scroll listener, throttled to one frame.
  */
-export function Nav() {
+export function Nav({ variant = "home" }: { variant?: "home" | "case" }) {
   const t = useTranslations("nav");
   const locale = useLocale();
   const pathname = usePathname();
@@ -116,6 +116,8 @@ export function Nav() {
   const transition = "transition-[color,background-color,border-color,box-shadow] duration-(--duration-base) ease-(--ease-out-soft)";
   const focusRing = light ? "focus-visible:outline-ink" : "focus-visible:outline-signal";
 
+  const brand = `flex min-h-11 items-center whitespace-nowrap font-display text-[1.0625rem] font-semibold tracking-[-0.01em] ${focusRing}`;
+
   const link = (id: ItemId, key: (typeof ITEMS)[number]["key"], extra = "") => (
     <a
       key={id}
@@ -140,17 +142,31 @@ export function Nav() {
         aria-label={t("label")}
         className={`pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between gap-6 [&_a]:pointer-events-auto [&_button]:pointer-events-auto [&>div]:pointer-events-auto px-(--page-margin) py-3 md:py-5 ${transition} ${light ? "text-ink" : "text-paper"}`}
       >
-        <a
-          href="#hero"
-          aria-label={t("home")}
-          className={`flex min-h-11 items-center font-display text-[1.0625rem] font-semibold tracking-[-0.01em] ${focusRing}`}
-        >
-          {site.name}
-        </a>
+        {variant === "home" ? (
+          <a href="#hero" aria-label={t("home")} className={brand}>
+            {site.name}
+          </a>
+        ) : (
+          <Link href="/" aria-label={t("home")} className={brand}>
+            {site.name}
+          </Link>
+        )}
 
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+          {variant === "case" && (
+            // Case study: one pill back to the index (Case Study R01; 44px tall on mobile).
+            <Link
+              href="/#projects"
+              className={`flex min-h-11 items-center gap-2.5 rounded-pill border px-4 text-[0.8125rem] whitespace-nowrap sm:px-4.5 font-medium ${glass} ${glassBlur} ${transition} ${focusRing}`}
+            >
+              <span aria-hidden="true">←</span>
+              <span className="sm:hidden">{t("projectsShort")}</span>
+              <span className="max-sm:hidden">{t("allProjects")}</span>
+            </Link>
+          )}
+
           {/* Desktop: the glass pill with every section */}
-          <div className={`hidden items-center gap-0.5 rounded-pill border p-[3px] md:flex ${glass} ${glassBlur} ${transition}`}>
+          <div className={`${variant === "case" ? "!hidden" : ""} hidden items-center gap-0.5 rounded-pill border p-[3px] md:flex ${glass} ${glassBlur} ${transition}`}>
             {ITEMS.map((i) => link(i.id, i.key))}
           </div>
 
@@ -171,7 +187,7 @@ export function Nav() {
             aria-expanded={open}
             aria-controls={menuId}
             onClick={() => setOpen((v) => !v)}
-            className={`flex min-h-11 items-center gap-2 rounded-pill border px-4 text-[0.8125rem] font-medium md:hidden ${glass} ${glassBlur} ${transition} ${focusRing}`}
+            className={`${variant === "case" ? "!hidden" : ""} flex min-h-11 items-center gap-2 rounded-pill border px-4 text-[0.8125rem] font-medium md:hidden ${glass} ${glassBlur} ${transition} ${focusRing}`}
           >
             <span aria-hidden="true" className="size-1.5 bg-current" />
             {t("menu")}

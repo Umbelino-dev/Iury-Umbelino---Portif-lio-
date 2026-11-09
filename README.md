@@ -1,5 +1,22 @@
 # Iury Umbelino — Portfolio
 
+![Iury Umbelino — Curiosity builds what comes next.](public/og-image.png)
+
+My personal portfolio: an editorial, bilingual (PT/EN) site that presents who I am, my work in IT and the products I build, starting with Koinonia.
+
+**Status:** pre-launch. CI is green on `main`; the Cloudflare deploy is the next step (guide below).
+
+### Highlights
+
+- **Night-to-day transition:** a sticky scroll stage with a clip-path scrub, replaced by a hard cut when reduced motion is on.
+- **Portrait reveal:** a radial mask uncovers a second, aligned portrait (pointer, press-and-hold or a 44px toggle).
+- **Editorial project index** with a floating preview, plus a typed case-study template. Koinonia is the first case.
+- **A scripted cat assistant** (no language model): it observes, docks, falls asleep and opens an accessible dialog with focus trap and Esc to close.
+- **Fully static:** Next.js static export served as Cloudflare Workers static assets. No server runtime.
+- **Accessibility and performance:** keyboard and reduced-motion paths, no-JS fallback, Lighthouse lab scores of 99–100 (table below).
+
+### Stack and commands
+
 Next.js 16 (static export) · TypeScript · Tailwind CSS v4 · GSAP · next-intl (pt / en) · Cloudflare Workers static assets.
 
 ```bash

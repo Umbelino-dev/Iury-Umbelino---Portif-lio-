@@ -10,15 +10,19 @@ Temporary progress log. Permanent rules live in `CLAUDE.md`.
 - [ ] M4 — Case study template (Koinonia first)
 - [ ] M5 — Cat assistant, Contact, Footer, SEO, audit, deploy guide
 
-## Open content questions (block M2–M5, not M1)
-1. May the site name Giassi and describe the DOX / SQL / PL-SQL work? (`experience.publishEmployer`)
-2. Which contacts go public? (`contacts[].publish` — email, LinkedIn, GitHub from the CV)
-3. Koinonia: exact role (front, database, auth?), stack (audit saw Supabase), screenshots.
-4. Via Hebraica: tools used and Iury's part.
-5. Copiloto / Tendências / Zeff / UMB: confirm status, year and a one-line summary — or drop them.
-6. Portrait photos (real + "cybernetic" alternate, aligned 4:5) — placeholders until then.
-7. Final domain → `NEXT_PUBLIC_SITE_URL`.
-8. Screenshots of the design pages (Homepage R02 desktop + mobile) for visual comparison: running the design's own JS was blocked in this environment, so it was read statically.
+## Answers from Iury (2026-11-09)
+- Giassi, DOX, SQL and PL/SQL may be named publicly → `experience.publishEmployer = true`.
+- Contacts stay hidden; Iury will send the real email and LinkedIn.
+- Koinonia / Via Hebraica: details and screenshots coming; leave as is.
+- Copiloto / Tendências / Zeff / UMB stay (product vision), `confirmed: false`, status only concept or in-development (Tendências moved prototype → concept).
+- M1 starts only after Iury sends Homepage R02 screenshots (desktop + mobile). Received so far: desktop Hero and desktop Night→Day transition (start state).
+
+## Still open
+1. Real email + LinkedIn.
+2. Koinonia and Via Hebraica: role, stack, screenshots.
+3. Portrait photos (real + "cybernetic" alternate, aligned 4:5) — placeholders until then.
+4. Final domain → `NEXT_PUBLIC_SITE_URL`.
+5. Homepage R02 mobile screenshots.
 
 ## Decisions taken
 - Static export over OpenNext (no runtime needed; OpenNext also pins Next ≥16.4.5).

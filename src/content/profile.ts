@@ -11,7 +11,7 @@ export const site = {
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
 } as const;
 
-/** Contacts listed in the CV. `publish` stays false until Iury confirms each one for the site. */
+/** Contacts listed in the CV. Hidden on purpose: Iury will send the final email/LinkedIn (2026-11-09). */
 export const contacts = [
   { kind: "email", label: "iuryumbelino1@gmail.com", href: "mailto:iuryumbelino1@gmail.com", publish: false },
   { kind: "linkedin", label: "in/iuryumbelino", href: "https://www.linkedin.com/in/iuryumbelino", publish: false },
@@ -24,11 +24,11 @@ export const education = [
 ] as const;
 
 /**
- * Professional experience. Naming the employer publicly is pending Iury's OK
- * (audit question 1) — keep `publishEmployer` false until then.
+ * Professional experience. Iury approved naming Giassi and the DOX / SQL / PL-SQL
+ * work publicly (2026-11-09). Never expose internal data or systems detail beyond the CV.
  */
 export const experience = {
-  publishEmployer: false,
+  publishEmployer: true,
   employer: "Giassi Supermercados",
   role: "Assistente de TI",
   since: "2026-04",

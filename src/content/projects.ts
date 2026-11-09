@@ -61,11 +61,11 @@ export const projects: Project[] = [
     index: "P.04",
     name: "Central de Inteligência de Tendências",
     nameLang: "pt",
-    status: "prototype",
+    status: "concept",
     year: 2025,
     tags: ["AI", "Data", "Research"],
     summary: { pt: "", en: "" },
-    source: "design Homepage R02 (status provisional)",
+    source: "design Homepage R02 (design said prototype; Iury: concept/in development only)",
     confirmed: false,
   },
   {

@@ -36,10 +36,26 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
+  const t = await getTranslations({ locale, namespace: "nav" });
 
   return (
-    <html lang={locale === "pt" ? "pt-BR" : "en"} className={`${display.variable} ${sans.variable}`}>
+    <html
+      lang={locale === "pt" ? "pt-BR" : "en"}
+      className={`${display.variable} ${sans.variable}`}
+      // The inline script below adds `js` before hydration.
+      suppressHydrationWarning
+    >
+      <head>
+        {/* Marks JS support before first paint, so entrance start states never hide content without JS. */}
+        <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
+      </head>
       <body className="surface-dark font-sans">
+        <a
+          href="#main"
+          className="sr-only z-50 focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:bg-paper focus:px-4 focus:py-3 focus:text-ink"
+        >
+          {t("skip")}
+        </a>
         <NextIntlClientProvider>{children as ReactNode}</NextIntlClientProvider>
       </body>
     </html>

@@ -10,7 +10,11 @@
     "projects": "Projects",
     "lab": "Lab",
     "contact": "Contact",
-    "switchLocale": "Versão em português"
+    "switchLocale": "View in Portuguese",
+    "home": "Iury Umbelino — home",
+    "menu": "Menu",
+    "skip": "Skip to content",
+    "localeShort": "PT"
   },
   "status": {
     "concept": "Concept",
@@ -19,8 +23,12 @@
     "in-development": "In development",
     "live": "Live"
   },
-  "home": {
+  "hero": {
+    "intro": "I design and build AI products, prototypes and small experiments — each one starting from a real question. This is where I document what I'm learning.",
+    "cta": "Meet the person",
     "edition": "Edition 01 — 2026",
-    "status": "Site under construction. Sections ship in stages."
+    "topics": "AI · Products · Experiments",
+    "index": "(00) Index",
+    "scroll": "Scroll"
   }
 }

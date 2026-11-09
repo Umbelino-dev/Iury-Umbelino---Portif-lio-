@@ -10,7 +10,11 @@
     "projects": "Projetos",
     "lab": "Lab",
     "contact": "Contato",
-    "switchLocale": "English version"
+    "switchLocale": "Ver em inglês",
+    "home": "Iury Umbelino — início",
+    "menu": "Menu",
+    "skip": "Pular para o conteúdo",
+    "localeShort": "EN"
   },
   "status": {
     "concept": "Conceito",
@@ -19,8 +23,12 @@
     "in-development": "Em desenvolvimento",
     "live": "No ar"
   },
-  "home": {
+  "hero": {
+    "intro": "Projeto e construo produtos com IA, protótipos e pequenos experimentos — cada um começando por uma pergunta real. É aqui que documento o que estou aprendendo.",
+    "cta": "Conheça a pessoa",
     "edition": "Edição 01 — 2026",
-    "status": "Site em construção. As seções chegam por etapas."
+    "topics": "IA · Produtos · Experimentos",
+    "index": "(00) Índice",
+    "scroll": "Rolar"
   }
 }

@@ -151,3 +151,42 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Hero blueprint grid: one line per column (4 → 12) and every 96px, fading from the centre. */
+.hero-grid {
+  --cols: 4;
+  margin-inline: max(var(--page-margin), calc((100% - var(--container-page)) / 2 + var(--page-margin)));
+  background-image:
+    linear-gradient(90deg, rgb(243 241 235 / 0.055) 1px, transparent 1px),
+    linear-gradient(0deg, rgb(243 241 235 / 0.04) 1px, transparent 1px);
+  background-size: calc(100% / var(--cols)) 100%, 100% 96px;
+  background-position: 0 0, 0 24px;
+  mask-image: radial-gradient(ellipse 70% 75% at 62% 48%, #000 25%, transparent 80%);
+}
+@media (min-width: 768px) {
+  .hero-grid {
+    --cols: 12;
+  }
+}
+
+/*
+ * Hero reveal start state — only when JS runs and motion is allowed, so the text
+ * is never hidden for no-JS or reduced-motion visitors. GSAP animates from here;
+ * the failsafe reveals the lines if the script never runs.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .js [data-hero-line] {
+    transform: translateY(105%);
+    animation: hero-failsafe 0.01s 3s forwards;
+  }
+  .js [data-hero-fade] {
+    opacity: 0;
+    animation: hero-failsafe 0.01s 3s forwards;
+  }
+}
+@keyframes hero-failsafe {
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}

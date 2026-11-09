@@ -2,6 +2,9 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "portfolio", // must match the Worker connected in Cloudflare (Workers Builds refuses a mismatch)
   "compatibility_date": "2026-10-01",
+  // Wrangler builds before every deploy, so Workers Builds works even when the
+  // dashboard's Build command is empty (its deploy step is `npx wrangler deploy`).
+  "build": { "command": "npm run build" },
   // Static assets only: no Worker script runs. `npm run build` writes ./out.
   "assets": {
     "directory": "./out",

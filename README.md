@@ -20,7 +20,7 @@ What is already configured in the repo:
 
 | File | What it does |
 | --- | --- |
-| `wrangler.jsonc` | Worker name `portfolio` (must match the Worker in the Cloudflare dashboard); serves `./out`. Uses `html_handling: "auto-trailing-slash"` so `/pt` serves `pt.html`, and `not_found_handling: "404-page"` so unknown URLs get `404.html` with a 404 status. |
+| `wrangler.jsonc` | Worker name `portfolio` (must match the Worker in the Cloudflare dashboard); `build.command` runs `npm run build` before every deploy, so Workers Builds works even with an empty Build command; serves `./out`. Uses `html_handling: "auto-trailing-slash"` so `/pt` serves `pt.html`, and `not_found_handling: "404-page"` so unknown URLs get `404.html` with a 404 status. |
 | `public/_redirects` | `/ → /pt` (302): Portuguese is the default language. |
 | `public/_headers` | Security headers on every response, plus a one-year immutable cache for hashed files in `/_next/static/*`. |
 | `src/app/sitemap.ts`, `src/app/robots.ts` | Generated at build time as `/sitemap.xml` and `/robots.txt`. |
@@ -33,7 +33,7 @@ Canonical links, `hreflang`, Open Graph, the sitemap and the structured data all
 NEXT_PUBLIC_SITE_URL=https://your-domain.com
 ```
 
-No trailing slash. Without it, the build falls back to `http://localhost:3000`, and link previews on LinkedIn or WhatsApp will point to the wrong place.
+No trailing slash. Without it, the build uses the live Worker address, `https://portfolio.iuryumbelino1.workers.dev`. Set it only when the site moves to a custom domain.
 
 ### Option A: from GitHub, automatically (recommended)
 

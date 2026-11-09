@@ -22,7 +22,14 @@ Temporary progress log. Permanent rules live in `CLAUDE.md`.
   - Via Hebraica: `caseStudy.confirmed: false` → no page (404); its index row still opens viahebraica.app.
   - Validated (1440/768/360/iPhone 13, PT/EN, reduced motion, no-JS): one h1, ordered headings, canonical + hreflang, sticky numeral at 96px on desktop only, mobile text ends 48px from the edge, full-bleed figures, progress 0→1, locale switch keeps the route, back pill → #projects, no overflow, no console errors. M1–M3 regressions clean.
   - Fixed: the nav wrapped onto two lines on phones (now one line down to 320px, "← Projetos" below 640px).
-- [ ] M5 — Cat assistant, Contact, Footer, SEO, audit, deploy guide
+- [x] **M5 — Cat assistant, Contact, Footer, SEO, deploy guide** (2026-11-09):
+  - `CatAssistant`: S1 observer (hero cat is now a button) → S2 arc jump to the dock → S3 docked, eyes follow reading progress → S4 sleep after 4s (eyes shut, body settles, z z z) → S5 panel. Desktop: dark glass panel 360×520 grown with a clip-path circle from the cat, which rides up and perches on its top edge. Mobile: bottom sheet (70% / 590px max), scrim, drag handle (>30% or flick closes), visualViewport for the keyboard. `role="dialog"` + `aria-modal`, focus to title on open, Tab trapped, Esc / × / scrim close, focus back to the cat, page `inert` + scroll lock. Reduced motion: 160ms crossfades. Case pages start docked (44px button, project chips).
+  - Scripted answers rewritten from verified facts (the prototype's "creative director / four products" copy was not true). Free text → keyword match or honest fallback.
+  - Contact: tagline at full scale, "next." in lime. No contact is published yet → the section says so and "Ask the cat" is the primary action; flipping `publish: true` in `profile.ts` brings back the email button + rows. Footer on home and case pages.
+  - SEO: OG/Twitter (og-image.png 1200×630 rendered from the project's fonts), sitemap with hreflang, robots, icon.svg (the cat), Person JSON-LD (no alumniOf — degrees in progress), `_headers`. README: Cloudflare deploy guide, checked against Cloudflare's docs via Context7 (developers.cloudflare.com is blocked in this environment).
+  - Validated (1440 desktop, iPhone 13, case page, reduced motion): every state transition, open from dock / hero cat / contact, chips + keyword + fallback, focus trap, Esc, drag-to-close, scrim tap, "see projects" scroll, close-at-hero returns to S1; M1–M4 regressions clean; no console errors. SEO URLs verified with `NEXT_PUBLIC_SITE_URL=https://example.com`.
+  - Bugs found and fixed: an effect returning `scrollIntoView()` (a Promise in current Chromium) crashed the page on the first chip; a keypress waking the cat mid-close killed the close animation (panel stuck open, focus lost).
+  - Not done: Lighthouse / Core Web Vitals not measured (no Lighthouse in this environment). Real-device testing pending.
 
 ## Answers from Iury (2026-11-09)
 - Giassi, DOX, SQL and PL/SQL may be named publicly → `experience.publishEmployer = true`.

@@ -1,7 +1,8 @@
 {
   "meta": {
     "title": "Iury Umbelino — Curiosity builds what comes next.",
-    "description": "Iury Umbelino designs and builds AI products, prototypes and small experiments — each one starting from a real question."
+    "description": "Iury Umbelino designs and builds AI products, prototypes and small experiments — each one starting from a real question.",
+    "ogAlt": "Iury Umbelino — Curiosity builds what comes next. A black cat with lime eyes beside the name."
   },
   "nav": {
     "label": "Primary",
@@ -176,5 +177,121 @@
     "newTab": "opens in a new tab",
     "links": "Links",
     "progress": "Reading progress"
+  },
+  "assistant": {
+    "ui": {
+      "title": "Ask the cat",
+      "subtitle": "knows a few things about Iury · prototype",
+      "subtitleCase": "ask about this project",
+      "open": "Ask the cat about Iury",
+      "openCase": "Ask the cat about this project",
+      "hint": "Ask the cat",
+      "close": "Close the assistant",
+      "handle": "Drag down to close",
+      "placeholder": "Ask something…",
+      "placeholderCase": "Ask about this project…",
+      "send": "Send",
+      "thinking": "thinking…",
+      "you": "You",
+      "cat": "Cat",
+      "log": "Conversation with the cat"
+    },
+    "home": {
+      "greeting": "Hi — I'm the cat. I know a few things about Iury. What would you like to know?",
+      "chips": [
+        {
+          "label": "Who is Iury?",
+          "keywords": [
+            "who",
+            "iury",
+            "about",
+            "work",
+            "study"
+          ],
+          "answer": "An IT Assistant at Giassi Supermercados, working with SQL, PL/SQL and Oracle. He studies Computer Science (UNESC) and Systems Analysis and Development (UNOPAR). He learns by building — and this site is where he documents what he finds."
+        },
+        {
+          "label": "AI experience?",
+          "keywords": [
+            "ai",
+            "artificial",
+            "experience",
+            "lovable",
+            "koinonia"
+          ],
+          "answer": "The most complete case is Koinonia: a live product built with AI, where Iury defined the problem, wrote the directives, orchestrated the build and tested the result. At work he uses AI to write rules and automations on the DOX platform."
+        },
+        {
+          "label": "See projects",
+          "keywords": [
+            "project",
+            "projects",
+            "portfolio",
+            "work"
+          ],
+          "answer": "Taking you there.",
+          "action": "projects"
+        }
+      ],
+      "fallback": "I'm still a prototype: scripted answers, no language model behind them. Try one of the suggestions."
+    },
+    "cases": {
+      "koinonia": {
+        "greeting": "I've read this case study. Ask me why a Radar, how AI was used or what the audit found.",
+        "chips": [
+          {
+            "label": "Why a Radar?",
+            "keywords": [
+              "radar",
+              "why",
+              "care",
+              "attendance"
+            ],
+            "answer": "Because an attendance list says who came, not where to start. The Radar ranks people by risk of drifting away and turns it into a care queue — without flagging newcomers as at risk."
+          },
+          {
+            "label": "How was AI used?",
+            "keywords": [
+              "ai",
+              "lovable",
+              "built",
+              "code"
+            ],
+            "answer": "AI wrote the code from a brief and plans Iury wrote. He directed every round, checked the result and tested it on desktop and mobile."
+          },
+          {
+            "label": "What did the audit find?",
+            "keywords": [
+              "audit",
+              "bug",
+              "failure",
+              "error",
+              "test"
+            ],
+            "answer": "Silent failures: unpaginated reads that would have broken the Radar past a thousand records, an inverted date filter that hid people who needed care, and no tests. All fixed."
+          }
+        ],
+        "fallback": "About this project I can only answer the suggestions above — I'm still a scripted prototype."
+      }
+    }
+  },
+  "contact": {
+    "label": "(05) Contact",
+    "open": "Open to collaborations, roles & good questions",
+    "lead": "Got a question worth building? Write to me — I read every message.",
+    "cta": "Write to Iury",
+    "pending": "Contact channels arrive here soon. Meanwhile, the cat answers the basics.",
+    "askCat": "Ask the cat",
+    "links": "Contact links",
+    "kinds": {
+      "email": "Email",
+      "linkedin": "LinkedIn",
+      "github": "GitHub"
+    }
+  },
+  "footer": {
+    "rights": "© 2026 Iury Umbelino",
+    "edition": "Edition 01",
+    "top": "Back to top"
   }
 }

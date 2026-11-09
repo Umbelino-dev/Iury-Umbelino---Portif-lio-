@@ -23,7 +23,17 @@ export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Pr
       canonical: `/${locale}`,
       languages: Object.fromEntries(routing.locales.map((l) => [l === "pt" ? "pt-BR" : l, `/${l}`])),
     },
-    openGraph: { type: "website", locale: locale === "pt" ? "pt_BR" : "en_US", siteName: site.name },
+    openGraph: {
+      type: "website",
+      locale: locale === "pt" ? "pt_BR" : "en_US",
+      alternateLocale: locale === "pt" ? "en_US" : "pt_BR",
+      siteName: site.name,
+      title: t("title"),
+      description: t("description"),
+      url: `/${locale}`,
+      images: [{ url: "/og-image.png", width: 1200, height: 630, alt: t("ogAlt") }],
+    },
+    twitter: { card: "summary_large_image", title: t("title"), description: t("description"), images: ["/og-image.png"] },
   };
 }
 

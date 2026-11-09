@@ -13,12 +13,20 @@ export const site = {
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
 } as const;
 
+export interface ContactLink {
+  kind: "email" | "linkedin" | "github";
+  label: string;
+  href: string;
+  /** Rendered only when true. */
+  publish: boolean;
+}
+
 /** Contacts listed in the CV. Hidden on purpose: Iury will send the final email/LinkedIn (2026-11-09). */
-export const contacts = [
+export const contacts: ContactLink[] = [
   { kind: "email", label: "iuryumbelino1@gmail.com", href: "mailto:iuryumbelino1@gmail.com", publish: false },
   { kind: "linkedin", label: "in/iuryumbelino", href: "https://www.linkedin.com/in/iuryumbelino", publish: false },
   { kind: "github", label: "@Umbelino-dev", href: "https://github.com/Umbelino-dev", publish: false },
-] as const;
+];
 
 export const education: { course: Localized; school: string; expected: number }[] = [
   { course: { pt: "Bacharelado em Ciência da Computação", en: "BSc in Computer Science" }, school: "UNESC", expected: 2030 },

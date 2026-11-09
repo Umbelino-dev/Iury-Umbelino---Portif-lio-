@@ -13,6 +13,7 @@ import { HeroMotion } from "./HeroMotion";
  */
 export async function Hero() {
   const t = await getTranslations("hero");
+  const ta = await getTranslations("assistant.ui");
   const nameLine =
     "block font-display font-bold leading-[0.86] tracking-[-0.045em] text-[clamp(4rem,20.5vw,6.5rem)] md:text-[clamp(4.5rem,17.5vw,15.75rem)]";
 
@@ -61,7 +62,7 @@ export async function Hero() {
                 </span>
                 <span className="sr-only"> Umbelino</span>
               </h1>
-              <CatObserver className="mb-[0.4rem] aspect-[4/5] w-16 flex-none md:hidden" />
+              <CatObserver label={ta("open")} className="mb-[0.4rem] aspect-[4/5] w-16 flex-none md:hidden" />
             </div>
             <p
               lang="en"
@@ -73,13 +74,13 @@ export async function Hero() {
                 what comes <span className="text-signal">next.</span>
               </span>
             </p>
-            <div aria-hidden="true" className="col-span-4 flex items-end gap-[clamp(0.75rem,1.6vw,1.75rem)] md:col-span-12">
-              <span data-cat-ignore className="overflow-hidden pb-[0.04em]">
+            <div className="col-span-4 flex items-end gap-[clamp(0.75rem,1.6vw,1.75rem)] md:col-span-12">
+              <span aria-hidden="true" data-cat-ignore className="overflow-hidden pb-[0.04em]">
                 <span data-hero-line className={nameLine}>
                   Umbelino
                 </span>
               </span>
-              <CatObserver className="mb-[2.2vw] hidden aspect-[4/5] w-[clamp(4rem,8.5vw,8.75rem)] flex-none md:block" />
+              <CatObserver label={ta("open")} className="mb-[2.2vw] hidden aspect-[4/5] w-[clamp(4rem,8.5vw,8.75rem)] flex-none md:block" />
             </div>
           </div>
         </div>

@@ -10,6 +10,9 @@ import { Chapter, hasContent } from "@/components/case-study/Chapter";
 import { MediaFrame } from "@/components/case-study/MediaFrame";
 import { NextProject } from "@/components/case-study/NextProject";
 import { ReadingProgress } from "@/components/case-study/ReadingProgress";
+import { CatAssistant } from "@/components/cat/CatAssistant";
+import { assistantProps } from "@/components/cat/assistantProps";
+import { Footer } from "@/components/layout/Footer";
 
 // Only confirmed case studies exist as pages; everything else is a 404 at build time.
 export const dynamicParams = false;
@@ -34,7 +37,14 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/projects
       canonical: `/${locale}/projects/${slug}`,
       languages: Object.fromEntries(routing.locales.map((l) => [l === "pt" ? "pt-BR" : l, `/${l}/projects/${slug}`])),
     },
-    openGraph: { title: project.name, description, type: "article" },
+    openGraph: {
+      title: project.name,
+      description,
+      type: "article",
+      url: `/${locale}/projects/${slug}`,
+      images: [{ url: "/og-image.png", width: 1200, height: 630 }],
+    },
+    twitter: { card: "summary_large_image", title: project.name, description, images: ["/og-image.png"] },
   };
 }
 
@@ -47,6 +57,7 @@ export default async function CaseStudyPage({ params }: PageProps<"/[locale]/pro
   if (!project) notFound();
 
   const t = await getTranslations("caseStudy");
+  const assistant = await assistantProps("case", slug);
   const cs = project.caseStudy;
   const chapters = cs.chapters.filter(hasContent);
   const cases = getCaseStudies();
@@ -117,7 +128,11 @@ export default async function CaseStudyPage({ params }: PageProps<"/[locale]/pro
         ) : (
           <NextProject href="/#projects" eyebrow={t("index")} title={t("allProjects")} />
         )}
+        <div data-surface="dark" className="bg-ink px-(--page-margin) pb-8 text-paper">
+          <Footer topHref="#main" />
+        </div>
       </main>
+      <CatAssistant context="case" projectsHref={`/${locale}#projects`} {...assistant} />
     </>
   );
 }

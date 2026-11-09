@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { gsap, MQ, useGSAP } from "@/lib/gsap";
 import { CatFigure } from "./CatFigure";
+import { CAT_OPEN } from "./states";
 
 /** Pointer rules from Homepage R02 · N3 (Cat — observer mode). */
 const FAR_PX = 700; // beyond this the cat ignores the pointer
@@ -21,8 +22,8 @@ type Pose = "idle" | "left" | "right" | "near";
  * - Touch: breathing + blink only. Reduced motion: fully static.
  * Work happens only while the hero is on screen and the tab is visible.
  */
-export function CatObserver({ className }: { className?: string }) {
-  const root = useRef<HTMLDivElement>(null);
+export function CatObserver({ className, label }: { className?: string; label: string }) {
+  const root = useRef<HTMLButtonElement>(null);
 
   useGSAP(
     () => {
@@ -155,8 +156,17 @@ export function CatObserver({ className }: { className?: string }) {
   );
 
   return (
-    <div ref={root} className={className} data-cat-root="observer">
+    // S1 is also a way in: clicking or tapping the cat opens the assistant (R03 · M1 → M5).
+    <button
+      ref={root}
+      type="button"
+      aria-label={label}
+      aria-haspopup="dialog"
+      onClick={() => window.dispatchEvent(new Event(CAT_OPEN))}
+      className={`cursor-pointer ${className ?? ""}`}
+      data-cat-root="observer"
+    >
       <CatFigure className="block h-full w-full overflow-visible" />
-    </div>
+    </button>
   );
 }

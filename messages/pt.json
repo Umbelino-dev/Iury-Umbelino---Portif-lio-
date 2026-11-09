@@ -1,7 +1,8 @@
 {
   "meta": {
     "title": "Iury Umbelino — Curiosity builds what comes next.",
-    "description": "Iury Umbelino projeta e constrói produtos com IA, protótipos e pequenos experimentos — cada um começando por uma pergunta real."
+    "description": "Iury Umbelino projeta e constrói produtos com IA, protótipos e pequenos experimentos — cada um começando por uma pergunta real.",
+    "ogAlt": "Iury Umbelino — Curiosity builds what comes next. Um gato preto de olhos verde-limão ao lado do nome."
   },
   "nav": {
     "label": "Principal",
@@ -176,5 +177,125 @@
     "newTab": "abre em nova aba",
     "links": "Links",
     "progress": "Progresso de leitura"
+  },
+  "assistant": {
+    "ui": {
+      "title": "Pergunte ao gato",
+      "subtitle": "sabe algumas coisas sobre o Iury · protótipo",
+      "subtitleCase": "pergunte sobre este projeto",
+      "open": "Pergunte ao gato sobre o Iury",
+      "openCase": "Pergunte ao gato sobre este projeto",
+      "hint": "Pergunte ao gato",
+      "close": "Fechar o assistente",
+      "handle": "Arraste para baixo para fechar",
+      "placeholder": "Pergunte algo…",
+      "placeholderCase": "Pergunte sobre este projeto…",
+      "send": "Enviar",
+      "thinking": "pensando…",
+      "you": "Você",
+      "cat": "Gato",
+      "log": "Conversa com o gato"
+    },
+    "home": {
+      "greeting": "Oi — eu sou o gato. Sei algumas coisas sobre o Iury. O que você quer saber?",
+      "chips": [
+        {
+          "label": "Quem é o Iury?",
+          "keywords": [
+            "quem",
+            "iury",
+            "sobre",
+            "trabalha",
+            "estuda",
+            "formação"
+          ],
+          "answer": "Assistente de TI no Giassi Supermercados, onde trabalha com SQL, PL/SQL e Oracle. Estuda Ciência da Computação (UNESC) e Análise e Desenvolvimento de Sistemas (UNOPAR). Aprende construindo — e este site é onde documenta o que encontra."
+        },
+        {
+          "label": "Experiência com IA?",
+          "keywords": [
+            "ia",
+            "ai",
+            "inteligência",
+            "experiência",
+            "lovable",
+            "koinonia"
+          ],
+          "answer": "O caso mais completo é o Koinonia: um produto no ar, construído com IA, em que o Iury definiu o problema, escreveu as diretrizes, orquestrou a construção e testou o resultado. No trabalho, usa IA para escrever regras e automações na plataforma DOX."
+        },
+        {
+          "label": "Ver projetos",
+          "keywords": [
+            "projeto",
+            "projetos",
+            "portfólio",
+            "trabalhos"
+          ],
+          "answer": "Te levo até lá.",
+          "action": "projects"
+        }
+      ],
+      "fallback": "Ainda sou um protótipo: respostas roteirizadas, sem modelo de linguagem por trás. Tente uma das sugestões."
+    },
+    "cases": {
+      "koinonia": {
+        "greeting": "Li este estudo de caso. Pergunte por que um Radar, como a IA foi usada ou o que a auditoria encontrou.",
+        "chips": [
+          {
+            "label": "Por que um Radar?",
+            "keywords": [
+              "radar",
+              "porque",
+              "por que",
+              "cuidado",
+              "presença"
+            ],
+            "answer": "Porque uma lista de presença diz quem veio, não por quem começar. O Radar ordena as pessoas pelo risco de afastamento e transforma isso numa fila de cuidado — sem marcar como risco quem acabou de chegar."
+          },
+          {
+            "label": "Como a IA foi usada?",
+            "keywords": [
+              "ia",
+              "ai",
+              "lovable",
+              "construído",
+              "código"
+            ],
+            "answer": "A IA escreveu o código a partir de um briefing e de planos escritos pelo Iury. Ele dirigiu cada rodada, conferiu o resultado e testou no desktop e no celular."
+          },
+          {
+            "label": "O que a auditoria encontrou?",
+            "keywords": [
+              "auditoria",
+              "falha",
+              "bug",
+              "erro",
+              "teste"
+            ],
+            "answer": "Falhas silenciosas: leituras sem paginação que deixariam o Radar errado depois de mil registros, um filtro de datas invertido que escondia quem precisava de cuidado, e nenhum teste. Tudo corrigido."
+          }
+        ],
+        "fallback": "Sobre este projeto, só sei responder às sugestões acima — ainda sou um protótipo roteirizado."
+      }
+    }
+  },
+  "contact": {
+    "label": "(05) Contato",
+    "open": "Aberto a colaborações, vagas e boas perguntas",
+    "lead": "Tem uma pergunta que vale construir? Me escreva — leio todas as mensagens.",
+    "cta": "Escreva para o Iury",
+    "pending": "Os canais de contato entram aqui em breve. Enquanto isso, o gato responde o básico.",
+    "askCat": "Pergunte ao gato",
+    "links": "Links de contato",
+    "kinds": {
+      "email": "E-mail",
+      "linkedin": "LinkedIn",
+      "github": "GitHub"
+    }
+  },
+  "footer": {
+    "rights": "© 2026 Iury Umbelino",
+    "edition": "Edição 01",
+    "top": "Voltar ao topo"
   }
 }

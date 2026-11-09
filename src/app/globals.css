@@ -244,3 +244,18 @@
     --cols: 12;
   }
 }
+
+/* Sleeping cat: three z's rise 12px and fade over 1.8s, staggered 600ms (Cat Journey R03 · S4·B). */
+.cat-z {
+  display: inline-block;
+  opacity: 0;
+  animation: cat-z 1.8s var(--ease-out-soft) infinite;
+}
+@keyframes cat-z {
+  0% { opacity: 0; transform: translateY(0); }
+  30% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-12px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cat-z { animation: none; opacity: 1; }
+}

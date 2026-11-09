@@ -1,0 +1,153 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens — source: Claude Design "Direção Criativa R01" (02 — Design system).
+ * Seven colours, two families, one grid, one rule. See CLAUDE.md §Design tokens.
+ */
+@theme {
+  /* Colour ------------------------------------------------------------ */
+  --color-*: initial;
+  --color-ink: #101010; /* ink-900 · dark background, text on light */
+  --color-ink-800: #1b1b1b; /* dark surface, assistant */
+  --color-gray-500: #929292; /* secondary text — dark surfaces only */
+  --color-gray-600: #5e5c57; /* secondary text — light surfaces (5.8:1) */
+  --color-paper-300: #d9d7d0; /* rules and dividers on light */
+  --color-paper: #f3f1eb; /* paper-100 · light background, text on dark */
+  --color-paper-0: #ffffff; /* image frames, raised panel */
+  --color-signal: #c8f169; /* accent: max 2 uses per viewport, never text on paper */
+  --color-current: currentColor;
+  --color-transparent: transparent;
+
+  /* Type families ----------------------------------------------------- */
+  --font-display: var(--font-space-grotesk), system-ui, sans-serif;
+  --font-sans: var(--font-ibm-plex-sans), system-ui, sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  /* Type scale — fluid between 375px and 1440px (desktop → mobile values in CLAUDE.md) */
+  --text-display-xxl: clamp(4rem, 0.831rem + 13.52vw, 13rem);
+  --text-display-xxl--line-height: 0.88;
+  --text-display-xxl--letter-spacing: -0.035em;
+  --text-display-xl: clamp(3rem, 1.415rem + 6.761vw, 7.5rem);
+  --text-display-xl--line-height: 0.92;
+  --text-display-xl--letter-spacing: -0.03em;
+  --text-headline-l: clamp(2.25rem, 1.634rem + 2.629vw, 4rem);
+  --text-headline-l--line-height: 1;
+  --text-headline-l--letter-spacing: -0.025em;
+  --text-headline-m: clamp(1.75rem, 1.486rem + 1.127vw, 2.5rem);
+  --text-headline-m--line-height: 1.08;
+  --text-headline-m--letter-spacing: -0.02em;
+  --text-title: clamp(1.25rem, 1.162rem + 0.3756vw, 1.5rem);
+  --text-title--line-height: 1.2;
+  --text-title--letter-spacing: -0.01em;
+  --text-numeral: clamp(3.5rem, 2.62rem + 3.756vw, 6rem);
+  --text-numeral--line-height: 0.9;
+  --text-numeral--letter-spacing: -0.04em;
+  --text-lead: clamp(1.1875rem, 1.121rem + 0.2817vw, 1.375rem);
+  --text-lead--line-height: 1.5;
+  --text-body: clamp(1rem, 0.978rem + 0.0939vw, 1.0625rem);
+  --text-body--line-height: 1.62;
+  --text-ui: 0.9375rem;
+  --text-ui--line-height: 1.2;
+  --text-caption: 0.8125rem;
+  --text-caption--line-height: 1.5;
+  --text-label: 0.75rem;
+  --text-label--line-height: 1.2;
+  --text-label--letter-spacing: 0.1em;
+
+  /* Layout ------------------------------------------------------------ */
+  --container-page: 90rem; /* 1440px */
+  --spacing-gutter: 1rem; /* 16 mobile → 24 desktop, see .page-grid */
+  --spacing-margin: 1.25rem; /* 20 mobile → 56 desktop */
+
+  /* Radius: 0 for content. Pills only for floating controls. */
+  --radius-*: initial;
+  --radius-pill: 999px;
+
+  /* Motion ------------------------------------------------------------ */
+  --ease-out-soft: cubic-bezier(0.2, 0.7, 0.1, 1);
+  --duration-fast: 160ms;
+  --duration-base: 320ms;
+  --duration-slow: 640ms;
+}
+
+@layer base {
+  :root {
+    --page-margin: 1.25rem;
+    --page-gutter: 1rem;
+    --section-space: 6rem;
+  }
+  @media (min-width: 768px) {
+    :root {
+      --page-margin: clamp(1.25rem, 3.5vw, 3.5rem);
+      --page-gutter: 1.5rem;
+      --section-space: 10rem;
+    }
+  }
+
+  html {
+    background: var(--color-ink);
+    color: var(--color-paper);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+  }
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+  ::selection {
+    background: var(--color-signal);
+    color: var(--color-ink);
+  }
+  /* Focus: 2px, 3px offset — signal on dark, ink on light ([data-surface="light"]). */
+  :focus-visible {
+    outline: 2px solid var(--color-signal);
+    outline-offset: 3px;
+  }
+  [data-surface="light"] :focus-visible {
+    outline-color: var(--color-ink);
+  }
+}
+
+@utility page-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  column-gap: var(--page-gutter);
+  padding-inline: var(--page-margin);
+  max-width: var(--container-page);
+  margin-inline: auto;
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+}
+
+@utility surface-dark {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+@utility surface-light {
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

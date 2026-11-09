@@ -1,0 +1,26 @@
+{
+  "meta": {
+    "title": "Iury Umbelino — Curiosity builds what comes next.",
+    "description": "Iury Umbelino projeta e constrói produtos com IA, protótipos e pequenos experimentos — cada um começando por uma pergunta real."
+  },
+  "nav": {
+    "label": "Principal",
+    "index": "Índice",
+    "about": "Sobre",
+    "projects": "Projetos",
+    "lab": "Lab",
+    "contact": "Contato",
+    "switchLocale": "English version"
+  },
+  "status": {
+    "concept": "Conceito",
+    "experiment": "Experimento",
+    "prototype": "Protótipo",
+    "in-development": "Em desenvolvimento",
+    "live": "No ar"
+  },
+  "home": {
+    "edition": "Edição 01 — 2026",
+    "status": "Site em construção. As seções chegam por etapas."
+  }
+}

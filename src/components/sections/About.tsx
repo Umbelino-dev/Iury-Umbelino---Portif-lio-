@@ -70,12 +70,45 @@ export async function About() {
 async function Experience({ locale }: { locale: Locale }) {
   const t = await getTranslations("experience");
   const listTitle = "font-mono text-[11px] tracking-[0.06em] uppercase text-gray-600";
+  const tl = await getTranslations("experience.timeline");
+  // "MM.YYYY" → months since year 0, to compute each role's length.
+  const month = (mmYYYY: string) => {
+    const [m, y] = mmYYYY.split(".").map(Number) as [number, number];
+    return y * 12 + (m - 1);
+  };
+  const duration = (period: string) => {
+    const [from, to] = period.split("–").map((p) => p.trim());
+    if (!from) return "";
+    if (!to) {
+      const [m, y] = from.split(".").map(Number) as [number, number];
+      const date = new Intl.DateTimeFormat(locale === "pt" ? "pt-BR" : "en", { month: "long", year: "numeric" }).format(new Date(y, m - 1, 1));
+      return tl("since", { date });
+    }
+    const total = month(to) - month(from) + 1; // both months included
+    const years = Math.floor(total / 12);
+    const months = total % 12;
+    const parts = [years ? tl("years", { n: years }) : "", months ? tl("months", { n: months }) : ""].filter(Boolean);
+    return parts.join(` ${tl("and")} `);
+  };
   // Oldest first: the path reads as a progression up to today.
   const steps = [...experience.path].reverse().map((s) => ({
     role: s.role[locale],
     period: s.period,
+    duration: duration(s.period),
+    area: s.area[locale],
+    summary: s.summary[locale],
+    details: s.details.map((d) => d[locale]),
+    more: s.more[locale],
+    list: s.highlights ? experience.highlights.map((h) => h[locale]) : undefined,
     current: s.period.trim().endsWith("–"),
   }));
+  const timelineLabels = {
+    now: t("now"),
+    seeMore: tl("seeMore"),
+    close: tl("close"),
+    area: tl("area"),
+    duration: tl("duration"),
+  };
 
   return (
     <section className="page-grid mt-(--section-space) gap-y-14" aria-labelledby="experience-title">
@@ -108,13 +141,7 @@ async function Experience({ locale }: { locale: Locale }) {
           </ol>
         </div>
 
-        <div className="grid gap-14 sm:grid-cols-2">
-          <div className="flex flex-col gap-6">
-            <h4 className={listTitle}>{t("path")}</h4>
-            <Timeline steps={steps} nowLabel={t("now")} />
-          </div>
-
-          <div className="flex flex-col gap-10">
+        <div className="grid gap-10 sm:grid-cols-2">
             <div className="flex flex-col gap-3">
               <h4 className={listTitle}>{t("stack")}</h4>
               <p className="text-[0.9375rem] leading-relaxed">{experience.stack.daily.join(" · ")}</p>
@@ -134,8 +161,13 @@ async function Experience({ locale }: { locale: Locale }) {
                 ))}
               </ul>
             </div>
-          </div>
         </div>
+      </div>
+
+      {/* The career path, full width: part of the page, not a side list. */}
+      <div className="col-span-full flex flex-col gap-8 pt-[clamp(1rem,3vw,3rem)]">
+        <h4 className={listTitle}>{t("path")}</h4>
+        <Timeline steps={steps} labels={timelineLabels} />
       </div>
     </section>
   );

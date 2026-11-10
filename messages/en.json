@@ -76,7 +76,17 @@
     "learning": "Learning",
     "education": "Education",
     "expected": "expected {year}",
-    "now": "now"
+    "now": "now",
+    "timeline": {
+      "seeMore": "see more",
+      "close": "Close",
+      "years": "{n, plural, one {# year} other {# years}}",
+      "months": "{n, plural, one {# month} other {# months}}",
+      "and": "and",
+      "since": "since {date}",
+      "area": "Area",
+      "duration": "Time"
+    }
   },
   "tags": {
     "web": "Web",

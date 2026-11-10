@@ -76,7 +76,17 @@
     "learning": "Estudando",
     "education": "Formação",
     "expected": "previsão {year}",
-    "now": "atual"
+    "now": "atual",
+    "timeline": {
+      "seeMore": "ver mais",
+      "close": "Fechar",
+      "years": "{n, plural, one {# ano} other {# anos}}",
+      "months": "{n, plural, one {# mês} other {# meses}}",
+      "and": "e",
+      "since": "desde {date}",
+      "area": "Área",
+      "duration": "Duração"
+    }
   },
   "tags": {
     "web": "Web",

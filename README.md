@@ -99,15 +99,15 @@ In the Worker: **Settings → Domains & Routes → Add → Custom domain**, and 
 
 ### Measured performance (lab, before deploy)
 
-Lighthouse 13.6.0 against the production build served by `wrangler dev` (Cloudflare's local assets runtime). Local machine, no CDN and no real network, so field numbers will differ. Measured after R4 (2026-11-10). The same machine varies by a few points between runs:
+Lighthouse 13.6.0 against the production build served by `wrangler dev` (Cloudflare's local assets runtime). Local machine, no CDN and no real network, so field numbers will differ. Measured after R5 (2026-11-10). The same machine varies by a few points between runs:
 
 | Page | Preset | Performance | Accessibility | Best practices | SEO | LCP | CLS | TBT |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `/pt` | mobile (3 runs) | 94 / 95 / 95 | 100 | 100 | 100 | 1.1 s | 0 | 250–290 ms |
-| `/pt` | desktop | 99 | 100 | 100 | 100 | 0.9 s | 0 | 30 ms |
-| `/en` | mobile | 96 | 100 | 100 | 100 | 1.1 s | 0 | 230 ms |
-| `/en` | desktop | 99 | 100 | 100 | 100 | 0.9 s | 0 | 40 ms |
-| `/pt/projects/koinonia` | mobile | 99 | 100 | 100 | 100 | 1.1 s | 0 | 130 ms |
+| `/pt` | mobile (3 runs) | 95 / 91 / 96 | 100 | 100 | 100 | 1.1 s | 0 | 240–370 ms |
+| `/pt` | desktop | 99 | 100 | 100 | 100 | 0.9 s | 0 | 40 ms |
+| `/en` | mobile | 96 | 100 | 100 | 100 | 1.1 s | 0 | 220 ms |
+| `/en` | desktop | 99 | 100 | 100 | 100 | 0.9 s | 0 | 30 ms |
+| `/pt/projects/koinonia` | mobile | 99 | 100 | 100 | 100 | 1.1 s | 0 | 110 ms |
 
 Before R2 the home page scored 99–100 on mobile (TBT 80–110 ms). The added cursor, cat rail and title reveals cost about 50–100 ms of blocking time on Lighthouse's throttled mobile CPU.
 

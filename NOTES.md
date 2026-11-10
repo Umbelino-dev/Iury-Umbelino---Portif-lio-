@@ -74,6 +74,12 @@ Temporary progress log. Permanent rules live in `CLAUDE.md`.
   - Lighthouse (wrangler dev): /pt mobile 94/95/95 (TBT 250–290 ms), desktop 99; /en 96 / 99; case mobile 99. A11y/BP/SEO 100, CLS 0.
   - Open: more photos for the carousel; the greeting hint at Contact briefly overlaps copy next to the rail (2.6 s).
 
+- [x] **R5: coverflow carousel + interactive timeline** (2026-11-10):
+  - Carousel (Iury's pick "grows at the centre"; the Envato reference could not be opened: network-blocked): scale 1 → 0.72, opacity 1 → 0.55, rotateY ±14° by distance to the screen centre. Fixed: `quickSetter("scale")` is a no-op shorthand; use scaleX/scaleY.
+  - Timeline: horizontal/vertical, hover details, click panel, keyboard and Esc. **Texts to review (Iury asked me to write them; only known facts used, `confirmed: false`):** summaries and "more" for Jovem Aprendiz, Operador de Caixas, Auxiliar Administrativo; durations are computed from the periods.
+  - A11y fixes: no half-faded captions (contrast); step buttons keep their visible text as their name.
+  - Lighthouse: /pt mobile 95/91/96 (TBT 240–370 ms), desktop 99; /en 96 / 99; case 99. A11y/BP/SEO 100, CLS 0.
+
 ## Answers from Iury (2026-11-09)
 - Giassi, DOX, SQL and PL/SQL may be named publicly → `experience.publishEmployer = true`.
 - Contacts stay hidden; Iury will send the real email and LinkedIn.

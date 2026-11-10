@@ -64,6 +64,16 @@ Temporary progress log. Permanent rules live in `CLAUDE.md`.
   - Lighthouse 13.6 (wrangler dev): /pt mobile 93/96/97 (TBT 200–310 ms), desktop 99; /en mobile 96, desktop 99; case mobile 99, desktop 100. A11y/BP/SEO 100, CLS 0.
   - Open: Lab entry numerals (01–03) sit right after the chapter numeral 03; consider smaller entry numerals if it reads as noise.
 
+- [x] **R4: Iury's review of R3** (2026-11-10):
+  - Hero: statement in Satoshi 500 (Iury's choice), name first and the positioning line under it on desktop too; edition/topics line and the "(00) Índice · Rolar" rule removed; footer edition removed.
+  - Cursor: no I-beam over text. Nav: numbers removed, the active dot is back.
+  - Sections: numbers, "01 / 05" and rules removed; the section name is the h2 at display size (`SectionTitle`) on About, Projects, Lab, Approach, Contact; theses became display paragraphs.
+  - About: traits side by side; the portrait reveal (human × machine) is replaced by `PhotoLoop`, an endless strip (scroll speed and direction drive it, cards lean with velocity, hover pauses, reduced motion = manual scroll). For now it shows the two existing photos; Iury will send event photos (LinkedIn photos can't be fetched from here: login wall).
+  - Experience: "(01.1)" label and top rules removed; the path is an animated `Timeline`.
+  - Fixed: SplitText put aria-label on paragraphs (a11y 96 → 100 with `aria: "none"` on non-headings); locale switch name now includes "EN".
+  - Lighthouse (wrangler dev): /pt mobile 94/95/95 (TBT 250–290 ms), desktop 99; /en 96 / 99; case mobile 99. A11y/BP/SEO 100, CLS 0.
+  - Open: more photos for the carousel; the greeting hint at Contact briefly overlaps copy next to the rail (2.6 s).
+
 ## Answers from Iury (2026-11-09)
 - Giassi, DOX, SQL and PL/SQL may be named publicly → `experience.publishEmployer = true`.
 - Contacts stay hidden; Iury will send the real email and LinkedIn.

@@ -3,8 +3,9 @@
 // Dev-only. Uses Playwright's Chromium (pre-installed in cloud sessions; locally:
 // `npx playwright install chromium`). Run after `scripts/lettering.py` or a copy change:
 //   node scripts/og.cjs
-// Inputs: the lettered name (src/components/hero/name-paths.ts), the hero copy in
-// messages/*.json, the cat drawing (CatFigure) and the self-hosted fonts.
+// Inputs: the lettered name (src/components/hero/name-paths.ts), the tagline in
+// messages/*.json, the cat drawing (CatFigure) and the self-hosted Satoshi
+// (run `node scripts/fonts.mjs` first on a fresh clone).
 const fs = require("node:fs");
 const path = require("node:path");
 const { chromium } = require("playwright");
@@ -33,7 +34,7 @@ const paths = mark.glyphs.map((g) => `<path d="${g.d}"/>`).join("") + `<path d="
 const a = mark.anchors;
 
 const page = (m) => `<!doctype html><html><head><meta charset="utf-8"><style>
-@font-face{font-family:InstSerif;src:${font("src/fonts/InstrumentSerif-Italic.woff2")};font-style:italic}
+@font-face{font-family:Satoshi;src:${font("src/fonts/Satoshi-Variable.woff2")};font-weight:300 900}
 @font-face{font-family:Plex;src:${font("src/fonts/IBMPlexSans-Medium.woff2")};font-weight:500}
 *{margin:0;box-sizing:border-box}
 body{width:1200px;height:630px;background:#101010;color:#F3F1EB;font-family:Plex;position:relative;overflow:hidden}
@@ -41,17 +42,15 @@ body{width:1200px;height:630px;background:#101010;color:#F3F1EB;font-family:Plex
 .glow{position:absolute;inset:0;background:radial-gradient(ellipse 55% 60% at 68% 52%,rgba(243,241,235,.075),transparent 75%)}
 .top,.rule{position:absolute;left:56px;right:56px;display:flex;justify-content:space-between;font-size:15px;letter-spacing:.1em;text-transform:uppercase;color:#929292}
 .top{top:44px}.rule{bottom:44px;border-top:1px solid #2a2a2a;padding-top:14px}
-.mark{position:absolute;left:56px;bottom:100px;width:1060px;container-type:inline-size}
+.mark{position:absolute;left:70px;top:50%;transform:translateY(-50%);width:1060px;container-type:inline-size}
 .mark svg.name{display:block;width:100%;height:auto;fill:#F3F1EB;overflow:visible}
-.tag{position:absolute;top:${a.xHeight1}%;left:${a.line1Right + 5}%;max-width:${100 - a.line1Right - 7}%;font-family:InstSerif;font-style:italic;font-size:4.4cqw;line-height:1.02}
-.tag b{color:#C8F169;font-weight:400}
+.tag{position:absolute;top:${a.xHeight1}%;left:${a.line1Right + 5}%;max-width:${100 - a.line1Right - 7}%;font-family:Satoshi;font-weight:500;font-size:3.5cqw;line-height:1.08;letter-spacing:-.025em}
+.tag b{color:#C8F169;font-weight:500}
 .cat{position:absolute;bottom:${100 - a.oTop}%;left:${a.oCenter}%;width:6.5cqw;transform:translateX(-50%);overflow:visible}
 </style></head><body>
 <div class="glow"></div><div class="grid"></div>
-<div class="top"><span>${m.hero.edition}</span><span>${m.hero.topics}</span></div>
 <div class="mark"><svg class="name" viewBox="${mark.viewBox}">${paths}</svg>
 <p class="tag">${m.hero.tagline.lead}<br>${m.hero.tagline.rest} <b>${m.hero.tagline.accent}</b></p>${cat}</div>
-<div class="rule"><span>${m.hero.index}</span><span>iury umbelino</span></div>
 </body></html>`;
 
 (async () => {

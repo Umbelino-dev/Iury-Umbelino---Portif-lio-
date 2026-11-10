@@ -99,16 +99,15 @@ In the Worker: **Settings → Domains & Routes → Add → Custom domain**, and 
 
 ### Measured performance (lab, before deploy)
 
-Lighthouse 13.6.0 against the production build served by `wrangler dev` (Cloudflare's local assets runtime). Local machine, no CDN and no real network, so field numbers will differ. Measured after R3 (2026-11-10). The same machine varies by a few points between runs:
+Lighthouse 13.6.0 against the production build served by `wrangler dev` (Cloudflare's local assets runtime). Local machine, no CDN and no real network, so field numbers will differ. Measured after R4 (2026-11-10). The same machine varies by a few points between runs:
 
 | Page | Preset | Performance | Accessibility | Best practices | SEO | LCP | CLS | TBT |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `/pt` | mobile (3 runs) | 93 / 96 / 97 | 100 | 100 | 100 | 1.1 s | 0 | 200–310 ms |
+| `/pt` | mobile (3 runs) | 94 / 95 / 95 | 100 | 100 | 100 | 1.1 s | 0 | 250–290 ms |
 | `/pt` | desktop | 99 | 100 | 100 | 100 | 0.9 s | 0 | 30 ms |
 | `/en` | mobile | 96 | 100 | 100 | 100 | 1.1 s | 0 | 230 ms |
-| `/en` | desktop | 99 | 100 | 100 | 100 | 0.9 s | 0 | 30 ms |
-| `/pt/projects/koinonia` | mobile | 99 | 100 | 100 | 100 | 1.1 s | 0 | 120 ms |
-| `/pt/projects/koinonia` | desktop | 100 | 100 | 100 | 100 | 0.8 s | 0 | 0 ms |
+| `/en` | desktop | 99 | 100 | 100 | 100 | 0.9 s | 0 | 40 ms |
+| `/pt/projects/koinonia` | mobile | 99 | 100 | 100 | 100 | 1.1 s | 0 | 130 ms |
 
 Before R2 the home page scored 99–100 on mobile (TBT 80–110 ms). The added cursor, cat rail and title reveals cost about 50–100 ms of blocking time on Lighthouse's throttled mobile CPU.
 
@@ -119,6 +118,7 @@ Before R2 the home page scored 99–100 on mobile (TBT 80–110 ms). The added c
 - Facts live in `src/content/` (`profile.ts`, `projects.ts`, `lab.ts`, `portrait.ts`). UI strings live in `messages/{pt,en}.json`.
 - Nothing is invented. A fact without a source stays `undefined` and the UI hides it. Items copied from the design prototype carry `confirmed: false`.
 - **Contacts:** set `publish: true` on an entry in `contacts` (`src/content/profile.ts`). The Contact section switches from "coming soon" to the email button and links on its own.
+- **About photos (carousel):** add an entry to `src/content/gallery.ts` after processing the image as below.
 - **Images:** put the source in `assets/media/`, add it to `scripts/images.mjs`, run `npm run images` (writes WebP variants at 640/960/1280/1920 to `public/media/`), then reference `/media/<name>.webp` with its width/height in the content entry. The custom loader (`src/lib/image-loader.ts`) builds the `srcset`. Never put unprocessed images in `public/`. Without an image, the editorial placeholder renders.
 - **Portraits:** the real photo and the cyborg version are aligned in `scripts/images.mjs` (eye positions → scale + offset) and cropped to the same 4:5 box, so the reveal mask shows the same face. Replacing either photo means re-measuring `ALIGN`.
 - **The cat's answers** are scripted (`messages/*.json → assistant`). No language model is involved. A real one would need its own Worker, because this site has no server.

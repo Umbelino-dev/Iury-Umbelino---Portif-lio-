@@ -8,7 +8,8 @@ import { gsap, MQ, SplitText, useGSAP } from "@/lib/gsap";
  * scroll into view. The text is in the server HTML; only titles that start
  * below the fold are animated (nothing on screen ever blinks out), and with
  * reduced motion nothing is split at all. No line masks, so no descender is
- * ever clipped. SplitText keeps the heading's accessible name intact.
+ * ever clipped. Headings keep their accessible name (aria-label); paragraphs
+ * are left without ARIA, their words read in order.
  */
 export function SplitReveal() {
   const pathname = usePathname();
@@ -25,6 +26,9 @@ export function SplitReveal() {
           SplitText.create(el, {
             type: "words",
             autoSplit: true,
+            // Headings keep their name through aria-label; on a paragraph that
+            // attribute is not allowed, so the split words are simply read in order.
+            aria: /^H[1-6]$/.test(el.tagName) ? "auto" : "none",
             onSplit: (self) =>
               gsap.from(self.words, {
                 yPercent: 60,

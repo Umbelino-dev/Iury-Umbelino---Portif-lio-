@@ -44,12 +44,12 @@ export async function Hero() {
       <HeroBackdrop />
 
       {/*
-        Mobile: the name comes first and the hero is as tall as its content, so the
-        mark leads and About peeks in below. Desktop: a full-height poster with the
-        positioning line at the top and the name at the bottom.
+        The name comes first everywhere; the positioning line and the link sit under
+        it. Mobile: the hero is as tall as its content. Desktop: a full-height poster,
+        the name at the top and the line at the bottom.
       */}
       <HeroMotion className="relative z-10 mx-auto flex w-full max-w-(--container-page) flex-1 flex-col gap-12 px-(--page-margin) md:justify-between md:gap-10">
-        <div className="flex flex-col gap-5 md:order-2">
+        <div className="flex flex-col gap-5">
           {/* Width also follows the viewport height (by the mark's own ratio), so the whole mark fits on short screens. */}
           <div
             data-hero-mark
@@ -68,7 +68,7 @@ export async function Hero() {
             <div className="mt-8 flex items-end justify-between gap-6 md:contents">
               <p
                 data-hero-fade-md
-                className="font-serif text-[clamp(1.5rem,1rem+2.4vw,1.75rem)] leading-[1.08] tracking-[-0.01em] text-paper italic md:absolute md:top-(--stmt-top) md:left-(--stmt-left) md:max-w-(--stmt-max) md:text-[max(1rem,4.4cqw)] md:leading-[1.02]"
+                className="font-display text-[clamp(1.375rem,0.95rem+2.1vw,1.625rem)] leading-[1.1] font-medium tracking-[-0.025em] text-paper md:absolute md:top-(--stmt-top) md:left-(--stmt-left) md:max-w-(--stmt-max) md:text-[max(1rem,3.5cqw)] md:leading-[1.08]"
               >
                 {t("tagline.lead")}
                 <br />
@@ -89,16 +89,9 @@ export async function Hero() {
               className="absolute bottom-(--o-bottom) left-(--o-center) hidden aspect-[4/5] w-[max(2.75rem,7.5cqw)] -translate-x-1/2 md:block"
             />
           </div>
-          <div
-            data-hero-fade
-            className="hidden justify-between gap-4 border-t border-[#2a2a2a] pt-3.5 text-label font-medium tracking-label text-gray-500 uppercase md:flex"
-          >
-            <span>{t("index")}</span>
-            <span aria-hidden="true">{t("scroll")}</span>
-          </div>
         </div>
 
-        <div className="grid grid-cols-4 gap-x-(--page-gutter) gap-y-6 md:order-1 md:grid-cols-12">
+        <div className="grid grid-cols-4 gap-x-(--page-gutter) gap-y-6 md:grid-cols-12">
           {/* Visible from the first paint (no fade): this is the mobile LCP text. */}
           <div className="col-span-4 flex flex-col gap-4 md:col-span-6 lg:col-span-5">
             <p className="text-label font-medium tracking-label text-gray-500 uppercase">{t("stack")}</p>
@@ -112,13 +105,6 @@ export async function Hero() {
               {t("cta")} <span aria-hidden="true">↓</span>
             </a>
           </div>
-          <p
-            data-hero-fade
-            className="col-span-4 hidden flex-col gap-1.5 text-label font-medium tracking-label text-gray-500 uppercase md:col-span-4 md:col-start-9 md:flex md:items-end md:text-right"
-          >
-            <span>{t("edition")}</span>
-            <span>{t("topics")}</span>
-          </p>
         </div>
       </HeroMotion>
     </section>

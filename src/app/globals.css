@@ -201,10 +201,6 @@
     opacity: 0;
     animation: hero-failsafe 0.01s 3s forwards;
   }
-  .js [data-hero-fade] {
-    opacity: 0;
-    animation: hero-failsafe 0.01s 3s forwards;
-  }
 }
 @media (prefers-reduced-motion: no-preference) and (min-width: 768px) {
   .js [data-hero-fade-md] {

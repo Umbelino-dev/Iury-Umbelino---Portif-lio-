@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 
 /**
- * Footer row (Homepage R02): copyright, edition, back to top. Right padding keeps
+ * Footer row: copyright and back to top. Right padding keeps
  * the last link clear of the docked cat.
  */
 export async function Footer({ topHref, tone = "dark" }: { topHref: string; tone?: "dark" | "light" }) {
@@ -13,7 +13,6 @@ export async function Footer({ topHref, tone = "dark" }: { topHref: string; tone
       }`}
     >
       <span>{t("rights")}</span>
-      <span>{t("edition")}</span>
       <a
         href={topHref}
         className={`flex min-h-11 items-center transition-colors duration-(--duration-fast) ${tone === "dark" ? "text-paper hover:text-signal" : "text-ink"}`}

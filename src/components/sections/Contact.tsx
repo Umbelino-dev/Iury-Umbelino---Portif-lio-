@@ -1,4 +1,4 @@
-import { CHAPTERS, CHAPTER_TOTAL, SectionMarker } from "@/components/layout/SectionMarker";
+import { SectionTitle } from "@/components/layout/SectionTitle";
 import { getTranslations } from "next-intl/server";
 import { contacts } from "@/content/profile";
 import { AskCatButton } from "@/components/layout/AskCatButton";
@@ -29,13 +29,13 @@ export async function Contact() {
       <div aria-hidden="true" className="pointer-events-none absolute -top-30 left-[10%] -z-10 h-[520px] w-[70%] bg-[radial-gradient(ellipse_50%_50%_at_50%_50%,rgba(243,241,235,0.07),transparent_72%)]" />
       <div className="mx-auto flex max-w-(--container-page) flex-col gap-[clamp(3.5rem,6vw,7rem)] px-(--page-margin)">
         <div className="flex flex-col gap-5">
-          <SectionMarker index={CHAPTERS.contact} total={CHAPTER_TOTAL} label={t("label")} tone="dark" />
+          <SectionTitle id="contact-title">{t("label")}</SectionTitle>
           <p className="text-label font-medium tracking-label text-gray-500 uppercase">{t("open")}</p>
         </div>
 
-        <h2 id="contact-title" data-split className="font-display text-[clamp(3.25rem,0.9rem+10vw,11.875rem)] leading-[0.88] font-bold tracking-[-0.045em] text-balance">
+        <p data-split className="font-display text-[clamp(2.25rem,1rem+5.4vw,6.5rem)] leading-[0.92] font-bold tracking-[-0.04em] text-balance">
           {th("tagline.lead")} {th("tagline.rest")} <span className="text-signal">{th("tagline.accent")}</span>
-        </h2>
+        </p>
 
         <div className="flex flex-wrap items-end justify-between gap-x-[clamp(2rem,5vw,6rem)] gap-y-14">
           <div className="flex max-w-[560px] flex-[1_1_340px] flex-col gap-7">

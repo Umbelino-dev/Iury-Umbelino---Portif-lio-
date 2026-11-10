@@ -1,4 +1,4 @@
-import { CHAPTERS, CHAPTER_TOTAL, SectionMarker } from "@/components/layout/SectionMarker";
+import { SectionTitle } from "@/components/layout/SectionTitle";
 import { getLocale, getTranslations } from "next-intl/server";
 import { projects } from "@/content/projects";
 import type { Locale } from "@/i18n/routing";
@@ -67,8 +67,8 @@ export async function Projects() {
     >
       <div className="mx-auto max-w-(--container-page) px-(--page-margin)">
         <div className="flex flex-col gap-6 pb-[clamp(2.5rem,5vw,5rem)]">
-          <SectionMarker index={CHAPTERS.projects} total={CHAPTER_TOTAL} label={t("label")} as="h2" id="projects-title" />
-          <p className="max-w-[34ch] self-end text-caption text-gray-600 md:mr-[8.33%]">{t("note")}</p>
+          <SectionTitle id="projects-title">{t("label")}</SectionTitle>
+          <p className="max-w-[34ch] text-[0.9375rem] leading-normal text-gray-600 md:self-end md:mr-[8.33%]">{t("note")}</p>
         </div>
         <ProjectList rows={rows} label={t("listLabel")} />
       </div>

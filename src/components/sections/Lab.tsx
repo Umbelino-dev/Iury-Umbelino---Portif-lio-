@@ -1,4 +1,4 @@
-import { CHAPTERS, CHAPTER_TOTAL, SectionMarker } from "@/components/layout/SectionMarker";
+import { SectionTitle } from "@/components/layout/SectionTitle";
 import Image from "next/image";
 import { getLocale, getTranslations } from "next-intl/server";
 import { lab } from "@/content/lab";
@@ -53,17 +53,9 @@ export async function Lab() {
       <LabBackdrop />
 
       <div className="mx-auto max-w-(--container-page) px-(--page-margin)">
-        <div className="pb-[clamp(2.5rem,4vw,4rem)]">
-          <SectionMarker index={CHAPTERS.lab} total={CHAPTER_TOTAL} label={t("label")} tone="dark" />
-        </div>
-        <header className="relative flex flex-wrap items-end justify-between gap-x-12 gap-y-8 border-b border-[#2a2a2a] pb-[clamp(1.75rem,3vw,3rem)]">
+        <header className="relative flex flex-wrap items-end justify-between gap-x-12 gap-y-8">
           <div className="flex flex-col gap-[clamp(0.75rem,1.4vw,1.5rem)]">
-            <h2
-              id="lab-title"
-              className="flex items-start gap-[clamp(0.5rem,1vw,1rem)] font-display text-[clamp(6rem,19vw,21.25rem)] leading-[0.8] font-bold tracking-[-0.055em]"
-            >
-              {t("title")}
-            </h2>
+            <SectionTitle id="lab-title">{t("title")}</SectionTitle>
           </div>
           <div className="flex max-w-[380px] flex-col gap-4 pb-[0.4em]">
             <p className="font-display text-[clamp(1.25rem,1.1rem+0.7vw,1.75rem)] leading-[1.15] font-medium tracking-[-0.015em] text-balance">

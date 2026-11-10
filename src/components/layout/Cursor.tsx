@@ -6,9 +6,8 @@ import { gsap, MQ } from "@/lib/gsap";
 const FINE = "(hover: hover) and (pointer: fine)";
 const LINK = "a, button, [role='button'], label, summary, select";
 const NATIVE = "input, textarea, select, [contenteditable='true']";
-const TEXT = "p, h1, h2, h3, h4, h5, h6, li, dd, dt, blockquote, figcaption, td, th";
 
-type Mode = "default" | "link" | "label" | "text" | "hidden";
+type Mode = "default" | "link" | "label" | "hidden";
 /** Dot scale per state: 8px at rest, 18px over something you can act on. */
 const dotScale = (m: Mode) => (m === "default" || m === "label" ? 1 : m === "link" ? 2.25 : 0);
 
@@ -18,7 +17,7 @@ const dotScale = (m: Mode) => (m === "default" || m === "label" ? 1 : m === "lin
  * has something to say. States, read from what is under the pointer:
  * - default: 8px dot · link/button: the dot grows to 18px
  * - `data-cursor-label="…"`: a small labelled pill appears beside the dot ("ver projeto")
- * - text: a thin I-beam · form fields: the native cursor (custom one hidden)
+ * - over text it stays a dot (no I-beam) · form fields: the native cursor (custom one hidden)
  * - `data-cursor="none"`: hidden (the element draws its own pointer, e.g. Lab frames)
  * - press: the dot compresses for 120ms.
  * It is `pointer-events: none` and `aria-hidden`, so it never blocks clicks, text
@@ -27,15 +26,13 @@ const dotScale = (m: Mode) => (m === "default" || m === "label" ? 1 : m === "lin
 export function Cursor() {
   const root = useRef<HTMLDivElement>(null);
   const dot = useRef<HTMLDivElement>(null);
-  const beam = useRef<HTMLDivElement>(null);
   const label = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     const el = root.current;
     const d = dot.current;
-    const b = beam.current;
     const l = label.current;
-    if (!el || !d || !b || !l) return;
+    if (!el || !d || !l) return;
     const fine = window.matchMedia(FINE);
     const html = document.documentElement;
     let cleanup: (() => void) | undefined;
@@ -43,8 +40,8 @@ export function Cursor() {
     const start = () => {
       const rm = window.matchMedia(MQ.reduced).matches;
       html.classList.add("has-cursor");
-      const px = gsap.quickSetter([d, b, l], "x", "px");
-      const py = gsap.quickSetter([d, b, l], "y", "px");
+      const px = gsap.quickSetter([d, l], "x", "px");
+      const py = gsap.quickSetter([d, l], "y", "px");
       let mode: Mode = "default";
       let text = "";
       let seen = false;
@@ -57,7 +54,6 @@ export function Cursor() {
         if (next === "label") l.textContent = nextText;
         gsap.to(d, { scale: dotScale(next), duration: t, overwrite: "auto" });
         gsap.to(l, { autoAlpha: next === "label" ? 1 : 0, duration: next === "label" ? t : 0.08, overwrite: "auto" });
-        gsap.to(b, { autoAlpha: next === "text" ? 1 : 0, duration: t, overwrite: "auto" });
       };
 
       const read = (target: EventTarget | null) => {
@@ -67,7 +63,6 @@ export function Cursor() {
         if (own?.dataset.cursor === "none") return apply("hidden");
         if (own?.dataset.cursorLabel) return apply("label", own.dataset.cursorLabel);
         if (target.closest(LINK)) return apply("link");
-        if (target.closest(TEXT)) return apply("text");
         apply("default");
       };
 
@@ -108,7 +103,7 @@ export function Cursor() {
         document.removeEventListener("pointerout", onOut);
         document.removeEventListener("pointerdown", onDown);
         window.removeEventListener("blur", hide);
-        gsap.killTweensOf([el, d, b, l]);
+        gsap.killTweensOf([el, d, l]);
         gsap.set(el, { autoAlpha: 0 });
       };
     };
@@ -131,7 +126,6 @@ export function Cursor() {
     <>
       <div ref={root} data-cursor-root aria-hidden="true" className="pointer-events-none invisible fixed inset-0 z-[90] opacity-0 mix-blend-difference">
         <div ref={dot} data-cursor-dot className="absolute -top-1 -left-1 size-2 rounded-full bg-paper" />
-        <div ref={beam} className="invisible absolute -top-3 -left-px h-6 w-0.5 bg-paper opacity-0" />
       </div>
       {/* Not blended: a paper pill with ink text stays legible on any surface. It sits beside the dot, never under it. */}
       <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-[91]">

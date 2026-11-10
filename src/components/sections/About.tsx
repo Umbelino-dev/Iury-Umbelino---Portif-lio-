@@ -1,20 +1,20 @@
-import { CHAPTERS, CHAPTER_TOTAL, SectionMarker } from "@/components/layout/SectionMarker";
 import { getLocale, getTranslations } from "next-intl/server";
 import { education, experience } from "@/content/profile";
+import { gallery } from "@/content/gallery";
 import type { Locale } from "@/i18n/routing";
-import { Portrait } from "@/components/media/Portrait";
-import { PortraitReveal } from "@/components/media/PortraitReveal";
+import { SectionTitle } from "@/components/layout/SectionTitle";
+import { PhotoLoop } from "@/components/media/PhotoLoop";
+import { Timeline } from "./Timeline";
 
 type Trait = { index: string; word: [string, string]; text: string };
 
 /**
- * 03 · About — light editorial (Homepage R02). Text in 4 columns, the portrait
- * sticky beside it; then the professional experience (verified CV facts).
- * Mobile order: intro → portrait → traits → experience.
+ * About — light editorial. The section name opens it ("Sobre"), then the thesis
+ * and the lead; the three traits side by side; an endless photo strip; then the
+ * professional experience (verified CV facts) with the career path as a timeline.
  */
 export async function About() {
   const t = await getTranslations("about");
-  const tc = await getTranslations("cursor");
   const locale = (await getLocale()) as Locale;
   const traits = t.raw("traits") as Trait[];
 
@@ -26,41 +26,40 @@ export async function About() {
       aria-labelledby="about-title"
       className="surface-light overflow-hidden py-(--section-space)"
     >
-      <div className="mx-auto max-w-(--container-page) px-(--page-margin) pb-[clamp(3rem,5vw,5rem)]">
-        <SectionMarker index={CHAPTERS.about} total={CHAPTER_TOTAL} label={t("label")} />
+      <div className="page-grid items-end gap-y-8">
+        <SectionTitle id="about-title" className="col-span-full">
+          {t("label")}
+        </SectionTitle>
+        <p
+          data-split
+          className="col-span-4 font-display text-[clamp(1.75rem,1.25rem+2vw,3.25rem)] leading-[1.02] font-bold tracking-[-0.03em] text-balance md:col-span-7"
+        >
+          {t("title")}
+        </p>
+        <p className="col-span-4 max-w-[38ch] text-[clamp(1.0625rem,1rem+0.3vw,1.25rem)] leading-normal text-pretty md:col-span-4 md:col-start-9">
+          {t("lead")}
+        </p>
       </div>
-      <div className="page-grid items-start gap-y-16">
-        <div className="col-span-4 flex flex-col gap-7 md:col-span-4 md:col-start-2 md:row-start-1">
-          <h2 id="about-title" data-split className="font-display text-[clamp(2rem,1.55rem+1.9vw,3.25rem)] leading-none font-bold tracking-[-0.025em]">
-            {t("title")}
-          </h2>
-          <p className="max-w-[36ch] text-[clamp(1.0625rem,1rem+0.3vw,1.25rem)] leading-normal text-pretty">{t("lead")}</p>
-        </div>
 
-        <div className="col-span-4 -mx-(--page-margin) md:sticky md:top-22 md:col-span-7 md:col-start-6 md:row-span-2 md:row-start-1 md:mr-[calc(-1*var(--page-margin))] md:ml-0">
-          <div className="[&_[data-reveal-frame]]:aspect-[4/5] md:[&_[data-reveal-frame]]:aspect-auto md:[&_[data-reveal-frame]]:h-[max(520px,calc(100dvh-160px))]">
-            <PortraitReveal
-              base={<Portrait variant="base" />}
-              alternate={<Portrait variant="alternate" />}
-              caption={t("caption")}
-              labels={{ showMachine: t("showMachine"), showPortrait: t("showPortrait"), cursor: tc("machine") }}
-            />
-          </div>
-        </div>
+      {/* The three traits, side by side. */}
+      <ul className="page-grid mt-[clamp(4.5rem,8vw,8rem)] gap-y-14">
+        {traits.map((trait) => (
+          <li key={trait.index} className="col-span-4 flex flex-col gap-4">
+            <span className="font-mono text-[11px] tracking-[0.06em] text-gray-600">{trait.index}</span>
+            <h3 className="font-display text-[clamp(2.75rem,1.9rem+3.4vw,4.75rem)] leading-[0.84] font-bold tracking-[-0.05em] [overflow-wrap:anywhere]">
+              {trait.word[0]}
+              <br />
+              {trait.word[1]}
+            </h3>
+            <p className="max-w-[30ch] text-[0.9375rem] leading-normal text-pretty text-gray-600">{trait.text}</p>
+          </li>
+        ))}
+      </ul>
 
-        <ul className="col-span-4 flex flex-col gap-[clamp(4rem,9vw,10rem)] md:col-span-4 md:col-start-2 md:row-start-2">
-          {traits.map((trait) => (
-            <li key={trait.index} className="flex flex-col gap-4.5">
-              <span className="font-mono text-[11px] tracking-[0.06em] text-gray-600">{trait.index}</span>
-              <h3 className="font-display text-[clamp(2.75rem,17vw,5rem)] leading-[0.82] font-bold tracking-[-0.05em] [overflow-wrap:anywhere] md:text-[clamp(2.75rem,6.6vw,6.25rem)]">
-                {trait.word[0]}
-                <br />
-                {trait.word[1]}
-              </h3>
-              <p className="max-w-[26ch] pl-[0.4em] text-[0.875rem] leading-[1.35] text-pretty text-gray-600">{trait.text}</p>
-            </li>
-          ))}
-        </ul>
+      <div className="mt-[clamp(4.5rem,8vw,8rem)]">
+        <PhotoLoop
+          photos={gallery.map((p) => ({ src: p.src, width: p.width, height: p.height, alt: p.alt[locale], caption: p.caption[locale] }))}
+        />
       </div>
 
       <Experience locale={locale} />
@@ -70,20 +69,24 @@ export async function About() {
 
 async function Experience({ locale }: { locale: Locale }) {
   const t = await getTranslations("experience");
-  const label = "text-label font-medium tracking-label uppercase text-gray-600";
   const listTitle = "font-mono text-[11px] tracking-[0.06em] uppercase text-gray-600";
+  // Oldest first: the path reads as a progression up to today.
+  const steps = [...experience.path].reverse().map((s) => ({
+    role: s.role[locale],
+    period: s.period,
+    current: s.period.trim().endsWith("–"),
+  }));
 
   return (
-    <section className="page-grid mt-(--section-space) gap-y-12" aria-labelledby="experience-title">
-      <div className="col-span-4 flex flex-col gap-6 border-t border-ink pt-6 md:col-span-4 md:col-start-2">
-        <p className={label}>{t("label")}</p>
-        <h3 id="experience-title" className="font-display text-headline-m font-bold">
+    <section className="page-grid mt-(--section-space) gap-y-14" aria-labelledby="experience-title">
+      <div className="col-span-4 flex flex-col gap-6 md:col-span-4">
+        <h3 id="experience-title" className="font-display text-headline-l leading-[0.98] font-bold tracking-[-0.03em] text-balance">
           {t("title")}
         </h3>
         <p className="max-w-[40ch] text-body text-pretty">{t("lead")}</p>
       </div>
 
-      <div className="col-span-4 flex flex-col gap-12 border-t border-ink pt-6 md:col-span-6 md:col-start-6">
+      <div className="col-span-4 flex flex-col gap-14 md:col-span-7 md:col-start-6">
         <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
           <p className="font-display text-title font-bold">
             {experience.role[locale]} · {experience.employer}
@@ -93,9 +96,9 @@ async function Experience({ locale }: { locale: Locale }) {
 
         <div className="flex flex-col gap-3">
           <h4 className={listTitle}>{t("highlights")}</h4>
-          <ol className="border-b border-paper-300">
+          <ol>
             {experience.highlights.map((h, i) => (
-              <li key={i} className="grid grid-cols-[2.5rem_1fr] gap-x-3 border-t border-paper-300 py-4 text-body">
+              <li key={i} className="grid grid-cols-[2.5rem_1fr] gap-x-3 border-b border-paper-300 py-4 text-body last:border-b-0">
                 <span aria-hidden="true" className="font-mono text-[11px] leading-[1.62rem] text-gray-600">
                   E.{String(i + 1).padStart(2, "0")}
                 </span>
@@ -105,33 +108,24 @@ async function Experience({ locale }: { locale: Locale }) {
           </ol>
         </div>
 
-        <div className="grid gap-10 sm:grid-cols-2">
-          <div className="flex flex-col gap-3">
+        <div className="grid gap-14 sm:grid-cols-2">
+          <div className="flex flex-col gap-6">
             <h4 className={listTitle}>{t("path")}</h4>
-            <ol className="flex flex-col">
-              {experience.path.map((step) => (
-                <li key={step.period} className="flex flex-col border-t border-paper-300 py-3">
-                  <span className="text-[0.9375rem] font-medium">{step.role[locale]}</span>
-                  <span className="font-mono text-[11px] tracking-[0.04em] text-gray-600">{step.period}</span>
-                </li>
-              ))}
-            </ol>
+            <Timeline steps={steps} nowLabel={t("now")} />
           </div>
 
           <div className="flex flex-col gap-10">
             <div className="flex flex-col gap-3">
               <h4 className={listTitle}>{t("stack")}</h4>
-              <p className="border-t border-paper-300 pt-3 text-[0.9375rem] leading-relaxed">{experience.stack.daily.join(" · ")}</p>
-              <h4 className={`${listTitle} mt-3`}>{t("learning")}</h4>
-              <p className="border-t border-paper-300 pt-3 text-[0.9375rem] leading-relaxed text-gray-600">
-                {experience.stack.learning.join(" · ")}
-              </p>
+              <p className="text-[0.9375rem] leading-relaxed">{experience.stack.daily.join(" · ")}</p>
+              <h4 className={`${listTitle} mt-5`}>{t("learning")}</h4>
+              <p className="text-[0.9375rem] leading-relaxed text-gray-600">{experience.stack.learning.join(" · ")}</p>
             </div>
             <div className="flex flex-col gap-3">
               <h4 className={listTitle}>{t("education")}</h4>
-              <ul className="flex flex-col">
+              <ul className="flex flex-col gap-4">
                 {education.map((e) => (
-                  <li key={e.school} className="flex flex-col border-t border-paper-300 py-3">
+                  <li key={e.school} className="flex flex-col">
                     <span className="text-[0.9375rem] font-medium">{e.course[locale]}</span>
                     <span className="font-mono text-[11px] tracking-[0.04em] text-gray-600">
                       {e.school} · {t("expected", { year: e.expected })}

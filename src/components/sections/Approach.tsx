@@ -1,4 +1,4 @@
-import { CHAPTERS, CHAPTER_TOTAL, SectionMarker } from "@/components/layout/SectionMarker";
+import { SectionTitle } from "@/components/layout/SectionTitle";
 import { getTranslations } from "next-intl/server";
 
 type Step = { title: string; text: string };
@@ -23,14 +23,14 @@ export async function Approach() {
       className="surface-light pt-(--section-space) pb-[clamp(7.5rem,11vw,12.5rem)]"
     >
       <div className="mx-auto max-w-(--container-page) px-(--page-margin)">
-        <div className="pb-[clamp(2.5rem,4vw,4rem)]">
-          <SectionMarker index={CHAPTERS.approach} total={CHAPTER_TOTAL} label={t("label")} />
-        </div>
+        <SectionTitle id="approach-title" className="pb-[clamp(2rem,3.5vw,3.5rem)]">
+          {t("label")}
+        </SectionTitle>
         <div className="flex flex-wrap items-end justify-between gap-x-12 gap-y-8 pb-[clamp(3.5rem,6vw,6.5rem)]">
           <div className="flex max-w-[760px] flex-[1_1_420px] flex-col gap-6">
-            <h2 id="approach-title" data-split className="font-display text-[clamp(2rem,1.5rem+2.4vw,3.75rem)] leading-[0.98] font-bold tracking-[-0.03em]">
+            <p data-split className="font-display text-[clamp(1.75rem,1.25rem+2vw,3.25rem)] leading-[1.02] font-bold tracking-[-0.03em] text-balance">
               {t("title")}
-            </h2>
+            </p>
           </div>
           <p className="max-w-[34ch] flex-[0_1_300px] text-caption text-gray-600">{t("note")}</p>
         </div>

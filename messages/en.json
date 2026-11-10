@@ -29,25 +29,12 @@
   "hero": {
     "intro": "I build products with AI. Each one starts with a question.",
     "cta": "Meet the person",
-    "edition": "Edition 01 · 2026",
-    "topics": "AI · Products · Experiments",
-    "index": "(00) Index",
-    "scroll": "Scroll",
     "stack": "IT Assistant · SQL/PL-SQL · AI & Products",
     "tagline": {
       "lead": "Curiosity builds",
       "rest": "what comes",
       "accent": "next."
     }
-  },
-  "portrait": {
-    "specimenBase": "Specimen 01 / Portrait",
-    "specimenAlt": "Specimen 01 / Portrait, machine version",
-    "metaBase": "4:5 · sRGB · 2400×3000",
-    "metaAlt": "aligned to the portrait · Δ 0px",
-    "srcBase": "src: photograph",
-    "srcAlt": "src: derived from the photograph",
-    "placeholder": "Iury Umbelino's portrait goes here."
   },
   "about": {
     "label": "About",
@@ -78,13 +65,9 @@
         ],
         "text": "I'd rather ship an honest prototype than polish a guess. Every project teaches me one specific thing."
       }
-    ],
-    "caption": "Specimen 01. Hover, or press and hold, to see the machine.",
-    "showMachine": "See the machine",
-    "showPortrait": "See the portrait"
+    ]
   },
   "experience": {
-    "label": "(01.1) Experience",
     "title": "Where curiosity becomes routine.",
     "lead": "Two and a half years at Giassi Supermercados. I joined as an apprentice and now work in IT, looking after internal systems with real data and real users.",
     "highlights": "What I do",
@@ -92,7 +75,8 @@
     "stack": "Daily tools",
     "learning": "Learning",
     "education": "Education",
-    "expected": "expected {year}"
+    "expected": "expected {year}",
+    "now": "now"
   },
   "tags": {
     "web": "Web",
@@ -106,7 +90,7 @@
     "personalTools": "Personal tools"
   },
   "projects": {
-    "label": "Selected projects",
+    "label": "Projects",
     "note": "Six projects at different stages. Each one shows only what exists today. Some statuses may still change.",
     "image": "Project image",
     "placeholder": "placeholder",
@@ -297,13 +281,11 @@
   },
   "footer": {
     "rights": "© 2026 Iury Umbelino",
-    "edition": "Edition 01",
     "top": "Back to top"
   },
   "cursor": {
     "project": "view project",
     "visit": "visit site",
-    "machine": "see the machine",
     "ask": "ask me"
   }
 }

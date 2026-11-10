@@ -5,7 +5,6 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { site } from "@/content/profile";
 import { SURFACE_EVENT } from "./surface";
-import { CHAPTERS } from "./SectionMarker";
 
 const ITEMS = [
   { id: "hero", key: "index" },
@@ -16,14 +15,6 @@ const ITEMS = [
 ] as const;
 
 type ItemId = (typeof ITEMS)[number]["id"];
-/** Chapter numbers, shared with the section markers (SectionMarker CHAPTERS). */
-const NUMBER: Record<ItemId, string> = {
-  hero: "00",
-  about: String(CHAPTERS.about).padStart(2, "0"),
-  projects: String(CHAPTERS.projects).padStart(2, "0"),
-  lab: String(CHAPTERS.lab).padStart(2, "0"),
-  contact: String(CHAPTERS.contact).padStart(2, "0"),
-};
 /** Sections without a nav item (e.g. "approach") mark nothing as current. */
 type SectionId = ItemId | (string & {});
 
@@ -135,13 +126,10 @@ export function Nav({ variant = "home" }: { variant?: "home" | "case" }) {
       onClick={() => setOpen(false)}
       className={`flex min-h-11 items-center gap-2 rounded-pill px-3.5 text-[0.8125rem] font-medium ${focusRing} ${extra}`}
     >
-      {/* Chapter number (same as the section markers): bright on the active section. */}
       <span
         aria-hidden="true"
-        className={`font-mono text-[10px] tabular-nums transition-opacity duration-(--duration-base) ${active === id ? "opacity-100" : "opacity-45"}`}
-      >
-        {NUMBER[id]}
-      </span>
+        className={`size-1.5 bg-current transition-opacity duration-(--duration-base) ${active === id ? "opacity-100" : "opacity-0"}`}
+      />
       {t(key)}
     </a>
   );
@@ -186,7 +174,7 @@ export function Nav({ variant = "home" }: { variant?: "home" | "case" }) {
             href={pathname}
             locale={otherLocale}
             hrefLang={otherLocale === "pt" ? "pt-BR" : "en"}
-            aria-label={t("switchLocale")}
+            aria-label={`${t("localeShort")} · ${t("switchLocale")}`}
             className={`flex min-h-11 min-w-11 items-center justify-center rounded-pill text-label font-medium tracking-label ${focusRing}`}
           >
             {t("localeShort")}

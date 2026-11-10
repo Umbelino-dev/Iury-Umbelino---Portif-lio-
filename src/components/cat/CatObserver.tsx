@@ -2,7 +2,9 @@
 
 import { useRef } from "react";
 import { gsap, MQ, useGSAP } from "@/lib/gsap";
+import { anchors } from "@/components/hero/name-paths";
 import { CatFigure } from "./CatFigure";
+import { catParts, crouch, prime, run, stretch, tailFlick, walk } from "./clips";
 import { CAT_OPEN } from "./states";
 
 /** Pointer rules from Homepage R02 · N3 (Cat — observer mode). */
@@ -15,7 +17,8 @@ const IGNORE = "h1,h2,h3,p,a,button,nav,figure,[data-cat-ignore]";
 type Pose = "idle" | "left" | "right" | "near";
 
 /**
- * S1 · Observer. Sits in its hero slot and never moves across the screen.
+ * S1 · Observer (IDLE). Sits in its hero slot; scrolling the hero away drives its
+ * walk, turn, run and crouch along the letters (scrubbed, below).
  * - Fine pointer + motion: head ±9°, body ±3°, eyes ±3px toward the pointer.
  * - Over text or links: no reaction (reading is not disturbed).
  * - Breathing (scaleY 1→1.025, 1.6s) only while idle; blink every 6–10s.
@@ -29,10 +32,6 @@ type Pose = "idle" | "left" | "right" | "near";
  */
 type Look = "left" | "up";
 const SLOT: Record<Look, string> = { left: "(min-width: 768px)", up: "(max-width: 767px)" };
-const LOOK: Record<Look, { lean: number; head: number; gx: number; gy: number }> = {
-  left: { lean: -6, head: -13, gx: -2.6, gy: -0.8 },
-  up: { lean: -3, head: -9, gx: -1.6, gy: -2.4 },
-};
 
 export function CatObserver({
   className,
@@ -77,11 +76,15 @@ export function CatObserver({
 
         let onScreen = false;
         let blinkTimer: number | undefined;
+        const idleParts = catParts(el);
+        if (idleParts) gsap.set(idleParts.tail, { svgOrigin: "80 118" });
         const blink = () => {
           gsap
             .timeline()
             .to(eyes, { scaleY: 0.1, duration: 0.07, ease: "none" })
             .to(eyes, { scaleY: 1, duration: 0.07, ease: "none", delay: 0.07 });
+          // Every other blink or so, a small tail flick: alive, not busy.
+          if (idleParts && Math.random() < 0.5) tailFlick(idleParts);
         };
         const scheduleBlink = () => {
           window.clearTimeout(blinkTimer);
@@ -172,34 +175,41 @@ export function CatObserver({
         };
       });
 
-      // Scroll: the cat notices the letters. As the hero scrolls away it leans in
-      // and looks at the name, then settles back and crouches, the anticipation
-      // of its jump (CatAssistant takes over at 60%). Scrubbed with a little lag
-      // so it follows the reader without feeling bolted to the scrollbar.
+      // Scroll narrative (Cat Journey R03 · S1 → S2), one scrubbed timeline per slot.
+      // Desktop: as the hero scrolls away the cat stretches, walks left over the
+      // "n", turns, runs right to the edge of the "o" and crouches; CatAssistant
+      // then takes the leap at 50% (JUMP → FALL → GRAB). Scrubbed, so scrolling
+      // back plays it in reverse and the cat can never be left half-way.
+      // Mobile: there is no room to walk, so it stretches, looks up at the name and
+      // crouches before its hop to the dock.
       mm.add(`${MQ.motion} and ${SLOT[look]}`, () => {
         const hero = document.getElementById("hero");
         const [lean] = q<HTMLElement>("[data-cat-lean]");
-        const [lookG] = q<SVGGElement>('[data-cat="look"]');
-        const [gaze] = q<SVGGElement>('[data-cat="gaze"]');
-        if (!hero || !lean || !lookG || !gaze) return;
-        const k = LOOK[look];
-        gsap.set(lean, { transformOrigin: "50% 100%" });
-        gsap.set(lookG, { svgOrigin: "50 62" });
-        gsap
-          .timeline({
-            defaults: { ease: "sine.inOut" },
-            scrollTrigger: { trigger: hero, start: "top top", end: "60% top", scrub: 0.6 },
-          })
-          // 0 → 0.45: lean in, head turns, eyes find the letters (eyes a beat early).
-          .to(gaze, { x: k.gx, y: k.gy, duration: 0.3 }, 0)
-          .to(lookG, { rotation: k.head, y: 1, duration: 0.45 }, 0.05)
-          .to(lean, { rotation: k.lean, x: look === "left" ? -2 : -1, duration: 0.45 }, 0.05)
-          // 0.5 → 0.8: settles back, still glancing at the name.
-          .to(lean, { rotation: 0, x: 0, duration: 0.3 }, 0.5)
-          .to(lookG, { rotation: k.head * 0.3, y: 0, duration: 0.3 }, 0.5)
-          .to(gaze, { x: k.gx * 0.4, y: 0, duration: 0.3 }, 0.5)
-          // 0.8 → 1: crouch before the leap.
-          .to(lean, { scaleY: 0.9, scaleX: 1.05, duration: 0.2, ease: "power2.in" }, 0.8);
+        const p = lean ? catParts(el, lean) : null;
+        if (!hero || !p) return;
+        prime(p);
+        const mark = el.closest<HTMLElement>("[data-hero-mark]");
+        const span = () => (mark?.offsetWidth ?? 0) / 100;
+        const tl = gsap.timeline({
+          defaults: { ease: "sine.inOut" },
+          scrollTrigger: { trigger: hero, start: "top top", end: "48% top", scrub: 0.5, invalidateOnRefresh: true },
+        });
+        if (look === "left") {
+          const toN = () => (anchors.nCenter - anchors.oCenter) * span();
+          const toEdge = () => (anchors.oRight - anchors.oCenter) * span() - el.offsetWidth * 0.2;
+          tl.add(stretch(p, 0.14), 0)
+            .add(walk(p, el, toN, { steps: 3, d: 0.2, dir: -1 }), 0.14)
+            // Turns: head and eyes swing toward the rail before it sets off.
+            .to(p.look, { rotation: 8, duration: 0.04 }, 0.34)
+            .to(p.gaze, { x: 2.5, duration: 0.04 }, 0.34)
+            .add(run(p, el, toEdge, { strides: 3, d: 0.1, dir: 1 }), 0.38)
+            .add(crouch(p, 0.04), 0.48);
+        } else {
+          tl.add(stretch(p, 0.2), 0)
+            .to(p.look, { rotation: -9, duration: 0.15 }, 0.22)
+            .to(p.gaze, { x: -1.6, y: -2.4, duration: 0.15 }, 0.22)
+            .add(crouch(p, 0.08), 0.42);
+        }
       });
 
       return () => mm.revert();

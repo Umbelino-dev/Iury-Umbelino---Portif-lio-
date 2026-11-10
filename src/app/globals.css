@@ -22,7 +22,7 @@
   --color-transparent: transparent;
 
   /* Type families ----------------------------------------------------- */
-  --font-display: var(--font-bricolage), system-ui, sans-serif;
+  --font-display: var(--font-satoshi), system-ui, sans-serif;
   --font-serif: var(--font-instrument-serif), Georgia, serif;
   --font-sans: var(--font-ibm-plex-sans), system-ui, sans-serif;
   --font-mono: ui-monospace, "SFMono-Regular", Menlo, monospace;

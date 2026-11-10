@@ -2,7 +2,7 @@
   "meta": {
     "title": "Iury Umbelino · Curiosity builds what comes next.",
     "description": "Iury Umbelino builds AI products, prototypes and small experiments. Each one starts with a question.",
-    "ogAlt": "Iury Umbelino, Curiosity builds what comes next. The name drawn as lettering, with the y joined to the b."
+    "ogAlt": "Iury Umbelino. Curiosity builds what comes next. The name drawn as lettering, with the y joined to the b."
   },
   "nav": {
     "label": "Primary",
@@ -33,7 +33,12 @@
     "topics": "AI · Products · Experiments",
     "index": "(00) Index",
     "scroll": "Scroll",
-    "stack": "IT Assistant · SQL/PL-SQL · AI & Products"
+    "stack": "IT Assistant · SQL/PL-SQL · AI & Products",
+    "tagline": {
+      "lead": "Curiosity builds",
+      "rest": "what comes",
+      "accent": "next."
+    }
   },
   "portrait": {
     "specimenBase": "Specimen 01 / Portrait",
@@ -45,7 +50,7 @@
     "placeholder": "Iury Umbelino's portrait goes here."
   },
   "about": {
-    "label": "(01) About",
+    "label": "About",
     "title": "I'm Iury. I learn by building. I build to learn.",
     "lead": "Most of what I make starts as a question I can't let go of. This is where I show what I found.",
     "traits": [
@@ -101,7 +106,7 @@
     "personalTools": "Personal tools"
   },
   "projects": {
-    "label": "(02) Selected projects",
+    "label": "Selected projects",
     "note": "Six projects at different stages. Each one shows only what exists today. Some statuses may still change.",
     "image": "Project image",
     "placeholder": "placeholder",
@@ -109,7 +114,7 @@
     "listLabel": "Projects"
   },
   "lab": {
-    "label": "(03) Experimental Lab",
+    "label": "Experimental lab",
     "title": "Lab",
     "intro": "Small things, built to answer one question each. Not products yet.",
     "meta": "{count} entries · ongoing · updated 11.2026",
@@ -119,7 +124,7 @@
     "playhead": "playhead · “why does it”"
   },
   "approach": {
-    "label": "(04) Approach",
+    "label": "Approach",
     "title": "How a question becomes a thing.",
     "note": "Five steps, in this order. The last one leads back to the first.",
     "back": "back to 01",
@@ -277,7 +282,7 @@
     }
   },
   "contact": {
-    "label": "(05) Contact",
+    "label": "Contact",
     "open": "Open to collaborations, roles & good questions",
     "lead": "Got a question worth building? Write to me.",
     "cta": "Write to Iury",

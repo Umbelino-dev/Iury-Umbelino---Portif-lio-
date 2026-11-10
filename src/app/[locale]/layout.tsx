@@ -33,9 +33,9 @@ export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Pr
       title: t("title"),
       description: t("description"),
       url: `/${locale}`,
-      images: [{ url: "/og-image.png", width: 1200, height: 630, alt: t("ogAlt") }],
+      images: [{ url: `/og-image-${locale}.png`, width: 1200, height: 630, alt: t("ogAlt") }],
     },
-    twitter: { card: "summary_large_image", title: t("title"), description: t("description"), images: ["/og-image.png"] },
+    twitter: { card: "summary_large_image", title: t("title"), description: t("description"), images: [`/og-image-${locale}.png`] },
   };
 }
 

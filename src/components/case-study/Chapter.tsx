@@ -85,7 +85,7 @@ export function Chapter({
                     {chapter.id === "audit" ? "A" : "S"}.{String(i + 1).padStart(2, "0")}
                   </span>
                   <div className="flex flex-col gap-3">
-                    <h3 className="font-display text-[clamp(1.5rem,1.1rem+1.8vw,3.25rem)] leading-none font-semibold tracking-[-0.03em] text-balance">
+                    <h3 className="font-display text-[clamp(1.5rem,1.1rem+1.8vw,3.25rem)] leading-none font-bold tracking-[-0.03em] text-balance">
                       {step.title[locale]}
                     </h3>
                     <p className="max-w-[56ch] text-body leading-[1.6] text-pretty text-[#3f3d39]">{step.text[locale]}</p>

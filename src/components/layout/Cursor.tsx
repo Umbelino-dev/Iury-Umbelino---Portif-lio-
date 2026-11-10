@@ -9,34 +9,33 @@ const NATIVE = "input, textarea, select, [contenteditable='true']";
 const TEXT = "p, h1, h2, h3, h4, h5, h6, li, dd, dt, blockquote, figcaption, td, th";
 
 type Mode = "default" | "link" | "label" | "text" | "hidden";
-const ringScale = (m: Mode) => (m === "default" ? 1 : m === "link" ? 1.75 : 0);
+/** Dot scale per state: 8px at rest, 18px over something you can act on. */
+const dotScale = (m: Mode) => (m === "default" || m === "label" ? 1 : m === "link" ? 2.25 : 0);
 
 /**
- * Custom cursor, fine pointers only (mouse / trackpad). A dot that follows the
- * pointer exactly and a ring that trails it (gsap.quickTo; no lag with reduced
- * motion). States, read from what is under the pointer:
- * - default: small ring · link/button: larger ring, no dot
- * - `data-cursor-label="…"`: the ring becomes a labelled pill ("ver projeto")
+ * Custom cursor, fine pointers only (mouse / trackpad). A single dot that sits
+ * exactly on the pointer (no trailing ring, no lag): almost invisible until it
+ * has something to say. States, read from what is under the pointer:
+ * - default: 8px dot · link/button: the dot grows to 18px
+ * - `data-cursor-label="…"`: a small labelled pill appears beside the dot ("ver projeto")
  * - text: a thin I-beam · form fields: the native cursor (custom one hidden)
  * - `data-cursor="none"`: hidden (the element draws its own pointer, e.g. Lab frames)
- * - press: the ring compresses for 120ms.
+ * - press: the dot compresses for 120ms.
  * It is `pointer-events: none` and `aria-hidden`, so it never blocks clicks, text
  * selection or keyboard focus. Touch devices keep the native cursor and never mount it.
  */
 export function Cursor() {
   const root = useRef<HTMLDivElement>(null);
-  const ring = useRef<HTMLDivElement>(null);
   const dot = useRef<HTMLDivElement>(null);
   const beam = useRef<HTMLDivElement>(null);
   const label = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     const el = root.current;
-    const r = ring.current;
     const d = dot.current;
     const b = beam.current;
     const l = label.current;
-    if (!el || !r || !d || !b || !l) return;
+    if (!el || !d || !b || !l) return;
     const fine = window.matchMedia(FINE);
     const html = document.documentElement;
     let cleanup: (() => void) | undefined;
@@ -44,13 +43,8 @@ export function Cursor() {
     const start = () => {
       const rm = window.matchMedia(MQ.reduced).matches;
       html.classList.add("has-cursor");
-      const lag = rm ? 0 : 0.35;
-      const rx = gsap.quickTo(r, "x", { duration: lag, ease: "power3.out" });
-      const ry = gsap.quickTo(r, "y", { duration: lag, ease: "power3.out" });
-      const lx = gsap.quickTo(l, "x", { duration: lag, ease: "power3.out" });
-      const ly = gsap.quickTo(l, "y", { duration: lag, ease: "power3.out" });
-      const dx = gsap.quickSetter([d, b], "x", "px");
-      const dy = gsap.quickSetter([d, b], "y", "px");
+      const px = gsap.quickSetter([d, b, l], "x", "px");
+      const py = gsap.quickSetter([d, b, l], "y", "px");
       let mode: Mode = "default";
       let text = "";
       let seen = false;
@@ -59,11 +53,10 @@ export function Cursor() {
         if (next === mode && nextText === text) return;
         mode = next;
         text = nextText;
-        const t = rm ? 0 : 0.2;
+        const t = rm ? 0 : 0.16;
         if (next === "label") l.textContent = nextText;
-        gsap.to(r, { scale: ringScale(next), duration: t, overwrite: "auto" });
-        gsap.to(l, { autoAlpha: next === "label" ? 1 : 0, scale: next === "label" ? 1 : 0.6, duration: next === "label" ? t : 0.08, overwrite: "auto" });
-        gsap.to(d, { autoAlpha: next === "default" ? 1 : 0, duration: t, overwrite: "auto" });
+        gsap.to(d, { scale: dotScale(next), duration: t, overwrite: "auto" });
+        gsap.to(l, { autoAlpha: next === "label" ? 1 : 0, duration: next === "label" ? t : 0.08, overwrite: "auto" });
         gsap.to(b, { autoAlpha: next === "text" ? 1 : 0, duration: t, overwrite: "auto" });
       };
 
@@ -80,25 +73,19 @@ export function Cursor() {
 
       const onMove = (e: PointerEvent) => {
         if (e.pointerType !== "mouse") return;
+        px(e.clientX);
+        py(e.clientY);
         if (!seen) {
           seen = true;
-          gsap.set([r, l], { x: e.clientX, y: e.clientY });
+          read(e.target);
           gsap.to(el, { autoAlpha: 1, duration: 0.16 });
         }
-        rx(e.clientX);
-        ry(e.clientY);
-        lx(e.clientX);
-        ly(e.clientY);
-        dx(e.clientX);
-        dy(e.clientY);
       };
       const onOver = (e: PointerEvent) => read(e.target);
       const onDown = () => {
-        if (rm) return;
-        const target = mode === "label" ? l : r;
-        const s = mode === "label" ? 1 : ringScale(mode);
-        if (!s) return;
-        gsap.fromTo(target, { scale: s * 0.6 }, { scale: s, duration: 0.12, delay: 0.12, overwrite: "auto" });
+        const s = dotScale(mode);
+        if (rm || !s) return;
+        gsap.fromTo(d, { scale: s * 0.6 }, { scale: s, duration: 0.12, delay: 0.12, overwrite: "auto" });
       };
       const hide = () => {
         seen = false;
@@ -121,7 +108,7 @@ export function Cursor() {
         document.removeEventListener("pointerout", onOut);
         document.removeEventListener("pointerdown", onDown);
         window.removeEventListener("blur", hide);
-        gsap.killTweensOf([el, r, d, b, l]);
+        gsap.killTweensOf([el, d, b, l]);
         gsap.set(el, { autoAlpha: 0 });
       };
     };
@@ -143,15 +130,14 @@ export function Cursor() {
   return (
     <>
       <div ref={root} data-cursor-root aria-hidden="true" className="pointer-events-none invisible fixed inset-0 z-[90] opacity-0 mix-blend-difference">
-        <div ref={ring} className="absolute -top-3 -left-3 size-6 rounded-full border border-paper" />
-        <div ref={dot} className="absolute -top-[3px] -left-[3px] size-1.5 rounded-full bg-paper" />
+        <div ref={dot} data-cursor-dot className="absolute -top-1 -left-1 size-2 rounded-full bg-paper" />
         <div ref={beam} className="invisible absolute -top-3 -left-px h-6 w-0.5 bg-paper opacity-0" />
       </div>
-      {/* Not blended: a paper pill with ink text stays legible on any surface. */}
+      {/* Not blended: a paper pill with ink text stays legible on any surface. It sits beside the dot, never under it. */}
       <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-[91]">
         <span
           ref={label}
-          className="invisible absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 rounded-pill border border-ink/14 bg-paper px-3.5 py-2 text-[11px] font-medium tracking-[0.08em] whitespace-nowrap text-ink uppercase opacity-0"
+          className="invisible absolute top-0 left-0 translate-x-4 translate-y-3 rounded-pill border border-ink/14 bg-paper px-3 py-1.5 text-[11px] font-medium tracking-[0.08em] whitespace-nowrap text-ink uppercase opacity-0"
         />
       </div>
     </>

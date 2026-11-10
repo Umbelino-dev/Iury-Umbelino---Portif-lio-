@@ -3,8 +3,9 @@
 import { useCallback, useEffect, useId, useReducer, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import { gsap, MQ } from "@/lib/gsap";
 import { CatFigure } from "./CatFigure";
+import { airborne, catParts, crouch, falling, grab, greet, land, prime, settle, wake, type CatParts } from "./clips";
 import { SectionRail } from "./SectionRail";
-import { CAT_OPEN, IDLE_MS, transition, type CatEvent, type CatState } from "./states";
+import { CAT_OPEN, HERO_LEFT_AT, IDLE_MS, transition, type CatEvent, type CatState } from "./states";
 
 export interface AssistantChip {
   label: string;
@@ -84,6 +85,9 @@ export function CatAssistant({
   const scrim = useRef<HTMLDivElement>(null);
   const title = useRef<HTMLHeadingElement>(null);
   const logEnd = useRef<HTMLDivElement>(null);
+  const hint = useRef<HTMLSpanElement>(null);
+  /** An "open" asked for mid-leap: honoured as soon as the cat lands. */
+  const pendingOpen = useRef(false);
   const prev = useRef<CatState>(state);
   const heroVisible = useRef(context === "home");
   const mounted = useRef(false);
@@ -112,6 +116,34 @@ export function CatAssistant({
       tail: q("tail"),
       paws: q("paws"),
     };
+  };
+  /** OPEN, except mid-leap: then it waits for the landing (the jump is not interruptible). */
+  const requestOpen = () => {
+    if (prev.current === "jump") pendingOpen.current = true;
+    else send({ type: "OPEN" });
+  };
+  const landed = () => {
+    send({ type: "LANDED" });
+    if (pendingOpen.current) {
+      pendingOpen.current = false;
+      send({ type: "OPEN" });
+    }
+  };
+  /** The docked cat's parts for the clip library (frame = its svg, pivoting on its feet). */
+  const clipParts = (): CatParts | null => {
+    const p = dockInner.current ? catParts(dockInner.current) : null;
+    if (p) prime(p);
+    return p;
+  };
+  /** Awake, at rest: the pose every awake state returns to. */
+  const awakePose = (p: CatParts, gripping: boolean, d: number) => {
+    gsap.to(p.frame, { scaleX: 1, scaleY: 1, rotation: 0, y: 0, duration: d, overwrite: "auto" });
+    gsap.to(p.eyes, { scaleY: 1, duration: d * 0.4 });
+    gsap.to(p.body, { scaleY: 1, duration: d });
+    gsap.to(p.head, { y: 0, rotation: 0, duration: d });
+    gsap.to([p.legL, p.legR], { y: 0, rotation: 0, duration: d });
+    gsap.to(p.tail, { rotation: 0, duration: d ? d * 1.4 : 0, ease: "elastic.out(1, 0.4)" });
+    gsap.to(p.paws, { opacity: gripping ? 1 : 0, duration: d * 0.3 });
   };
   /** Dock offset (px) that puts the cat's centre on the reading line. */
   const railY = () => {
@@ -186,19 +218,50 @@ export function CatAssistant({
     if (!hero) return;
     const io = new IntersectionObserver(
       ([entry]) => {
-        const visible = (entry?.intersectionRatio ?? 0) >= 0.4; // ≥60% out of view = left
+        const visible = (entry?.intersectionRatio ?? 0) >= 1 - HERO_LEFT_AT; // half out of view = left
         heroVisible.current = visible;
         send({ type: visible ? "HERO_ENTERED" : "HERO_LEFT" });
       },
-      { threshold: [0, 0.4, 1] },
+      { threshold: [0, 1 - HERO_LEFT_AT, 1] },
     );
     io.observe(hero);
     return () => io.disconnect();
   }, [context]);
 
+  // ── ASSISTANT invitation: at Contact the awake cat waves once and the
+  //    "Ask the cat" hint shows for a moment. It never opens anything itself.
+  useEffect(() => {
+    if (context !== "home") return;
+    const contact = document.getElementById("contact");
+    if (!contact) return;
+    let greeted = false;
+    let hintTimer: number | undefined;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (greeted || !entry?.isIntersecting || prev.current !== "cling" || reduced()) return;
+        const p = clipParts();
+        if (!p) return;
+        greeted = true;
+        greet(p);
+        if (hint.current) {
+          gsap.to(hint.current, { opacity: 1, duration: 0.2, delay: 0.3 });
+          hintTimer = window.setTimeout(() => {
+            if (hint.current) gsap.to(hint.current, { opacity: 0, clearProps: "opacity", duration: 0.3 });
+          }, 2600);
+        }
+      },
+      { threshold: 0.35 },
+    );
+    io.observe(contact);
+    return () => {
+      io.disconnect();
+      window.clearTimeout(hintTimer);
+    };
+  }, [context]);
+
   // ── Any "ask the cat" control (hero cat, contact) opens the assistant ────
   useEffect(() => {
-    const onOpen = () => send({ type: "OPEN" });
+    const onOpen = () => requestOpen();
     window.addEventListener(CAT_OPEN, onOpen);
     return () => window.removeEventListener(CAT_OPEN, onOpen);
   }, []);
@@ -349,42 +412,29 @@ export function CatAssistant({
     const d = dock.current;
     const inner = dockInner.current;
     if (!d || !inner) return;
-    const { svg, body, head, eyes, tail, paws } = parts();
+    if (state !== "jump") pendingOpen.current = false; // a leap that never landed drops its request
     const first = !mounted.current;
     mounted.current = true;
     const rm = reduced();
+    const p = clipParts();
+    if (!p) return;
     const ctx = gsap.context(() => {
-      if (svg) gsap.set(svg, { transformOrigin: "50% 100%" });
-      if (body) gsap.set(body, { svgOrigin: "50 125" });
-      if (eyes) gsap.set(eyes, { svgOrigin: "50 40" });
-
-      // Pose: asleep = eyes shut, body settled; anything else = awake.
-      const asleep = state === "sleep";
-      if (eyes) gsap.to(eyes, { scaleY: asleep ? 0.1 : 1, duration: rm ? 0 : 0.2 });
-      if (body) gsap.to(body, { scaleY: asleep ? 0.82 : 1, duration: rm ? 0 : 0.52, ease: "power2.in" });
-      if (head) gsap.to(head, { y: asleep ? 6 : 0, rotation: asleep ? -4 : 0, svgOrigin: "50 62", duration: rm ? 0 : 0.52 });
-      // Tail: curls in when asleep; settles with a little whip otherwise (the jump drives its own).
-      if (tail && state !== "jump") {
-        gsap.to(tail, {
-          rotation: asleep ? 26 : 0,
-          svgOrigin: "80 118",
-          duration: rm ? 0 : asleep ? 0.6 : 0.7,
-          ease: asleep ? "power2.out" : "elastic.out(1, 0.4)",
-        });
-      }
-      // Paws grip the rail only while hanging there.
-      const gripping = isRail() && state === "cling";
-      if (paws && state !== "jump") gsap.to(paws, { opacity: gripping ? 1 : 0, duration: rm ? 0 : 0.16 });
-
       const hero = heroCat();
-      // S1 → S2: one arc from the hero slot to the dock.
+      const gripping = isRail() && state === "cling";
+
+      // Awake states settle into the rest pose (the jump, sleep and wake-up drive their own).
+      if (state === "cling" || state === "awaken" || state === "observer") awakePose(p, gripping, rm ? 0 : 0.3);
+
+      // S1 → S2: JUMP (crouch, take-off, apex) → FALL (gravity, legs dangling)
+      // → GRAB the rail (squash, damped swing) or LAND in the dock.
       if (state === "jump") {
         // Rail mode: the landing spot is on the rail, at the reading line.
         if (isRail()) gsap.set(d, { y: railY() });
         if (first || !hero) {
           gsap.set(d, { autoAlpha: 1 });
           if (hero) gsap.set(hero, { autoAlpha: 0 });
-          send({ type: "LANDED" });
+          awakePose(p, isRail(), 0);
+          landed();
           return;
         }
         const hr = hero.getBoundingClientRect();
@@ -394,26 +444,23 @@ export function CatAssistant({
         gsap.set(d, { autoAlpha: 1 });
         if (rm) {
           gsap.to(hero, { autoAlpha: 0, duration: 0.16 });
-          gsap.fromTo(d, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.16, onComplete: () => send({ type: "LANDED" }) });
+          awakePose(p, isRail(), 0);
+          gsap.fromTo(d, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.16, onComplete: landed });
           return;
         }
         gsap.set(hero, { autoAlpha: 0 });
-        const tl = gsap.timeline();
+        // Apex above both ends of the leap, but never above the visible page (under the nav).
+        const apex = Math.max(Math.min(dy, 0) - 70, 90 - dr.top);
+        const tl = gsap.timeline({ onComplete: landed });
         tl.set(inner, { x: dx, y: dy, scale: hr.width / dr.width })
-          // Anticipation: a short crouch before the leap.
-          .to(svg, { scaleX: 1.1, scaleY: 0.86, duration: 0.1, ease: "power2.out" })
+          .add(crouch(p, 0.1))
           .addLabel("air")
-          .to(inner, { x: 0, scale: 1, duration: 0.42, ease: "power1.inOut" }, "air")
-          .to(inner, { y: 0, duration: 0.42, ease: "back.in(1.4)" }, "air") // rises, then falls onto its perch
-          // Stretched in flight, tail trailing behind.
-          .to(svg, { scaleX: 0.9, scaleY: 1.14, duration: 0.18, ease: "power1.out" }, "air")
-          .to(svg, { scaleX: 1, scaleY: 1, duration: 0.22 }, "air+=0.2");
-        if (tail) tl.to(tail, { rotation: -28, svgOrigin: "80 118", duration: 0.2 }, "air");
-        if (paws && isRail()) tl.to(paws, { opacity: 1, duration: 0.08 }, "air+=0.34"); // reaches for the rail
-        // Landing: squash, the tail whips forward; cling's pose settles it.
-        tl.to(svg, { scaleX: 1.1, scaleY: 0.88, duration: 0.07, ease: "power1.out" }, "air+=0.42");
-        if (tail) tl.to(tail, { rotation: 18, duration: 0.1 }, "<");
-        tl.to(svg, { scaleX: 1, scaleY: 1, duration: 0.14, ease: "power2.out" }).call(() => send({ type: "LANDED" }));
+          .add(airborne(p, 0.2), "air")
+          .to(inner, { x: 0, scale: 1, duration: 0.5, ease: "power1.inOut" }, "air")
+          .to(inner, { y: apex, duration: 0.22, ease: "power2.out" }, "air")
+          .add(falling(p, 0.22), "air+=0.22")
+          .to(inner, { y: 0, duration: 0.28, ease: "power2.in" }, "air+=0.22")
+          .add(isRail() ? grab(p) : land(p), "air+=0.5");
         return;
       }
 
@@ -448,11 +495,43 @@ export function CatAssistant({
       }
 
       // Docked states are visible; the hero slot is empty.
-      if (state === "cling" || state === "sleep") {
+      if (state === "cling" || state === "sleep" || state === "waking") {
         gsap.set(d, { autoAlpha: 1 });
         if (hero) gsap.set(hero, { autoAlpha: 0 });
-        // Release: eyes close first (200ms), then it slides down the rail to curl in the corner.
-        if (state === "sleep") gsap.to(d, { y: 0, duration: rm ? 0 : 0.52, delay: rm ? 0 : 0.2, ease: "power2.in" });
+      }
+
+      // S4 · SLEEP. On the rail: eyes close, it lets go and FALLS down the rail,
+      // lands in the corner, then curls up (settle). In the dock: it just curls up.
+      if (state === "sleep") {
+        if (rm) {
+          gsap.set(d, { y: 0 });
+          settle(p).progress(1).pause();
+          return;
+        }
+        const lifted = (Number(gsap.getProperty(d, "y")) || 0) < -1;
+        const tl = gsap.timeline();
+        if (lifted) {
+          tl.to(p.eyes, { scaleY: 0.1, duration: 0.2 }, 0)
+            .set(p.paws, { opacity: 0 }, 0.2)
+            .add(falling(p, 0.2), 0.2)
+            .to(d, { y: 0, duration: 0.45, ease: "power2.in" }, 0.2)
+            .add(land(p), 0.65)
+            .add(settle(p), 0.8);
+        } else {
+          tl.add(settle(p), 0);
+        }
+        return;
+      }
+
+      // WAKING: an ear twitch, eyes open, it rises and stretches; then it is awake
+      // (cling), and on the rail it climbs back up to the reading line.
+      if (state === "waking") {
+        if (rm) {
+          awakePose(p, false, 0);
+          send({ type: "WOKE" });
+          return;
+        }
+        wake(p).call(() => send({ type: "WOKE" }));
       }
 
     }, root);
@@ -620,7 +699,7 @@ export function CatAssistant({
             aria-label={ui.open}
             aria-haspopup="dialog"
             aria-expanded={open}
-            onClick={() => (open ? close() : send({ type: "OPEN" }))}
+            onClick={() => (open ? close() : requestOpen())}
             className={`group relative flex ${disc} items-end justify-center rounded-full border border-ink/14 bg-paper pb-1.5 focus-visible:outline-ink`}
           >
             <CatFigure className={`${catSize} overflow-visible`} />
@@ -633,8 +712,9 @@ export function CatAssistant({
               <span className="cat-z [animation-delay:600ms]">z</span>
               <span className="cat-z [animation-delay:1200ms]">z</span>
             </span>
-            {/* Hover / focus hint (desktop) */}
+            {/* Hover / focus hint (desktop); also shown once by the Contact greeting. */}
             <span
+              ref={hint}
               aria-hidden="true"
               className="pointer-events-none absolute top-1/2 right-full mr-3 -translate-y-1/2 translate-x-2 rounded-pill bg-ink px-3 py-1.5 text-caption font-medium whitespace-nowrap text-paper opacity-0 transition-[opacity,translate] duration-(--duration-fast) group-hover:translate-x-0 group-hover:opacity-100 group-focus-visible:translate-x-0 group-focus-visible:opacity-100 [@media(hover:none)]:hidden"
             >
@@ -668,7 +748,7 @@ export function CatAssistant({
 
         <header className="flex shrink-0 items-start justify-between gap-3 border-b border-paper/10 px-5 pb-3.5 md:pt-4.5">
           <div className="flex min-w-0 flex-col gap-1">
-            <h2 id={titleId} ref={title} tabIndex={-1} className="font-display text-title font-semibold outline-none">
+            <h2 id={titleId} ref={title} tabIndex={-1} className="font-display text-title font-bold outline-none">
               {ui.title}
             </h2>
             <p className="font-mono text-[11px] tracking-[0.04em] text-gray-500 uppercase">{ui.subtitle}</p>

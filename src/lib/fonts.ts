@@ -1,14 +1,16 @@
 import localFont from "next/font/local";
 
 /**
- * Display: Bricolage Grotesque (variable weight 200–800, latin). Headings and UI display.
+ * Display: Satoshi (variable weight 300–900, Indian Type Foundry, ITF Free Font
+ * License). Headings, numerals and display UI. The file is not in git: the
+ * license forbids distributing it through a public repository, so
+ * scripts/fonts.mjs fetches the official woff2 before every build (npm prebuild).
  * The hero name is NOT set in this font at runtime: it is pre-lettered SVG
- * (scripts/lettering.py → src/components/hero/NameMark.tsx), so only the weight
- * axis ships here (41 KB) — width/optical-size are used at lettering time only.
+ * (scripts/lettering.py → src/components/hero/name-paths.ts).
  */
 export const display = localFont({
-  src: [{ path: "../fonts/BricolageGrotesque-Variable.woff2", weight: "200 800", style: "normal" }],
-  variable: "--font-bricolage",
+  src: [{ path: "../fonts/Satoshi-Variable.woff2", weight: "300 900", style: "normal" }],
+  variable: "--font-satoshi",
   display: "swap",
   preload: true,
   adjustFontFallback: "Arial",

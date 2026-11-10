@@ -5,8 +5,11 @@
  *
  * Parts carry `data-cat` hooks so animation code can target them without
  * knowing the markup. Pivots (SVG user units, viewBox 0 0 100 125):
- * body → (50,125) · head and look → (50,62) neck · eyes → (50,40) · tail → (80,118).
- * `paws` are hidden by default: they show only while the cat grips the rail.
+ * body → (50,125) · head and look → (50,62) neck · eyes → (50,40) · tail → (80,118) ·
+ * legs → (33,100) and (67,100) shoulders.
+ * The two front legs sit behind the body, only the feet showing: they walk, run,
+ * stretch and wave. `paws` are hidden by default: they show only while the cat
+ * grips the rail.
  */
 export function CatFigure({ className }: { className?: string }) {
   return (
@@ -15,9 +18,14 @@ export function CatFigure({ className }: { className?: string }) {
       <g data-cat="tail">
         <path d="M80 118 C 98 116, 100 96, 92 84" fill="none" stroke="#2a2a2a" strokeWidth="7" strokeLinecap="round" />
       </g>
+      {/* Front legs, behind the body: the feet show under it. */}
+      <g data-cat="legs">
+        <rect data-cat="leg-l" x="26" y="98" width="14" height="27" rx="7" fill="#1b1b1b" stroke="#333333" strokeWidth="1" />
+        <rect data-cat="leg-r" x="60" y="98" width="14" height="27" rx="7" fill="#1b1b1b" stroke="#333333" strokeWidth="1" />
+      </g>
       <g data-cat="body">
         <path
-          d="M18 125 L18 86 C18 66 30 56 50 56 C70 56 82 66 82 86 L82 125 Z"
+          d="M18 113 L18 86 C18 66 30 56 50 56 C70 56 82 66 82 86 L82 113 Q82 118 77 118 L23 118 Q18 118 18 113 Z"
           fill="#1b1b1b"
           stroke="#333333"
           strokeWidth="1"

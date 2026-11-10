@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { site } from "@/content/profile";
 import { SURFACE_EVENT } from "./surface";
+import { CHAPTERS } from "./SectionMarker";
 
 const ITEMS = [
   { id: "hero", key: "index" },
@@ -15,6 +16,14 @@ const ITEMS = [
 ] as const;
 
 type ItemId = (typeof ITEMS)[number]["id"];
+/** Chapter numbers, shared with the section markers (SectionMarker CHAPTERS). */
+const NUMBER: Record<ItemId, string> = {
+  hero: "00",
+  about: String(CHAPTERS.about).padStart(2, "0"),
+  projects: String(CHAPTERS.projects).padStart(2, "0"),
+  lab: String(CHAPTERS.lab).padStart(2, "0"),
+  contact: String(CHAPTERS.contact).padStart(2, "0"),
+};
 /** Sections without a nav item (e.g. "approach") mark nothing as current. */
 type SectionId = ItemId | (string & {});
 
@@ -116,7 +125,7 @@ export function Nav({ variant = "home" }: { variant?: "home" | "case" }) {
   const transition = "transition-[color,background-color,border-color,box-shadow] duration-(--duration-base) ease-(--ease-out-soft)";
   const focusRing = light ? "focus-visible:outline-ink" : "focus-visible:outline-signal";
 
-  const brand = `flex min-h-11 items-center whitespace-nowrap font-display text-[1.0625rem] font-semibold tracking-[-0.01em] ${focusRing}`;
+  const brand = `flex min-h-11 items-center whitespace-nowrap font-display text-[1.0625rem] font-bold tracking-[-0.01em] ${focusRing}`;
 
   const link = (id: ItemId, key: (typeof ITEMS)[number]["key"], extra = "") => (
     <a
@@ -126,10 +135,13 @@ export function Nav({ variant = "home" }: { variant?: "home" | "case" }) {
       onClick={() => setOpen(false)}
       className={`flex min-h-11 items-center gap-2 rounded-pill px-3.5 text-[0.8125rem] font-medium ${focusRing} ${extra}`}
     >
+      {/* Chapter number (same as the section markers): bright on the active section. */}
       <span
         aria-hidden="true"
-        className={`size-1.5 bg-current transition-opacity duration-(--duration-base) ${active === id ? "opacity-100" : "opacity-0"}`}
-      />
+        className={`font-mono text-[10px] tabular-nums transition-opacity duration-(--duration-base) ${active === id ? "opacity-100" : "opacity-45"}`}
+      >
+        {NUMBER[id]}
+      </span>
       {t(key)}
     </a>
   );

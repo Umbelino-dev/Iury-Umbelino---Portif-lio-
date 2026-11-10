@@ -1,6 +1,5 @@
 import type { CSSProperties } from "react";
 import { getTranslations } from "next-intl/server";
-import { site } from "@/content/profile";
 import { CatObserver } from "@/components/cat/CatObserver";
 import { NameMark } from "@/components/hero/NameMark";
 import { anchors, viewBox } from "@/components/hero/name-paths";
@@ -68,13 +67,12 @@ export async function Hero() {
             */}
             <div className="mt-8 flex items-end justify-between gap-6 md:contents">
               <p
-                lang="en"
                 data-hero-fade-md
                 className="font-serif text-[clamp(1.5rem,1rem+2.4vw,1.75rem)] leading-[1.08] tracking-[-0.01em] text-paper italic md:absolute md:top-(--stmt-top) md:left-(--stmt-left) md:max-w-(--stmt-max) md:text-[max(1rem,4.4cqw)] md:leading-[1.02]"
               >
-                {site.tagline.lead}
+                {t("tagline.lead")}
                 <br />
-                what comes <span className="text-signal">next.</span>
+                {t("tagline.rest")} <span className="text-signal">{t("tagline.accent")}</span>
               </p>
               <CatObserver
                 label={ta("open")}

@@ -130,7 +130,7 @@ export function ProjectList({ rows, label }: { rows: ProjectRow[]; label: string
                   lang={row.nameLang}
                   onPointerEnter={(e) => e.pointerType === "mouse" && enter(i, e.clientX, e.clientY)}
                   onPointerLeave={(e) => e.pointerType === "mouse" && leave()}
-                  className="max-w-full self-start font-display text-[clamp(2rem,1.1rem+5.2vw,7rem)] leading-[0.94] font-semibold tracking-[-0.035em] text-balance hyphens-auto [overflow-wrap:anywhere]"
+                  className="max-w-full self-start font-display text-[clamp(2rem,1.1rem+5.2vw,7rem)] leading-[0.94] font-bold tracking-[-0.035em] text-balance hyphens-auto [overflow-wrap:anywhere]"
                 >
                   {row.name}
                   {row.external && (

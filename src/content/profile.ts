@@ -7,8 +7,6 @@ import type { Localized } from "./types";
 
 export const site = {
   name: "Iury Umbelino",
-  /** Brand tagline — kept in English in every locale (render with lang="en"). */
-  tagline: { lead: "Curiosity builds", accent: "what comes next." },
   /** Public origin, used for canonical/hreflang/sitemap. Defaults to the live Worker; set NEXT_PUBLIC_SITE_URL at build time for a custom domain. */
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://portfolio.iuryumbelino1.workers.dev",
 } as const;

@@ -54,6 +54,16 @@ Temporary progress log. Permanent rules live in `CLAUDE.md`.
   - Instrument Serif is now preloaded (the in-flow statement caused CLS 0.001 on mobile from the font swap; now 0).
   - Lighthouse (wrangler dev): /pt mobile 93/95/97 over 3 runs (TBT 180–300 ms), desktop 99; /en mobile 97, desktop 99; case mobile 97. A11y/BP/SEO 100, CLS 0.
 
+- [x] **R3: Satoshi, dot cursor, cat state machine, bilingual tagline, section markers** (2026-11-10):
+  - Type: Satoshi (Iury's choice over Instrument Serif / General Sans). Licence: ITF FFL forbids distributing the files through a public repo, so they are fetched at build time by `scripts/fonts.mjs` (never committed). Bricolage removed.
+  - Lettering: Satoshi 900; the y's V is cut where it is as wide as the b stem (bisection, y = 2.23, stem 154 units) and runs straight into the b as one outline; glyph overlaps unioned (fixed a hairline sliver in the e).
+  - Cursor: ring removed; one dot (8 → 18px on links), label pill beside it, I-beam on text.
+  - Cat: front legs added to CatFigure (feet under the body); `clips.ts`; hero scrub walk/run; jump/fall/grab; rail release fall; new `waking` state; Contact greeting; tap mid-leap opens on landing. Tested in Playwright (1440, 1280, reduced motion, iPhone): every state in order, scroll-back mid-jump, open while waking, no console errors or warnings.
+  - Tagline per locale (PT "A curiosidade constrói o que vem a seguir."); meta and share images per locale (`scripts/og.cjs`).
+  - Section markers (`SectionMarker`) on About, Projects, Lab, Approach, Contact; nav items carry the same numbers (bright when active).
+  - Lighthouse 13.6 (wrangler dev): /pt mobile 93/96/97 (TBT 200–310 ms), desktop 99; /en mobile 96, desktop 99; case mobile 99, desktop 100. A11y/BP/SEO 100, CLS 0.
+  - Open: Lab entry numerals (01–03) sit right after the chapter numeral 03; consider smaller entry numerals if it reads as noise.
+
 ## Answers from Iury (2026-11-09)
 - Giassi, DOX, SQL and PL/SQL may be named publicly → `experience.publishEmployer = true`.
 - Contacts stay hidden; Iury will send the real email and LinkedIn.

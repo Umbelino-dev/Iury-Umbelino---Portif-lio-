@@ -99,15 +99,15 @@ In the Worker: **Settings → Domains & Routes → Add → Custom domain**, and 
 
 ### Measured performance (lab, before deploy)
 
-Lighthouse 13.6.0 against the production build served by `wrangler dev` (Cloudflare's local assets runtime). Local machine, no CDN and no real network, so field numbers will differ. Measured after the hero refinement (2026-11-09). The same machine varies by a few points between runs:
+Lighthouse 13.6.0 against the production build served by `wrangler dev` (Cloudflare's local assets runtime). Local machine, no CDN and no real network, so field numbers will differ. Measured after R3 (2026-11-10). The same machine varies by a few points between runs:
 
 | Page | Preset | Performance | Accessibility | Best practices | SEO | LCP | CLS | TBT |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `/pt` | mobile (3 runs) | 93 / 95 / 97 | 100 | 100 | 100 | 1.1 s | 0 | 180–300 ms |
-| `/pt` | desktop | 99 | 100 | 100 | 100 | 0.9 s | 0 | 40 ms |
-| `/en` | mobile | 97 | 100 | 100 | 100 | 1.1 s | 0 | 190 ms |
-| `/en` | desktop | 99 | 100 | 100 | 100 | 0.9 s | 0 | 20 ms |
-| `/pt/projects/koinonia` | mobile | 97 | 100 | 100 | 100 | 1.1 s | 0 | 190 ms |
+| `/pt` | mobile (3 runs) | 93 / 96 / 97 | 100 | 100 | 100 | 1.1 s | 0 | 200–310 ms |
+| `/pt` | desktop | 99 | 100 | 100 | 100 | 0.9 s | 0 | 30 ms |
+| `/en` | mobile | 96 | 100 | 100 | 100 | 1.1 s | 0 | 230 ms |
+| `/en` | desktop | 99 | 100 | 100 | 100 | 0.9 s | 0 | 30 ms |
+| `/pt/projects/koinonia` | mobile | 99 | 100 | 100 | 100 | 1.1 s | 0 | 120 ms |
 | `/pt/projects/koinonia` | desktop | 100 | 100 | 100 | 100 | 0.8 s | 0 | 0 ms |
 
 Before R2 the home page scored 99–100 on mobile (TBT 80–110 ms). The added cursor, cat rail and title reveals cost about 50–100 ms of blocking time on Lighthouse's throttled mobile CPU.
@@ -123,4 +123,4 @@ Before R2 the home page scored 99–100 on mobile (TBT 80–110 ms). The added c
 - **Portraits:** the real photo and the cyborg version are aligned in `scripts/images.mjs` (eye positions → scale + offset) and cropped to the same 4:5 box, so the reveal mask shows the same face. Replacing either photo means re-measuring `ALIGN`.
 - **The cat's answers** are scripted (`messages/*.json → assistant`). No language model is involved. A real one would need its own Worker, because this site has no server.
 
-Fonts (Bricolage Grotesque, IBM Plex Sans, Instrument Serif) are self-hosted under the SIL Open Font License 1.1. The hero name is lettered from Bricolage by `scripts/lettering.py` (see `CLAUDE.md`).
+Fonts are self-hosted. IBM Plex Sans and Instrument Serif are OFL and live in `src/fonts/`. **Satoshi** (Indian Type Foundry, ITF Free Font License) may be self-hosted but not redistributed, so it is not in this public repo: `npm run build` fetches the official file first (`scripts/fonts.mjs`, run by `prebuild`). The hero name is lettered from Satoshi by `scripts/lettering.py`; share images come from `node scripts/og.cjs` (see `CLAUDE.md`).

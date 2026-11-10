@@ -1,3 +1,4 @@
+import { CHAPTERS, CHAPTER_TOTAL, SectionMarker } from "@/components/layout/SectionMarker";
 import { getLocale, getTranslations } from "next-intl/server";
 import { education, experience } from "@/content/profile";
 import type { Locale } from "@/i18n/routing";
@@ -16,7 +17,6 @@ export async function About() {
   const tc = await getTranslations("cursor");
   const locale = (await getLocale()) as Locale;
   const traits = t.raw("traits") as Trait[];
-  const label = "text-label font-medium tracking-label uppercase text-gray-600";
 
   return (
     <section
@@ -26,10 +26,12 @@ export async function About() {
       aria-labelledby="about-title"
       className="surface-light overflow-hidden py-(--section-space)"
     >
+      <div className="mx-auto max-w-(--container-page) px-(--page-margin) pb-[clamp(3rem,5vw,5rem)]">
+        <SectionMarker index={CHAPTERS.about} total={CHAPTER_TOTAL} label={t("label")} />
+      </div>
       <div className="page-grid items-start gap-y-16">
         <div className="col-span-4 flex flex-col gap-7 md:col-span-4 md:col-start-2 md:row-start-1">
-          <p className={label}>{t("label")}</p>
-          <h2 id="about-title" data-split className="font-display text-[clamp(2rem,1.55rem+1.9vw,3.25rem)] leading-none font-semibold tracking-[-0.025em]">
+          <h2 id="about-title" data-split className="font-display text-[clamp(2rem,1.55rem+1.9vw,3.25rem)] leading-none font-bold tracking-[-0.025em]">
             {t("title")}
           </h2>
           <p className="max-w-[36ch] text-[clamp(1.0625rem,1rem+0.3vw,1.25rem)] leading-normal text-pretty">{t("lead")}</p>
@@ -75,7 +77,7 @@ async function Experience({ locale }: { locale: Locale }) {
     <section className="page-grid mt-(--section-space) gap-y-12" aria-labelledby="experience-title">
       <div className="col-span-4 flex flex-col gap-6 border-t border-ink pt-6 md:col-span-4 md:col-start-2">
         <p className={label}>{t("label")}</p>
-        <h3 id="experience-title" className="font-display text-headline-m font-semibold">
+        <h3 id="experience-title" className="font-display text-headline-m font-bold">
           {t("title")}
         </h3>
         <p className="max-w-[40ch] text-body text-pretty">{t("lead")}</p>
@@ -83,7 +85,7 @@ async function Experience({ locale }: { locale: Locale }) {
 
       <div className="col-span-4 flex flex-col gap-12 border-t border-ink pt-6 md:col-span-6 md:col-start-6">
         <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-          <p className="font-display text-title font-semibold">
+          <p className="font-display text-title font-bold">
             {experience.role[locale]} · {experience.employer}
           </p>
           <p className="text-label font-medium tracking-label text-gray-600 uppercase">{experience.period[locale]}</p>

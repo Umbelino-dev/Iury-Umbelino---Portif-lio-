@@ -42,9 +42,9 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/projects
       description,
       type: "article",
       url: `/${locale}/projects/${slug}`,
-      images: [{ url: "/og-image.png", width: 1200, height: 630 }],
+      images: [{ url: `/og-image-${locale}.png`, width: 1200, height: 630 }],
     },
-    twitter: { card: "summary_large_image", title: project.name, description, images: ["/og-image.png"] },
+    twitter: { card: "summary_large_image", title: project.name, description, images: [`/og-image-${locale}.png`] },
   };
 }
 
@@ -103,7 +103,7 @@ export default async function CaseStudyPage({ params }: PageProps<"/[locale]/pro
                         href={l.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex min-h-14 items-center justify-between gap-4 py-4 font-display text-title font-semibold transition-colors duration-(--duration-fast) hover:text-gray-600"
+                        className="flex min-h-14 items-center justify-between gap-4 py-4 font-display text-title font-bold transition-colors duration-(--duration-fast) hover:text-gray-600"
                       >
                         {l.label[locale]}
                         <span aria-hidden="true">↗</span>

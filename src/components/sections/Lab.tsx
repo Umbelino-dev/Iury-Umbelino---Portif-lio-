@@ -1,3 +1,4 @@
+import { CHAPTERS, CHAPTER_TOTAL, SectionMarker } from "@/components/layout/SectionMarker";
 import Image from "next/image";
 import { getLocale, getTranslations } from "next-intl/server";
 import { lab } from "@/content/lab";
@@ -34,7 +35,7 @@ export async function Lab() {
         {e.year && <span>{e.year}</span>}
         <StatusMark status={e.status} label={ts(e.status)} className="font-sans text-label text-paper-300 normal-case tracking-normal" />
       </p>
-      <h3 className="font-display text-[clamp(1.875rem,1.2rem+2.6vw,3.5rem)] leading-[0.96] font-semibold tracking-[-0.03em] text-balance">
+      <h3 className="font-display text-[clamp(1.875rem,1.2rem+2.6vw,3.5rem)] leading-[0.96] font-bold tracking-[-0.03em] text-balance">
         {e.title[locale]}
       </h3>
       <p className={`text-[0.9375rem] leading-normal text-pretty text-paper-300 ${maxCh}`}>{e.body[locale]}</p>
@@ -52,15 +53,16 @@ export async function Lab() {
       <LabBackdrop />
 
       <div className="mx-auto max-w-(--container-page) px-(--page-margin)">
+        <div className="pb-[clamp(2.5rem,4vw,4rem)]">
+          <SectionMarker index={CHAPTERS.lab} total={CHAPTER_TOTAL} label={t("label")} tone="dark" />
+        </div>
         <header className="relative flex flex-wrap items-end justify-between gap-x-12 gap-y-8 border-b border-[#2a2a2a] pb-[clamp(1.75rem,3vw,3rem)]">
           <div className="flex flex-col gap-[clamp(0.75rem,1.4vw,1.5rem)]">
-            <p className="text-label font-medium tracking-label text-gray-500 uppercase">{t("label")}</p>
             <h2
               id="lab-title"
               className="flex items-start gap-[clamp(0.5rem,1vw,1rem)] font-display text-[clamp(6rem,19vw,21.25rem)] leading-[0.8] font-bold tracking-[-0.055em]"
             >
               {t("title")}
-              <span className="pt-[0.6em] font-mono text-[11px] font-normal tracking-[0.04em] text-gray-500">/03</span>
             </h2>
           </div>
           <div className="flex max-w-[380px] flex-col gap-4 pb-[0.4em]">

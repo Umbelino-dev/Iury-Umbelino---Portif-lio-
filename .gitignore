@@ -9,3 +9,7 @@ out/
 test-results/
 playwright-report/
 next-env.d.ts
+
+# Satoshi (ITF Free Font License): never committed, fetched by scripts/fonts.mjs
+src/fonts/Satoshi-*
+assets/fonts/Satoshi-*

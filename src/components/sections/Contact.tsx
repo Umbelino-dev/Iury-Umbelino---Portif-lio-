@@ -1,5 +1,6 @@
+import { CHAPTERS, CHAPTER_TOTAL, SectionMarker } from "@/components/layout/SectionMarker";
 import { getTranslations } from "next-intl/server";
-import { contacts, site } from "@/content/profile";
+import { contacts } from "@/content/profile";
 import { AskCatButton } from "@/components/layout/AskCatButton";
 import { Footer } from "@/components/layout/Footer";
 
@@ -13,6 +14,7 @@ import { Footer } from "@/components/layout/Footer";
  */
 export async function Contact() {
   const t = await getTranslations("contact");
+  const th = await getTranslations("hero");
   const published = contacts.filter((c) => c.publish);
   const email = published.find((c) => c.kind === "email");
 
@@ -26,13 +28,13 @@ export async function Contact() {
     >
       <div aria-hidden="true" className="pointer-events-none absolute -top-30 left-[10%] -z-10 h-[520px] w-[70%] bg-[radial-gradient(ellipse_50%_50%_at_50%_50%,rgba(243,241,235,0.07),transparent_72%)]" />
       <div className="mx-auto flex max-w-(--container-page) flex-col gap-[clamp(3.5rem,6vw,7rem)] px-(--page-margin)">
-        <div className="flex flex-wrap justify-between gap-4 text-label font-medium tracking-label text-gray-500 uppercase">
-          <p>{t("label")}</p>
-          <p>{t("open")}</p>
+        <div className="flex flex-col gap-5">
+          <SectionMarker index={CHAPTERS.contact} total={CHAPTER_TOTAL} label={t("label")} tone="dark" />
+          <p className="text-label font-medium tracking-label text-gray-500 uppercase">{t("open")}</p>
         </div>
 
-        <h2 id="contact-title" lang="en" data-split className="font-display text-[clamp(3.25rem,0.9rem+10vw,11.875rem)] leading-[0.88] font-bold tracking-[-0.045em] text-balance">
-          {site.tagline.lead} {site.tagline.accent.replace(" next.", "")} <span className="text-signal">next.</span>
+        <h2 id="contact-title" data-split className="font-display text-[clamp(3.25rem,0.9rem+10vw,11.875rem)] leading-[0.88] font-bold tracking-[-0.045em] text-balance">
+          {th("tagline.lead")} {th("tagline.rest")} <span className="text-signal">{th("tagline.accent")}</span>
         </h2>
 
         <div className="flex flex-wrap items-end justify-between gap-x-[clamp(2rem,5vw,6rem)] gap-y-14">
@@ -43,14 +45,14 @@ export async function Contact() {
             {email ? (
               <a
                 href={email.href}
-                className="flex min-h-14 items-center gap-3.5 self-start bg-paper px-6 py-4 font-display text-[clamp(1.0625rem,1rem+0.4vw,1.25rem)] font-semibold tracking-[-0.01em] text-ink transition-colors duration-(--duration-fast) hover:bg-signal"
+                className="flex min-h-14 items-center gap-3.5 self-start bg-paper px-6 py-4 font-display text-[clamp(1.0625rem,1rem+0.4vw,1.25rem)] font-bold tracking-[-0.01em] text-ink transition-colors duration-(--duration-fast) hover:bg-signal"
               >
                 {t("cta")} <span aria-hidden="true">→</span>
               </a>
             ) : (
               <AskCatButton
                 label={t("askCat")}
-                className="flex min-h-14 items-center gap-3.5 self-start bg-paper px-6 py-4 font-display text-[clamp(1.0625rem,1rem+0.4vw,1.25rem)] font-semibold tracking-[-0.01em] text-ink transition-colors duration-(--duration-fast) hover:bg-signal"
+                className="flex min-h-14 items-center gap-3.5 self-start bg-paper px-6 py-4 font-display text-[clamp(1.0625rem,1rem+0.4vw,1.25rem)] font-bold tracking-[-0.01em] text-ink transition-colors duration-(--duration-fast) hover:bg-signal"
               />
             )}
           </div>

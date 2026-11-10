@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "fonts": "node scripts/fonts.mjs",
+    "prebuild": "node scripts/fonts.mjs",
     "build": "next build",
     "preview": "npx serve@14 out -l 4173",
     "lint": "eslint .",

@@ -1,3 +1,4 @@
+import { CHAPTERS, CHAPTER_TOTAL, SectionMarker } from "@/components/layout/SectionMarker";
 import { getLocale, getTranslations } from "next-intl/server";
 import { projects } from "@/content/projects";
 import type { Locale } from "@/i18n/routing";
@@ -65,11 +66,9 @@ export async function Projects() {
       className="surface-light pt-[clamp(4rem,7vw,7.5rem)] pb-(--section-space)"
     >
       <div className="mx-auto max-w-(--container-page) px-(--page-margin)">
-        <div className="grid grid-cols-4 items-end gap-6 pb-[clamp(2.5rem,5vw,5rem)] md:grid-cols-12">
-          <h2 id="projects-title" className="col-span-4 text-label font-medium tracking-label text-gray-600 uppercase">
-            {t("label")}
-          </h2>
-          <p className="col-span-4 max-w-[34ch] text-caption text-gray-600 md:col-start-9">{t("note")}</p>
+        <div className="flex flex-col gap-6 pb-[clamp(2.5rem,5vw,5rem)]">
+          <SectionMarker index={CHAPTERS.projects} total={CHAPTER_TOTAL} label={t("label")} as="h2" id="projects-title" />
+          <p className="max-w-[34ch] self-end text-caption text-gray-600 md:mr-[8.33%]">{t("note")}</p>
         </div>
         <ProjectList rows={rows} label={t("listLabel")} />
       </div>

@@ -1,8 +1,8 @@
 {
   "meta": {
-    "title": "Iury Umbelino · Curiosity builds what comes next.",
+    "title": "Iury Umbelino · A curiosidade constrói o que vem a seguir.",
     "description": "Iury Umbelino constrói produtos com IA, protótipos e pequenos experimentos. Cada um começa com uma pergunta.",
-    "ogAlt": "Iury Umbelino, Curiosity builds what comes next. O nome desenhado à mão, com o y ligado ao b."
+    "ogAlt": "Iury Umbelino. A curiosidade constrói o que vem a seguir. O nome desenhado como letreiro, com o y ligado ao b."
   },
   "nav": {
     "label": "Principal",
@@ -33,7 +33,12 @@
     "topics": "IA · Produtos · Experimentos",
     "index": "(00) Índice",
     "scroll": "Rolar",
-    "stack": "Assistente de TI · SQL/PL-SQL · IA & Produtos"
+    "stack": "Assistente de TI · SQL/PL-SQL · IA & Produtos",
+    "tagline": {
+      "lead": "A curiosidade constrói",
+      "rest": "o que vem",
+      "accent": "a seguir."
+    }
   },
   "portrait": {
     "specimenBase": "Espécime 01 / Retrato",
@@ -45,7 +50,7 @@
     "placeholder": "Aqui entra o retrato de Iury Umbelino."
   },
   "about": {
-    "label": "(01) Sobre",
+    "label": "Sobre",
     "title": "Sou o Iury. Aprendo construindo. Construo para aprender.",
     "lead": "Quase tudo que faço começa com uma pergunta que não me larga. Aqui eu mostro o que encontrei.",
     "traits": [
@@ -101,7 +106,7 @@
     "personalTools": "Ferramentas pessoais"
   },
   "projects": {
-    "label": "(02) Projetos selecionados",
+    "label": "Projetos selecionados",
     "note": "Seis projetos em fases diferentes. Cada um mostra só o que existe hoje. Alguns status ainda podem mudar.",
     "image": "Imagem do projeto",
     "placeholder": "placeholder",
@@ -109,7 +114,7 @@
     "listLabel": "Projetos"
   },
   "lab": {
-    "label": "(03) Laboratório experimental",
+    "label": "Laboratório experimental",
     "title": "Lab",
     "intro": "Coisas pequenas, feitas para responder uma pergunta cada. Ainda não são produtos.",
     "meta": "{count} entradas · em andamento · atualizado 11.2026",
@@ -119,7 +124,7 @@
     "playhead": "cursor · “por que ele”"
   },
   "approach": {
-    "label": "(04) Abordagem",
+    "label": "Abordagem",
     "title": "Como uma pergunta vira uma coisa.",
     "note": "Cinco passos, nessa ordem. O último devolve ao primeiro.",
     "back": "volta ao 01",
@@ -282,7 +287,7 @@
     }
   },
   "contact": {
-    "label": "(05) Contato",
+    "label": "Contato",
     "open": "Aberto a colaborações, vagas e boas perguntas",
     "lead": "Tem uma pergunta que vale construir? Me escreve.",
     "cta": "Escreva para o Iury",

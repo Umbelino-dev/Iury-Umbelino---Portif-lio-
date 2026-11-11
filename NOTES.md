@@ -101,6 +101,8 @@ Temporary progress log. Permanent rules live in `CLAUDE.md`.
   - Timeline: one line drawn left → right on scroll with a lime tip; roles light up as it passes. Vertical on small screens.
   - Validated (Playwright 1780/1440/390, iPhone 13, reduced motion): hero alignment measured (I and U at the same x), no console errors.
 
+- [x] **R9** (2026-11-11): traits side by side, smaller, whole words sized to the column. Photos: PhotoLoop (≈20 cards × 3 backdrop-filter layers, recomputed every frame) replaced by `PhotoDeck`, a 4-card deck that tweens only on change; frosted base from a pre-blurred image copy. Measured in headless Chromium: 250 frames in 4.2 s during a deal, none over 34 ms. Open: Iury to send 3–4 photos (only the two portraits exist, so the deck repeats them).
+
 ## Answers from Iury (2026-11-09)
 - Giassi, DOX, SQL and PL/SQL may be named publicly → `experience.publishEmployer = true`.
 - Contacts stay hidden; Iury will send the real email and LinkedIn.

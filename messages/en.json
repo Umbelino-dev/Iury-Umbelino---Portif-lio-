@@ -53,7 +53,9 @@
         "word": "Curiosity",
         "text": "I'd rather ship an honest prototype than polish a guess. Every project teaches me one specific thing."
       }
-    ]
+    ],
+    "gallery": "Photos",
+    "galleryShow": "Show {caption}"
   },
   "experience": {
     "title": "Where curiosity becomes routine.",

@@ -1,10 +1,9 @@
-import type { CSSProperties } from "react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { education, experience } from "@/content/profile";
 import { gallery } from "@/content/gallery";
 import type { Locale } from "@/i18n/routing";
 import { SectionTitle } from "@/components/layout/SectionTitle";
-import { PhotoLoop } from "@/components/media/PhotoLoop";
+import { PhotoDeck } from "@/components/media/PhotoDeck";
 import { Timeline } from "./Timeline";
 
 type Trait = { word: string; text: string };
@@ -43,29 +42,24 @@ export async function About() {
       </div>
 
       {/*
-        The three traits as whole words across the page, one per row, each starting
-        one column further in: the eye reads them in order without numbers. The
-        sentence sits at the row's end, on the word's baseline.
+        The three traits side by side, each word whole: the size follows the column's
+        own width (container units), so the longest word always fits on one line.
       */}
-      <ul className="mt-[clamp(4.5rem,8vw,8rem)] flex flex-col gap-[clamp(2.5rem,4vw,3.5rem)]">
-        {traits.map((trait, i) => (
-          <li key={trait.word} className="page-grid w-full items-end gap-y-4">
-            <h3
-              style={{ "--step": i } as CSSProperties}
-              className="col-span-4 font-display text-[clamp(2.75rem,0.5rem+7.4vw,8.5rem)] leading-[0.82] font-black tracking-[-0.05em] md:col-start-[calc(1+var(--step))] md:col-end-10"
-            >
+      <ul className="page-grid mt-[clamp(4.5rem,8vw,8rem)] gap-y-12">
+        {traits.map((trait) => (
+          <li key={trait.word} className="@container col-span-4 flex flex-col gap-4">
+            <h3 className="font-display text-[clamp(2rem,13cqw,4.25rem)] leading-[0.9] font-black tracking-[-0.045em] whitespace-nowrap">
               {trait.word}
             </h3>
-            <p className="col-span-4 max-w-[30ch] pb-[0.35em] text-ui leading-normal text-pretty text-gray-600 md:col-span-3 md:col-start-10">
-              {trait.text}
-            </p>
+            <p className="max-w-[32ch] text-ui leading-normal text-pretty text-gray-600">{trait.text}</p>
           </li>
         ))}
       </ul>
 
       <div className="mt-[clamp(4.5rem,8vw,8rem)]">
-        <PhotoLoop
+        <PhotoDeck
           photos={gallery.map((p) => ({ src: p.src, width: p.width, height: p.height, alt: p.alt[locale], caption: p.caption[locale] }))}
+          labels={{ deck: t("gallery"), show: t.raw("galleryShow") as string }}
         />
       </div>
 

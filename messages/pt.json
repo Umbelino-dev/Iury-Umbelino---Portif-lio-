@@ -53,7 +53,9 @@
         "word": "Curiosidade",
         "text": "Prefiro um protótipo honesto a um palpite polido. Cada projeto me ensina uma coisa específica."
       }
-    ]
+    ],
+    "gallery": "Fotos",
+    "galleryShow": "Mostrar {caption}"
   },
   "experience": {
     "title": "Onde a curiosidade vira rotina.",

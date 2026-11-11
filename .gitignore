@@ -13,3 +13,7 @@ next-env.d.ts
 # Satoshi (ITF Free Font License): never committed, fetched by scripts/fonts.mjs
 src/fonts/Satoshi-*
 assets/fonts/Satoshi-*
+
+# Blender backups and Python caches (scripts/cat3d)
+*.blend1
+__pycache__/

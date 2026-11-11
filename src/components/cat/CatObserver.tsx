@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import { gsap, MQ, useGSAP } from "@/lib/gsap";
 import { anchors } from "@/components/hero/name-paths";
-import { CatFigure } from "./CatFigure";
+import { CAT_PIVOTS, CatFigure } from "./CatFigure";
 import { catParts, crouch, prime, run, stretch, tailFlick, walk } from "./clips";
 import { CAT_OPEN } from "./states";
 
@@ -60,9 +60,9 @@ export function CatObserver({
       const mm = gsap.matchMedia();
 
       mm.add(MQ.motion, () => {
-        gsap.set(body, { svgOrigin: "50 125" });
-        gsap.set(head, { svgOrigin: "50 62" });
-        gsap.set(eyes, { svgOrigin: "50 40" });
+        gsap.set(body, { svgOrigin: CAT_PIVOTS.body });
+        gsap.set(head, { svgOrigin: CAT_PIVOTS.head });
+        gsap.set(eyes, { svgOrigin: CAT_PIVOTS.eyes });
 
         const breath = gsap.to(el, {
           scaleY: 1.025,
@@ -77,7 +77,7 @@ export function CatObserver({
         let onScreen = false;
         let blinkTimer: number | undefined;
         const idleParts = catParts(el);
-        if (idleParts) gsap.set(idleParts.tail, { svgOrigin: "80 118" });
+        if (idleParts) gsap.set(idleParts.tail, { svgOrigin: CAT_PIVOTS.tail });
         const blink = () => {
           gsap
             .timeline()

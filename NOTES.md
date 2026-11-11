@@ -122,3 +122,5 @@ Temporary progress log. Permanent rules live in `CLAUDE.md`.
 - Tagline stays English in both locales.
 - Hero keeps the poetic intro, with an eyebrow showing the current stack (Iury, 2026-11-09).
 - The About traits copy (T.01–T.03) is the design's, translated; it states intent, not achievements.
+
+- [x] **Cat redraw** (2026-11-11): `CatFigure` redrawn after Iury's character sheet (black cat, tall ears with a graphite inner, almond lime eyes with slit pupils, whiskers, slim seated body, tail curled on the floor). No 3D: the sheet is flat 2D, and the SVG + GSAP clips already carry every state. Same `data-cat` parts; pivots now live in `CAT_PIVOTS` (legs moved to the chest, shoulders at y 80; tail root at 72,118). A faint graphite rim keeps the black cat readable on ink. Favicon redrawn to match. Open: the og images still show no cat (unchanged); only the seated pose is drawn, other sheet poses (lying on the back, head tilt with "?", peeking over an edge) are candidates for later clips.

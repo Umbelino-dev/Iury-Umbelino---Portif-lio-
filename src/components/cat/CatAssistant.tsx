@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useId, useReducer, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import { gsap, MQ } from "@/lib/gsap";
-import { CatFigure } from "./CatFigure";
+import { CAT_PIVOTS, CatFigure } from "./CatFigure";
 import { airborne, catParts, crouch, falling, grab, greet, land, prime, settle, wake, type CatParts } from "./clips";
 import { SectionRail } from "./SectionRail";
 import { CAT_OPEN, HERO_LEFT_AT, IDLE_MS, transition, type CatEvent, type CatState } from "./states";
@@ -186,7 +186,7 @@ export function CatAssistant({
     const tick = () => {
       offset += (0 - offset) * 0.12;
       setY(base + offset);
-      if (tail) gsap.set(tail, { rotation: gsap.utils.clamp(-30, 30, offset * 0.3), svgOrigin: "80 118" });
+      if (tail) gsap.set(tail, { rotation: gsap.utils.clamp(-30, 30, offset * 0.3), svgOrigin: CAT_PIVOTS.tail });
       if (Math.abs(offset) > 0.5) {
         frame = requestAnimationFrame(tick);
       } else {

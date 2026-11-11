@@ -1,4 +1,5 @@
 import { gsap } from "@/lib/gsap";
+import { CAT_PIVOTS } from "./CatFigure";
 
 /**
  * The cat's motion vocabulary (Cat Journey R03): every move is a pure function
@@ -20,8 +21,8 @@ export interface CatParts {
   ears: SVGGElement | null;
   tail: SVGGElement | null;
   paws: SVGGElement | null;
-  legL: SVGRectElement | null;
-  legR: SVGRectElement | null;
+  legL: SVGGElement | null;
+  legR: SVGGElement | null;
 }
 
 export function catParts(scope: Element, frame?: Element | null): CatParts | null {
@@ -47,13 +48,13 @@ export function catParts(scope: Element, frame?: Element | null): CatParts | nul
 export function prime(p: CatParts) {
   gsap.set(p.frame, { transformOrigin: "50% 100%" });
   const svg: [Element | null, string][] = [
-    [p.body, "50 125"],
-    [p.head, "50 62"],
-    [p.look, "50 62"],
-    [p.eyes, "50 40"],
-    [p.tail, "80 118"],
-    [p.legL, "33 100"],
-    [p.legR, "67 100"],
+    [p.body, CAT_PIVOTS.body],
+    [p.head, CAT_PIVOTS.head],
+    [p.look, CAT_PIVOTS.head],
+    [p.eyes, CAT_PIVOTS.eyes],
+    [p.tail, CAT_PIVOTS.tail],
+    [p.legL, CAT_PIVOTS.legL],
+    [p.legR, CAT_PIVOTS.legR],
   ];
   for (const [el, origin] of svg) if (el) gsap.set(el, { svgOrigin: origin });
 }

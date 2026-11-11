@@ -103,6 +103,8 @@ Temporary progress log. Permanent rules live in `CLAUDE.md`.
 
 - [x] **R9** (2026-11-11): traits side by side, smaller, whole words sized to the column. Photos: PhotoLoop (≈20 cards × 3 backdrop-filter layers, recomputed every frame) replaced by `PhotoDeck`, a 4-card deck that tweens only on change; frosted base from a pre-blurred image copy. Measured in headless Chromium: 250 frames in 4.2 s during a deal, none over 34 ms. Open: Iury to send 3–4 photos (only the two portraits exist, so the deck repeats them).
 
+- [x] **R10** (2026-11-11): About reordered: thesis line removed; summary + "O que faço" first, then tools/learning/education, the photo deck, the traits, the path. PhotoDeck: hover lift, a box rising from the pointer, click opens a dialog with story + LinkedIn embed + link. Open: Iury to send the LinkedIn photos and, per photo, summary, story, post URL and embed URL (`src/content/gallery.ts`).
+
 ## Answers from Iury (2026-11-09)
 - Giassi, DOX, SQL and PL/SQL may be named publicly → `experience.publishEmployer = true`.
 - Contacts stay hidden; Iury will send the real email and LinkedIn.

@@ -38,7 +38,6 @@
   },
   "about": {
     "label": "Sobre",
-    "title": "Sou o Iury. Aprendo construindo. Construo para aprender.",
     "lead": "Quase tudo que faço começa com uma pergunta que não me larga. Aqui eu mostro o que encontrei.",
     "traits": [
       {
@@ -55,7 +54,13 @@
       }
     ],
     "gallery": "Fotos",
-    "galleryShow": "Mostrar {caption}"
+    "galleryShow": "Mostrar {caption}",
+    "galleryMore": "Saber mais",
+    "galleryHint": "Clique para saber mais",
+    "galleryPending": "A história desta foto entra em breve.",
+    "galleryLinkedIn": "Ver no LinkedIn",
+    "galleryPost": "Post no LinkedIn",
+    "galleryClose": "Fechar"
   },
   "experience": {
     "title": "Onde a curiosidade vira rotina.",

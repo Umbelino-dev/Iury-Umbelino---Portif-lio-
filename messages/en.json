@@ -38,7 +38,6 @@
   },
   "about": {
     "label": "About",
-    "title": "I'm Iury. I learn by building. I build to learn.",
     "lead": "Most of what I make starts as a question I can't let go of. This is where I show what I found.",
     "traits": [
       {
@@ -55,7 +54,13 @@
       }
     ],
     "gallery": "Photos",
-    "galleryShow": "Show {caption}"
+    "galleryShow": "Show {caption}",
+    "galleryMore": "Learn more",
+    "galleryHint": "Click to learn more",
+    "galleryPending": "The story behind this photo is coming soon.",
+    "galleryLinkedIn": "View on LinkedIn",
+    "galleryPost": "LinkedIn post",
+    "galleryClose": "Close"
   },
   "experience": {
     "title": "Where curiosity becomes routine.",

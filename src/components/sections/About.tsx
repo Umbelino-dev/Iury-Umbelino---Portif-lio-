@@ -9,66 +9,14 @@ import { Timeline } from "./Timeline";
 type Trait = { word: string; text: string };
 
 /**
- * About — light editorial. The section name opens it ("Sobre"), then the thesis
- * and the lead; the three traits side by side; an endless photo strip; then the
- * professional experience (verified CV facts) with the career path as a timeline.
+ * About — light editorial. The section name opens it ("Sobre"); right under it,
+ * who Iury is in brief and what he has done (verified CV facts); then the photo
+ * deck (each card tells its story); the three traits; the career path.
  */
 export async function About() {
-  const t = await getTranslations("about");
+  const ta = await getTranslations("about");
   const locale = (await getLocale()) as Locale;
-  const traits = t.raw("traits") as Trait[];
-
-  return (
-    <section
-      id="about"
-      data-nav-id="about"
-      data-surface="light"
-      aria-labelledby="about-title"
-      className="surface-light overflow-hidden py-(--section-space)"
-    >
-      <div className="page-grid items-end gap-y-8">
-        <SectionTitle id="about-title" className="col-span-full">
-          {t("label")}
-        </SectionTitle>
-        <p
-          data-split
-          className="col-span-4 font-display text-[clamp(1.75rem,1.25rem+2vw,3.25rem)] leading-[1.02] font-bold tracking-[-0.03em] text-balance md:col-span-7"
-        >
-          {t("title")}
-        </p>
-        <p className="col-span-4 max-w-[38ch] text-[clamp(1.0625rem,1rem+0.3vw,1.25rem)] leading-normal text-pretty md:col-span-4 md:col-start-9">
-          {t("lead")}
-        </p>
-      </div>
-
-      {/*
-        The three traits side by side, each word whole: the size follows the column's
-        own width (container units), so the longest word always fits on one line.
-      */}
-      <ul className="page-grid mt-[clamp(4.5rem,8vw,8rem)] gap-y-12">
-        {traits.map((trait) => (
-          <li key={trait.word} className="@container col-span-4 flex flex-col gap-4">
-            <h3 className="font-display text-[clamp(2rem,13cqw,4.25rem)] leading-[0.9] font-black tracking-[-0.045em] whitespace-nowrap">
-              {trait.word}
-            </h3>
-            <p className="max-w-[32ch] text-ui leading-normal text-pretty text-gray-600">{trait.text}</p>
-          </li>
-        ))}
-      </ul>
-
-      <div className="mt-[clamp(4.5rem,8vw,8rem)]">
-        <PhotoDeck
-          photos={gallery.map((p) => ({ src: p.src, width: p.width, height: p.height, alt: p.alt[locale], caption: p.caption[locale] }))}
-          labels={{ deck: t("gallery"), show: t.raw("galleryShow") as string }}
-        />
-      </div>
-
-      <Experience locale={locale} />
-    </section>
-  );
-}
-
-async function Experience({ locale }: { locale: Locale }) {
+  const traits = ta.raw("traits") as Trait[];
   const t = await getTranslations("experience");
   const tl = await getTranslations("experience.timeline");
   const intl = locale === "pt" ? "pt-BR" : "en";
@@ -114,25 +62,36 @@ async function Experience({ locale }: { locale: Locale }) {
   });
   const timelineLabels = { now: t("now"), seeMore: tl("seeMore"), close: tl("close"), stack: t("stack") };
 
-  return (
-    <section className="page-grid mt-(--section-space) gap-y-14" aria-labelledby="experience-title">
-      <div className="col-span-4 flex flex-col gap-6 md:col-span-4">
-        <h3 id="experience-title" className="font-display text-headline-l leading-[0.98] font-bold tracking-[-0.03em] text-balance">
-          {t("title")}
-        </h3>
-        <p className="max-w-[40ch] text-body text-pretty">{t("lead")}</p>
-      </div>
 
-      <div className="col-span-4 flex flex-col gap-[clamp(3rem,5vw,4.5rem)] md:col-span-7 md:col-start-6">
-        <div className="flex flex-col gap-1">
-          <p className="font-display text-headline-m font-bold tracking-[-0.02em]">{experience.role[locale]}</p>
-          <p className="text-note text-[1.25rem] text-[#3f3d39]">
-            {experience.employer}, {experience.period[locale]}
+  return (
+    <section
+      id="about"
+      data-nav-id="about"
+      data-surface="light"
+      aria-labelledby="about-title"
+      className="surface-light overflow-hidden py-(--section-space)"
+    >
+      <div className="page-grid gap-y-[clamp(2.5rem,5vw,4rem)]">
+        <SectionTitle id="about-title" className="col-span-full">
+          {ta("label")}
+        </SectionTitle>
+
+        {/* Who, in brief: the facts first, at reading-display size. */}
+        <div className="col-span-4 flex flex-col gap-6 md:col-span-12 lg:col-span-6">
+          <p data-split className="font-display text-[clamp(1.5rem,1.1rem+1.4vw,2.375rem)] leading-[1.1] font-bold tracking-[-0.025em] text-pretty">
+            {t("lead")}
           </p>
+          <div className="flex flex-col gap-1">
+            <p className="font-display text-title font-bold tracking-[-0.01em]">{experience.role[locale]}</p>
+            <p className="text-note text-gray-600">
+              {experience.employer}, {experience.period[locale]}
+            </p>
+          </div>
         </div>
 
-        <div className="flex flex-col gap-5">
-          <h4 className={subhead}>{t("highlights")}</h4>
+        {/* What he has done: every line is a CV bullet. */}
+        <div className="col-span-4 flex flex-col gap-5 md:col-span-12 lg:col-span-5 lg:col-start-8 lg:pt-2">
+          <h3 className={subhead}>{t("highlights")}</h3>
           <ul className="flex flex-col gap-5">
             {experience.highlights.map((h, i) => (
               <li key={i} className="max-w-[60ch] text-[clamp(1rem,0.97rem+0.15vw,1.0625rem)] leading-[1.6] text-pretty">
@@ -142,20 +101,22 @@ async function Experience({ locale }: { locale: Locale }) {
           </ul>
         </div>
 
-        <div className="grid gap-x-10 gap-y-12 sm:grid-cols-2">
+        <div className="col-span-4 grid gap-x-10 gap-y-10 sm:grid-cols-3 md:col-span-12">
           <div className="flex flex-col gap-3">
-            <h4 className={subhead}>{t("stack")}</h4>
+            <h3 className={subhead}>{t("stack")}</h3>
             <p className="text-ui leading-relaxed">{experience.stack.daily.join(", ")}.</p>
-            <h4 className={`${subhead} mt-6`}>{t("learning")}</h4>
+          </div>
+          <div className="flex flex-col gap-3">
+            <h3 className={subhead}>{t("learning")}</h3>
             <p className="text-ui leading-relaxed text-gray-600">{experience.stack.learning.join(", ")}.</p>
           </div>
           <div className="flex flex-col gap-3">
-            <h4 className={subhead}>{t("education")}</h4>
-            <ul className="flex flex-col gap-5">
+            <h3 className={subhead}>{t("education")}</h3>
+            <ul className="flex flex-col gap-4">
               {education.map((e) => (
                 <li key={e.school} className="flex flex-col gap-0.5">
                   <span className="text-ui font-medium">{e.course[locale]}</span>
-                  <span className="text-note text-[1.0625rem] text-[#3f3d39]">
+                  <span className="text-note text-gray-600">
                     {e.school}, {t("expected", { year: e.expected })}
                   </span>
                 </li>
@@ -165,10 +126,53 @@ async function Experience({ locale }: { locale: Locale }) {
         </div>
       </div>
 
-      {/* The career path, full width: part of the page, not a side list. */}
-      <div className="col-span-full flex flex-col gap-[clamp(2.5rem,5vw,4.5rem)] pt-[clamp(2rem,4vw,4rem)]">
-        <h4 className="font-display text-headline-m font-bold tracking-[-0.02em]">{t("path")}</h4>
-        <Timeline steps={steps} labels={timelineLabels} />
+      {/* The photos: each card is a moment, with its story and its LinkedIn post. */}
+      <div className="mt-[clamp(3.5rem,6vw,6rem)]">
+        <PhotoDeck
+          photos={gallery.map((p) => ({
+            src: p.src,
+            width: p.width,
+            height: p.height,
+            alt: p.alt[locale],
+            caption: p.caption[locale],
+            summary: p.summary?.[locale],
+            story: p.story?.[locale],
+            linkedin: p.linkedin,
+          }))}
+          labels={{
+            deck: ta("gallery"),
+            show: ta.raw("galleryShow") as string,
+            more: ta("galleryMore"),
+            hint: ta("galleryHint"),
+            pending: ta("galleryPending"),
+            linkedin: ta("galleryLinkedIn"),
+            post: ta("galleryPost"),
+            close: ta("galleryClose"),
+          }}
+        />
+      </div>
+
+      {/*
+        The three traits side by side, each word whole: the size follows the column's
+        own width (container units), so the longest word always fits on one line.
+      */}
+      <ul className="page-grid mt-[clamp(3.5rem,6vw,6rem)] gap-y-12">
+        {traits.map((trait) => (
+          <li key={trait.word} className="@container col-span-4 flex flex-col gap-4">
+            <h3 className="font-display text-[clamp(2rem,13cqw,4.25rem)] leading-[0.9] font-black tracking-[-0.045em] whitespace-nowrap">
+              {trait.word}
+            </h3>
+            <p className="max-w-[32ch] text-ui leading-normal text-pretty text-gray-600">{trait.text}</p>
+          </li>
+        ))}
+      </ul>
+
+      {/* The career path, full width. */}
+      <div className="page-grid mt-(--section-space)">
+        <div className="col-span-full flex flex-col gap-[clamp(2.5rem,5vw,4.5rem)]">
+          <h3 className="font-display text-headline-m font-bold tracking-[-0.02em]">{t("path")}</h3>
+          <Timeline steps={steps} labels={timelineLabels} />
+        </div>
       </div>
     </section>
   );

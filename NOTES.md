@@ -93,6 +93,14 @@ Temporary progress log. Permanent rules live in `CLAUDE.md`.
   - Projects: typographic posters for missing covers; the names are the index. Timeline: staircase of type, roles grow toward today. Approach: verbs step down, no numerals. Lab: hand-drawn pointer stroke.
   - Validated (Playwright 1440/1024/768/390/iPhone 13, PT+EN, reduced motion): stage navigation, timeline hover/click/Esc, no overflow, no console errors; `npm run check` and copy check pass.
 
+- [x] **R8: Iury's review of R7** (2026-11-11):
+  - Annotations: Instrument Serif italic → Satoshi Medium, muted (Iury: the curved face did not work).
+  - Projects: back to the editorial list with the floating image (`ProjectList`), without codes or rules; `ProjectStage` removed.
+  - Hero: name centred both ways, intro on the same left edge; "Iury" and "Umbelino" flush left (lettering.py splits the 190-unit gap: line 1 tracking +23.9, line 2 −51.9). OG images not regenerated yet.
+  - About: traits as whole words in stepped full-width rows. PhotoLoop restyled after Iury's reference video (fanned glossy cards, progressive frosted base, rim light, step-by-step dealing).
+  - Timeline: one line drawn left → right on scroll with a lime tip; roles light up as it passes. Vertical on small screens.
+  - Validated (Playwright 1780/1440/390, iPhone 13, reduced motion): hero alignment measured (I and U at the same x), no console errors.
+
 ## Answers from Iury (2026-11-09)
 - Giassi, DOX, SQL and PL/SQL may be named publicly → `experience.publishEmployer = true`.
 - Contacts stay hidden; Iury will send the real email and LinkedIn.

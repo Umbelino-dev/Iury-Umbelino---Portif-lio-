@@ -147,17 +147,17 @@
 }
 
 /*
- * The annotation voice: Instrument Serif italic for what situates something
- * (a date, a status, a caption, a place). It replaces codes and labels: the
- * site names things in Satoshi, explains them in Plex, and annotates in serif.
+ * The annotation voice: what situates something (a date, a status, a caption,
+ * a place). Satoshi Medium in a muted tone, so annotations share the display
+ * face's geometry without competing with the titles.
  */
 @utility text-note {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-weight: 400;
-  font-size: 1.125rem;
-  line-height: 1.3;
-  letter-spacing: 0;
+  font-family: var(--font-display);
+  font-style: normal;
+  font-weight: 500;
+  font-size: 1rem;
+  line-height: 1.35;
+  letter-spacing: -0.005em;
 }
 
 /*
@@ -269,4 +269,18 @@ html.has-cursor :is(input, textarea, select, [contenteditable="true"]) {
 }
 .js .stage-details > [data-active="false"] [data-rise] {
   translate: 0 0.16em;
+}
+
+/*
+ * Career line: while the line is drawing (Timeline sets data-tl-anim only with JS
+ * and motion), a role waits faded until the line's tip passes under it.
+ */
+.tl-step {
+  transition:
+    opacity var(--duration-slow) var(--ease-out-soft),
+    translate var(--duration-slow) var(--ease-out-soft);
+}
+[data-tl-anim] .tl-step:not([data-reached]) {
+  opacity: 0.16;
+  translate: 0 12px;
 }

@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { education, experience } from "@/content/profile";
 import { gallery } from "@/content/gallery";
@@ -6,7 +7,7 @@ import { SectionTitle } from "@/components/layout/SectionTitle";
 import { PhotoLoop } from "@/components/media/PhotoLoop";
 import { Timeline } from "./Timeline";
 
-type Trait = { word: [string, string]; text: string };
+type Trait = { word: string; text: string };
 
 /**
  * About — light editorial. The section name opens it ("Sobre"), then the thesis
@@ -41,16 +42,23 @@ export async function About() {
         </p>
       </div>
 
-      {/* The three traits, side by side. */}
-      <ul className="page-grid mt-[clamp(4.5rem,8vw,8rem)] gap-y-14">
-        {traits.map((trait) => (
-          <li key={trait.text} className="col-span-4 flex flex-col gap-4">
-            <h3 className="font-display text-[clamp(2.75rem,1.9rem+3.4vw,4.75rem)] leading-[0.84] font-bold tracking-[-0.05em] [overflow-wrap:anywhere]">
-              {trait.word[0]}
-              <br />
-              {trait.word[1]}
+      {/*
+        The three traits as whole words across the page, one per row, each starting
+        one column further in: the eye reads them in order without numbers. The
+        sentence sits at the row's end, on the word's baseline.
+      */}
+      <ul className="mt-[clamp(4.5rem,8vw,8rem)] flex flex-col gap-[clamp(2.5rem,4vw,3.5rem)]">
+        {traits.map((trait, i) => (
+          <li key={trait.word} className="page-grid w-full items-end gap-y-4">
+            <h3
+              style={{ "--step": i } as CSSProperties}
+              className="col-span-4 font-display text-[clamp(2.75rem,0.5rem+7.4vw,8.5rem)] leading-[0.82] font-black tracking-[-0.05em] md:col-start-[calc(1+var(--step))] md:col-end-10"
+            >
+              {trait.word}
             </h3>
-            <p className="max-w-[30ch] text-[0.9375rem] leading-normal text-pretty text-gray-600">{trait.text}</p>
+            <p className="col-span-4 max-w-[30ch] pb-[0.35em] text-ui leading-normal text-pretty text-gray-600 md:col-span-3 md:col-start-10">
+              {trait.text}
+            </p>
           </li>
         ))}
       </ul>

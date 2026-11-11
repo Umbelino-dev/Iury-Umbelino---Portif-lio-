@@ -38,7 +38,6 @@ const page = (m) => `<!doctype html><html><head><meta charset="utf-8"><style>
 @font-face{font-family:Plex;src:${font("src/fonts/IBMPlexSans-Medium.woff2")};font-weight:500}
 *{margin:0;box-sizing:border-box}
 body{width:1200px;height:630px;background:#101010;color:#F3F1EB;font-family:Plex;position:relative;overflow:hidden}
-.grid{position:absolute;inset:0 56px;background-image:linear-gradient(90deg,rgba(243,241,235,.055) 1px,transparent 1px),linear-gradient(0deg,rgba(243,241,235,.04) 1px,transparent 1px);background-size:calc(100%/12) 100%,100% 96px;mask-image:radial-gradient(ellipse 70% 75% at 62% 48%,#000 25%,transparent 80%)}
 .glow{position:absolute;inset:0;background:radial-gradient(ellipse 55% 60% at 68% 52%,rgba(243,241,235,.075),transparent 75%)}
 .top,.rule{position:absolute;left:56px;right:56px;display:flex;justify-content:space-between;font-size:15px;letter-spacing:.1em;text-transform:uppercase;color:#929292}
 .top{top:44px}.rule{bottom:44px;border-top:1px solid #2a2a2a;padding-top:14px}
@@ -48,7 +47,7 @@ body{width:1200px;height:630px;background:#101010;color:#F3F1EB;font-family:Plex
 .tag b{color:#C8F169;font-weight:500}
 .cat{position:absolute;bottom:${100 - a.oTop}%;left:${a.oCenter}%;width:6.5cqw;transform:translateX(-50%);overflow:visible}
 </style></head><body>
-<div class="glow"></div><div class="grid"></div>
+<div class="glow"></div>
 <div class="mark"><svg class="name" viewBox="${mark.viewBox}">${paths}</svg>
 <p class="tag">${m.hero.tagline.lead}<br>${m.hero.tagline.rest} <b>${m.hero.tagline.accent}</b></p>${cat}</div>
 </body></html>`;

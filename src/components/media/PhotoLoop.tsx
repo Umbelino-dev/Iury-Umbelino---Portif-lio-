@@ -12,14 +12,24 @@ export interface LoopPhoto {
   caption: string;
 }
 
-const MIN_CARDS = 8; // per set, so one set is always wider than the screen
+/** Progressive blur layers for the frosted base of each card (lowest is strongest). */
+const FROST = [
+  { h: "54%", blur: 3, mask: "linear-gradient(to top, #000 40%, transparent)" },
+  { h: "40%", blur: 9, mask: "linear-gradient(to top, #000 45%, transparent)" },
+  { h: "28%", blur: 18, mask: "linear-gradient(to top, #000 50%, transparent)" },
+] as const;
+
+const MIN_CARDS = 10; // per set, so one set is always wider than the screen (cards overlap)
 
 /**
- * An endless photo strip (About). Two identical sets side by side; the track
- * slides one set's width and repeats, so the loop has no seam.
- * - Coverflow: a card grows to full size at the centre of the screen and
- *   shrinks, fades and turns slightly toward the edges; only the centre card
- *   shows its caption.
+ * An endless photo strip (About), set like a fanned hand of glossy cards.
+ * Two identical sets side by side; the track slides one set's width and repeats,
+ * so the loop has no seam.
+ * - Fan: the card at the screen's centre is in front at full size; its
+ *   neighbours tuck behind it, smaller, turned outward around a point below the
+ *   strip (so the row bows into an arc) and a little paler with distance.
+ * - Each card: rounded portrait, a rim of light, and its lower part dissolving
+ *   into a frosted blur that carries the caption.
  * - Scroll drives it: scrolling down speeds it up, scrolling up runs it
  *   backwards, and the cards lean with the scroll speed, then ease back.
  * - Hover pauses it (fine pointers); it also pauses off screen and in a hidden tab.
@@ -42,46 +52,54 @@ export function PhotoLoop({ photos }: { photos: LoopPhoto[] }) {
       const mm = gsap.matchMedia();
       mm.add(MQ.motion, () => {
         const cards = gsap.utils.toArray<HTMLElement>("[data-loop-card]", tr);
-        // Coverflow: each card grows as it passes the centre of the screen and
-        // shrinks, fades and turns slightly toward the edges. Computed on the
-        // loop's own updates (no extra rAF); layout is measured on resize only.
-        const caps = cards.map((c) => c.querySelector("figcaption"));
+        // Fan: computed on the loop's own updates (no extra rAF); layout is
+        // measured on resize only. k = distance from the centre in card steps.
         const fx = cards.map((c) => ({
           // quickSetter needs the real properties: "scale" is only a shorthand.
           sx: gsap.quickSetter(c, "scaleX"),
           sy: gsap.quickSetter(c, "scaleY"),
           alpha: gsap.quickSetter(c, "opacity"),
-          turn: gsap.quickSetter(c, "rotationY", "deg"),
+          turn: gsap.quickSetter(c, "rotation", "deg"),
+          z: gsap.quickSetter(c, "zIndex"),
         }));
-        gsap.set(cards, { transformPerspective: 1000, transformOrigin: "50% 50%" });
+        gsap.set(cards, { transformOrigin: "50% 200%" });
         let centres: number[] = [];
         let left = 0;
         let width = 0;
+        let step = 1;
         const measure = () => {
           left = el.getBoundingClientRect().left;
           width = tr.offsetWidth;
           centres = cards.map((c) => c.offsetLeft + c.offsetWidth / 2);
+          step = Math.max(1, (centres[1] ?? 1) - (centres[0] ?? 0));
+          // A static x offset puts a card's centre exactly on the screen's centre at
+          // every stop (x composes with the loop's xPercent).
+          const off = window.innerWidth / 2 - (left + (centres[0] ?? 0));
+          gsap.set(tr, { x: ((off % step) + step) % step });
         };
         const update = () => {
-          const shift = ((Number(gsap.getProperty(tr, "xPercent")) || 0) / 100) * width;
+          const shift = ((Number(gsap.getProperty(tr, "xPercent")) || 0) / 100) * width + (Number(gsap.getProperty(tr, "x")) || 0);
           const mid = window.innerWidth / 2;
           for (let i = 0; i < cards.length; i++) {
-            const centre = left + (centres[i] ?? 0) + shift;
-            const off = (centre - mid) / mid; // -1 left edge … 0 centre … 1 right edge
-            const d = Math.min(1, Math.abs(off));
+            const k = (left + (centres[i] ?? 0) + shift - mid) / step;
+            const d = Math.min(4, Math.abs(k));
             const f = fx[i];
             if (!f) continue;
-            f.sx(1 - 0.28 * d);
-            f.sy(1 - 0.28 * d);
-            f.alpha(1 - 0.45 * d);
-            f.turn(gsap.utils.clamp(-14, 14, -off * 14));
-            const cap = caps[i];
-            // All or nothing (with a short CSS fade): a half-faded caption would fail contrast.
-            if (cap) cap.style.opacity = d < 0.2 ? "1" : "0";
+            const sc = 1 - 0.13 * Math.min(d, 2.5);
+            f.sx(sc);
+            f.sy(sc);
+            f.alpha(1 - 0.16 * Math.max(0, d - 1));
+            f.turn(gsap.utils.clamp(-14, 14, k * 4.5));
+            f.z(100 - Math.round(d * 10));
           }
         };
         measure();
-        const loop = gsap.to(tr, { xPercent: -50, duration: set.length * 5, ease: "none", repeat: -1, onUpdate: update });
+        // Step by step, like a deck being dealt: slide one card, hold it in front, go on.
+        // Every step is the same share of the set, so the loop still ends where it began.
+        const loop = gsap.timeline({ repeat: -1, onUpdate: update });
+        for (let i = 1; i <= set.length; i++) {
+          loop.to(tr, { xPercent: (-50 * i) / set.length, duration: 0.95, ease: "power3.inOut" }).to({}, { duration: 1.5 });
+        }
         update();
         const onResize = () => {
           measure();
@@ -133,19 +151,40 @@ export function PhotoLoop({ photos }: { photos: LoopPhoto[] }) {
       key={`${copy ? "b" : "a"}-${i}`}
       data-loop-card
       aria-hidden={copy || undefined}
-      className="group flex w-[clamp(16rem,28vw,26rem)] shrink-0 snap-start flex-col gap-3 will-change-transform"
+      className="group relative -mr-[clamp(3rem,7vw,7rem)] w-[clamp(13rem,22vw,20rem)] shrink-0 snap-center will-change-transform motion-reduce:mr-[clamp(0.75rem,1.5vw,1.25rem)]"
     >
-      <div className="relative aspect-[4/5] overflow-hidden bg-[#1f1f1f]">
+      <div className="relative aspect-[3/4] overflow-hidden rounded-[clamp(1.25rem,2vw,1.75rem)] bg-ink-800 shadow-[0_30px_50px_-28px_rgba(16,16,16,0.55)]">
         <Image
           src={p.src}
           alt={copy ? "" : p.alt}
           width={p.width}
           height={p.height}
-          sizes="(min-width: 768px) 24vw, 66vw"
-          className="h-full w-full object-cover object-[50%_20%] transition-transform duration-(--duration-slow) ease-(--ease-out-soft) group-hover:scale-[1.04]"
+          sizes="(min-width: 768px) 22vw, 60vw"
+          className="h-full w-full object-cover object-[50%_18%] transition-transform duration-(--duration-slow) ease-(--ease-out-soft) group-hover:scale-[1.04]"
+        />
+        {/* Frosted base: the photo dissolves into blur gradually (three layers, each
+            stronger and lower), then into a soft light that carries the caption. */}
+        {FROST.map((f) => (
+          <div
+            key={f.blur}
+            aria-hidden="true"
+            className="absolute inset-x-0 bottom-0"
+            style={{ height: f.h, backdropFilter: `blur(${f.blur}px)`, WebkitBackdropFilter: `blur(${f.blur}px)`, maskImage: f.mask, WebkitMaskImage: f.mask }}
+          />
+        ))}
+        <div
+          aria-hidden="true"
+          className="absolute inset-x-0 bottom-0 h-[48%] bg-[linear-gradient(to_top,rgba(243,241,235,0.4),rgba(243,241,235,0.1)_50%,rgba(243,241,235,0))]"
+        />
+        <figcaption className="absolute inset-x-0 bottom-0 px-5 pb-[clamp(1rem,1.6vw,1.375rem)] text-center font-display text-[clamp(1.0625rem,0.95rem+0.4vw,1.375rem)] leading-tight font-bold tracking-[-0.015em] text-balance text-paper-0 [text-shadow:0_1px_14px_rgba(16,16,16,0.55)]">
+          {p.caption}
+        </figcaption>
+        {/* Rim light: a bright edge and a soft inner glow, over the photo. */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 rounded-[inherit] shadow-[inset_0_0_0_1.5px_rgba(255,255,255,0.5),inset_0_1px_22px_rgba(255,255,255,0.22)]"
         />
       </div>
-      <figcaption className="text-note text-[#3f3d39] transition-opacity duration-(--duration-fast)">{p.caption}</figcaption>
     </figure>
   );
 
@@ -154,13 +193,13 @@ export function PhotoLoop({ photos }: { photos: LoopPhoto[] }) {
       ref={root}
       className="overflow-hidden motion-reduce:snap-x motion-reduce:snap-mandatory motion-reduce:overflow-x-auto"
     >
-      {/* Two identical sets, each closed by the same trailing gap: moving the track by
-          -50% lands exactly on the start of the copy, so the loop has no seam. */}
-      <div ref={track} className="relative flex w-max py-6">
-        <div className="flex gap-[clamp(0.5rem,1vw,1rem)] pr-[clamp(0.5rem,1vw,1rem)] motion-reduce:pl-(--page-margin)">
+      {/* Two identical sets; every card carries the same (negative) right margin, so
+          moving the track by -50% lands exactly on the start of the copy: no seam. */}
+      <div ref={track} className="relative flex w-max pt-[clamp(2.5rem,5vw,4.5rem)] pb-[clamp(5rem,9vw,8.5rem)]">
+        <div className="flex motion-reduce:pl-(--page-margin)">
           {set.map((p, i) => card(p, i, false))}
         </div>
-        <div className="flex gap-[clamp(0.5rem,1vw,1rem)] pr-[clamp(0.5rem,1vw,1rem)] motion-reduce:hidden" aria-hidden="true">
+        <div className="flex motion-reduce:hidden" aria-hidden="true">
           {set.map((p, i) => card(p, i, true))}
         </div>
       </div>

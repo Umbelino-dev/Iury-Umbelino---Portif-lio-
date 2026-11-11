@@ -46,16 +46,18 @@ export async function Hero() {
       {/*
         The name comes first everywhere; the positioning line and the link sit under
         it. Mobile: the hero is as tall as its content. Desktop: a full-height poster,
-        the name at the top and the line at the bottom.
+        the name centred in the space above, the line at the bottom.
       */}
       <HeroMotion className="relative z-10 mx-auto flex w-full max-w-(--container-page) flex-1 flex-col gap-12 px-(--page-margin) md:justify-between md:gap-10">
-        <div className="flex flex-col gap-5">
-          {/* Width also follows the viewport height (by the mark's own ratio), so the whole mark fits on short screens. */}
-          <div
-            data-hero-mark
-            style={markVars}
-            className="@container relative w-full md:w-[clamp(50%,calc((100svh-24rem)*var(--mark-ratio)),100%)]"
-          >
+        {/*
+          Desktop: one centred column as wide as the name, so the name and the intro
+          share a left edge; the name is centred vertically in the space above the
+          intro. Its width also follows the viewport height (by the mark's own ratio),
+          so the whole mark fits on short screens.
+        */}
+        <div style={markVars} className="flex w-full flex-1 flex-col gap-12 md:mx-auto md:w-[clamp(50%,calc((100svh-24rem)*var(--mark-ratio)),100%)] md:gap-10">
+        <div className="flex flex-col gap-5 md:flex-1 md:justify-center">
+          <div data-hero-mark className="@container relative w-full">
             <h1 id="hero-name" className="text-paper">
               <span className="sr-only">Iury Umbelino</span>
               <NameMark className="block h-auto w-full" />
@@ -91,9 +93,9 @@ export async function Hero() {
           </div>
         </div>
 
-        <div className="grid grid-cols-4 gap-x-(--page-gutter) gap-y-6 md:grid-cols-12">
+        <div className="flex flex-col gap-6">
           {/* Visible from the first paint (no fade): this is the mobile LCP text. */}
-          <div className="col-span-4 flex flex-col gap-4 md:col-span-6 lg:col-span-5">
+          <div className="flex max-w-[36rem] flex-col gap-4">
             <p className="text-note text-[1.25rem] text-gray-500">{t("stack")}</p>
             <p className="max-w-[30ch] text-[clamp(1.1875rem,1rem+0.6vw,1.5rem)] leading-[1.45] md:leading-[1.35] text-pretty text-paper">
               {t("intro")}
@@ -105,6 +107,7 @@ export async function Hero() {
               {t("cta")} <span aria-hidden="true">↓</span>
             </a>
           </div>
+        </div>
         </div>
       </HeroMotion>
     </section>

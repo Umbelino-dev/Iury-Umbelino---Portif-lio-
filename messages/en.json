@@ -42,24 +42,15 @@
     "lead": "Most of what I make starts as a question I can't let go of. This is where I show what I found.",
     "traits": [
       {
-        "word": [
-          "Tech-",
-          "nology"
-        ],
+        "word": "Technology",
         "text": "AI is my main material right now. Assistants, agents and tools that make information actually useful."
       },
       {
-        "word": [
-          "Crea-",
-          "tivity"
-        ],
+        "word": "Creativity",
         "text": "I care how things feel, not only how they work. The interface is part of the answer."
       },
       {
-        "word": [
-          "Curio-",
-          "sity"
-        ],
+        "word": "Curiosity",
         "text": "I'd rather ship an honest prototype than polish a guess. Every project teaches me one specific thing."
       }
     ]

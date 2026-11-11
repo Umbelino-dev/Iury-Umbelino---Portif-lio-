@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing, type Locale } from "@/i18n/routing";
-import { getCaseStudies, projects } from "@/content/projects";
+import { getCaseStudies } from "@/content/projects";
 import { Nav } from "@/components/layout/Nav";
 import { CaseHero } from "@/components/case-study/CaseHero";
 import { Chapter, hasContent } from "@/components/case-study/Chapter";
@@ -70,7 +70,7 @@ export default async function CaseStudyPage({ params }: PageProps<"/[locale]/pro
       <Nav variant="case" />
       <main id="main" data-surface="light" className="surface-light">
         <article>
-          <CaseHero project={project} caseStudy={cs} total={projects.length} locale={locale} />
+          <CaseHero project={project} caseStudy={cs} locale={locale} />
 
           {cs.cover && (
             <figure className="flex flex-col gap-3 md:px-(--page-margin)">
@@ -78,9 +78,8 @@ export default async function CaseStudyPage({ params }: PageProps<"/[locale]/pro
                 <MediaFrame
                   slot={cs.cover}
                   locale={locale}
-                  numeral={project.index.replace("P.", "")}
                   priority
-                  spec={{ left: `${cs.cover.label[locale]} · ${project.index}`, right: `16:9 · 3200×1800 · ${t("placeholder")}` }}
+                  pending={t("pending")}
                 />
               </div>
               <figcaption className="px-(--page-margin) text-caption text-gray-600 max-md:pr-12 md:px-0">
@@ -90,20 +89,20 @@ export default async function CaseStudyPage({ params }: PageProps<"/[locale]/pro
           )}
 
           <div className="flex flex-col gap-[clamp(7rem,11vw,12.5rem)] pt-[clamp(6rem,9vw,10rem)]">
-            {chapters.map((c, i) => (
-              <Chapter key={c.id} chapter={c} number={i + 1} locale={locale} figureLabel={t("figure")} placeholder={t("placeholder")} />
+            {chapters.map((c) => (
+              <Chapter key={c.id} chapter={c} locale={locale} placeholder={t("pending")} />
             ))}
 
             {project.links && (
               <section aria-label={t("links")} className="px-(--page-margin) max-md:pr-12 md:grid md:grid-cols-3 md:gap-x-[clamp(1.5rem,4vw,5rem)]">
-                <ul className="flex flex-col border-y border-ink md:col-span-2 md:col-start-2">
+                <ul className="flex flex-col md:col-span-2 md:col-start-2">
                   {project.links.map((l) => (
                     <li key={l.href}>
                       <a
                         href={l.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex min-h-14 items-center justify-between gap-4 py-4 font-display text-title font-bold transition-colors duration-(--duration-fast) hover:text-gray-600"
+                        className="flex min-h-14 items-center gap-3 py-2 font-display text-headline-m font-bold tracking-[-0.02em] transition-colors duration-(--duration-fast) hover:text-gray-600"
                       >
                         {l.label[locale]}
                         <span aria-hidden="true">↗</span>
@@ -121,7 +120,6 @@ export default async function CaseStudyPage({ params }: PageProps<"/[locale]/pro
           <NextProject
             href={`/projects/${next.slug}`}
             eyebrow={t("next")}
-            index={`${next.index} / ${String(projects.length).padStart(2, "0")}`}
             title={next.name}
             titleLang={next.nameLang && next.nameLang !== locale ? next.nameLang : undefined}
           />

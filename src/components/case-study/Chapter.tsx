@@ -9,26 +9,22 @@ export function hasContent(c: CaseStudyChapter) {
 
 /**
  * A case-study chapter (Case Study R01 · C2, Mobile · M4–M6).
- * Desktop: three columns — the label and a giant numeral, sticky while the text
+ * Desktop: three columns — the chapter's name in serif, sticky while the text
  * scrolls past, then the H2 (≤15ch) and body in the other two.
- * Mobile: no sticky numeral; the mono label sits above a 32px H2, body 16/1.6,
- * text kept out of the 48px cat lane; figures run full bleed in reading order.
+ * Mobile: the name sits above a 32px H2, body 16/1.6, text kept out of the 48px
+ * cat lane; figures run full bleed in reading order. No numbers or rules: the
+ * steps are separated by space and their own headings.
  */
 export function Chapter({
   chapter,
-  number,
   locale,
-  figureLabel,
   placeholder,
 }: {
   chapter: CaseStudyChapter;
-  number: number;
   locale: Locale;
-  figureLabel: string;
   placeholder: string;
 }) {
-  const n = String(number).padStart(2, "0");
-  const label = `${n} · ${chapter.label[locale]}`;
+  const label = chapter.label[locale];
   const title = chapter.title[locale];
   const mark = chapter.highlight?.[locale];
   const at = mark ? title.indexOf(mark) : -1;
@@ -37,12 +33,7 @@ export function Chapter({
   return (
     <section id={chapter.id} aria-labelledby={headingId} className="flex flex-col gap-[clamp(3rem,5vw,5.5rem)]">
       <div className="grid grid-cols-1 items-start gap-x-[clamp(1.5rem,4vw,5rem)] gap-y-6 px-(--page-margin) max-md:pr-12 md:grid-cols-3">
-        <div className="flex flex-col gap-3.5 md:sticky md:top-24">
-          <p className="text-index text-gray-600 uppercase">{label}</p>
-          <span aria-hidden="true" className="hidden font-display text-[clamp(6rem,12vw,12.5rem)] leading-[0.8] font-bold tracking-[-0.05em] md:block">
-            {n}
-          </span>
-        </div>
+        <p className="text-note text-[clamp(1.25rem,1.1rem+0.6vw,1.75rem)] text-[#3f3d39] md:sticky md:top-24">{label}</p>
 
         <div className="flex min-w-0 flex-col gap-[clamp(1.75rem,3vw,2.75rem)] md:col-span-2">
           <h2
@@ -75,15 +66,9 @@ export function Chapter({
           )}
 
           {chapter.steps && (
-            <ol className="flex flex-col border-b border-ink">
+            <ol className="flex flex-col gap-[clamp(2rem,3.5vw,3.25rem)] pt-[clamp(0.5rem,1.5vw,1.5rem)]">
               {chapter.steps.map((step, i) => (
-                <li
-                  key={i}
-                  className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-4 border-t border-ink py-[clamp(1.25rem,2.4vw,2.25rem)] md:grid-cols-[3.5rem_minmax(0,1fr)]"
-                >
-                  <span className="pt-[0.7em] text-index text-gray-600">
-                    {chapter.id === "audit" ? "A" : "S"}.{String(i + 1).padStart(2, "0")}
-                  </span>
+                <li key={i}>
                   <div className="flex flex-col gap-3">
                     <h3 className="font-display text-[clamp(1.5rem,1.1rem+1.8vw,3.25rem)] leading-none font-bold tracking-[-0.03em] text-balance">
                       {step.title[locale]}
@@ -118,7 +103,7 @@ export function Chapter({
                 locale={locale}
                 sizes="(min-width: 768px) 46vw, 100vw"
                 tone={i % 2 === 0 ? "ink" : "stone"}
-                spec={{ left: `${figureLabel} ${String(i + 2).padStart(2, "0")} · ${fig.label[locale]}`, right: `${fig.aspect.replace("/", ":")} · ${placeholder}` }}
+                pending={placeholder}
               />
               <figcaption className="px-(--page-margin) text-caption text-gray-600 max-md:pr-12 md:px-0">{fig.caption[locale]}</figcaption>
             </figure>

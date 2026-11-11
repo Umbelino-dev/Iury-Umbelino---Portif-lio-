@@ -2,17 +2,14 @@
 
 import { useRef, useState, type CSSProperties, type KeyboardEvent, type MouseEvent, type ReactNode } from "react";
 import { DUR, EASE, gsap, MQ, useGSAP } from "@/lib/gsap";
-import { Ruler } from "@/components/layout/Ruler";
 
 export interface StageSlide {
   slug: string;
-  /** "P.01" */
-  index: string;
   name: string;
   nameLang?: string;
   /** Frame proportion (width / height). Frames share a height, so widths differ. */
   ratio: number;
-  /** Cover or editorial placeholder, rendered on the server; fills the frame. */
+  /** Cover or typographic poster, rendered on the server; fills the frame. */
   image: ReactNode;
   /** Status, name, summary and link for this project, rendered on the server. */
   detail: ReactNode;
@@ -20,14 +17,11 @@ export interface StageSlide {
   external?: boolean;
   /** Custom cursor label over the frame in front (fine pointers only). */
   cursorLabel?: string;
-  /** "Mostrar Koinonia" — name of the ruler tick that brings this project to the front. */
-  goLabel: string;
 }
 
 export interface StageLabels {
   carousel: string;
-  prev: string;
-  next: string;
+  index: string;
   drag: string;
 }
 
@@ -39,16 +33,17 @@ const FADE = 0.3;
  * The project stage: one horizontal strip of frames in different proportions.
  * The frame on the page's left margin is in front, at full size; the others wait
  * to its right, smaller and paler, and run off the screen's edge. Its name sits
- * above the strip at display size, the way the old index set it.
+ * above the strip at display size.
  *
  * - It is a native horizontal scroller with snap points: touch, trackpad, keyboard
- *   and no-JS all work before any script runs. Scale, fade and the ruler marker
- *   are derived from the scroll position (one rAF per scroll event, no loop).
+ *   and no-JS all work before any script runs. Scale and fade are derived from the
+ *   scroll position (one rAF per scroll event, no loop).
  * - Frames scale from their bottom-left corner and are shifted so the gaps stay
  *   even: the strip reads as one row standing on a baseline, not as loose cards.
- * - Mouse: drag the strip; arrows and ruler ticks move one project at a time;
- *   a click on a frame behind brings it forward, a click on the front one opens it.
- * - Keyboard: ← → Home End on the strip; links and ticks are tab stops.
+ * - Below the strip, the project names are the index: the one in front is ink,
+ *   the others grey; each name brings its project forward. No numbers, no ruler.
+ * - Mouse: drag the strip; a click on a frame behind brings it forward, a click
+ *   on the front one opens it. Keyboard: ← → Home End on the strip.
  * - Reduced motion: moves are instant; nothing animates by itself in any mode.
  */
 export function ProjectStage({ slides, labels }: { slides: StageSlide[]; labels: StageLabels }) {
@@ -65,8 +60,6 @@ export function ProjectStage({ slides, labels }: { slides: StageSlide[]; labels:
       if (!el || !sc) return;
       const list = sc.querySelector<HTMLElement>("[data-strip]");
       const items = gsap.utils.toArray<HTMLElement>("[data-slide]", sc);
-      const marker = el.querySelector<HTMLElement>("[data-marker]");
-      const rule = el.querySelector<HTMLElement>("[data-rule]");
       if (!list || !items.length) return;
       const n = items.length;
       const reduced = window.matchMedia(MQ.reduced);
@@ -82,18 +75,15 @@ export function ProjectStage({ slides, labels }: { slides: StageSlide[]; labels:
         alpha: gsap.quickSetter(f, "opacity"),
       }));
       const capX = caps.map((c) => gsap.quickSetter(c, "x", "px"));
-      const markX = marker ? gsap.quickSetter(marker, "x", "px") : null;
 
       let offsets: number[] = []; // scrollLeft that puts slide i in front
       let widths: number[] = [];
-      let ruleWidth = 0;
       const scale = new Array<number>(n).fill(1);
       const dist = new Array<number>(n).fill(0);
 
       const measure = () => {
         offsets = items.map((it) => it.offsetLeft);
         widths = items.map((it) => it.offsetWidth);
-        ruleWidth = rule?.offsetWidth ?? 0;
         // Room after the last frame, so it can reach the front too.
         const inset = parseFloat(getComputedStyle(sc).paddingLeft) || 0;
         list.style.paddingRight = `${Math.max(0, sc.clientWidth - inset - (widths[n - 1] ?? 0))}px`;
@@ -141,18 +131,6 @@ export function ProjectStage({ slides, labels }: { slides: StageSlide[]; labels:
           const cap = caps[i];
           if (cap) cap.style.opacity = d < 0.5 ? "0" : "1";
         }
-        // Ruler marker: continuous position between ticks.
-        let at = n - 1;
-        for (let i = 0; i < n - 1; i++) {
-          const a = offsets[i] ?? 0;
-          const b = offsets[i + 1] ?? 0;
-          if (s < b) {
-            at = i + gsap.utils.clamp(0, 1, (s - a) / (b - a || 1));
-            break;
-          }
-        }
-        markX?.((at / Math.max(1, n - 1)) * ruleWidth);
-
         const now = nearest(s);
         if (now !== activeRef.current) {
           activeRef.current = now;
@@ -279,10 +257,6 @@ export function ProjectStage({ slides, labels }: { slides: StageSlide[]; labels:
     go(i);
   };
 
-  const last = slides.length - 1;
-  const arrow =
-    "flex size-11 items-center justify-center text-xl transition-[background-color,opacity] duration-(--duration-fast) hover:bg-ink/6 disabled:pointer-events-none disabled:opacity-25";
-
   return (
     <div ref={root} className="group/stage">
       {/* The project in front, named at display size. All six are in the HTML;
@@ -315,14 +289,8 @@ export function ProjectStage({ slides, labels }: { slides: StageSlide[]; labels:
                     {s.image}
                   </span>
                 </span>
-                <span
-                  data-cap
-                  className="mt-3 flex max-w-[76%] items-baseline gap-3 transition-opacity duration-(--duration-fast)"
-                >
-                  <span className="text-index text-gray-600">{s.index}</span>
-                  <span lang={s.nameLang} className="truncate text-ui font-medium">
-                    {s.name}
-                  </span>
+                <span data-cap lang={s.nameLang} className="mt-3 block max-w-[80%] truncate text-ui font-medium transition-opacity duration-(--duration-fast)">
+                  {s.name}
                 </span>
               </>
             );
@@ -357,39 +325,26 @@ export function ProjectStage({ slides, labels }: { slides: StageSlide[]; labels:
         </ul>
       </div>
 
-      {/* Position: one tick per project on the measured line, and the two arrows. */}
-      <div className="mx-auto mt-[clamp(1.5rem,3vw,2.5rem)] flex max-w-(--container-page) items-start gap-6 px-(--page-margin)">
-        <div className="min-w-0 flex-1 px-2 md:max-w-[58%]">
-          <div data-rule className="relative">
-            <Ruler ticks={slides.map((_, i) => ({ at: last ? i / last : 0, major: true }))} className="text-ink">
-              <span aria-hidden="true" data-marker className="absolute top-2 -left-1 size-[9px] bg-ink will-change-transform" />
-              {slides.map((s, i) => (
-                <button
-                  key={s.slug}
-                  type="button"
-                  onClick={() => go(i)}
-                  aria-label={s.goLabel}
-                  aria-current={i === active ? "true" : undefined}
-                  style={{ left: `${(last ? i / last : 0) * 100}%` }}
-                  className={`text-index absolute -top-1 flex h-11 w-11 -translate-x-1/2 items-end justify-center pb-1 transition-colors duration-(--duration-fast) hover:text-ink ${
-                    i === active ? "font-semibold text-ink" : "text-gray-600"
-                  }`}
-                >
-                  {s.index.replace(/\D/g, "")}
-                </button>
-              ))}
-            </Ruler>
-          </div>
-        </div>
-        <div className="ml-auto flex">
-          <button type="button" onClick={() => go(active - 1)} disabled={active === 0} aria-label={labels.prev} className={arrow}>
-            <span aria-hidden="true">←</span>
-          </button>
-          <button type="button" onClick={() => go(active + 1)} disabled={active === last} aria-label={labels.next} className={arrow}>
-            <span aria-hidden="true">→</span>
-          </button>
-        </div>
-      </div>
+      {/* The index is the projects' own names: the one in front is ink. */}
+      <nav aria-label={labels.index} className="mx-auto mt-[clamp(1.75rem,3vw,2.75rem)] max-w-(--container-page) px-(--page-margin)">
+        <ul className="flex max-w-[60rem] flex-wrap gap-x-[clamp(1rem,2vw,2rem)] max-md:pr-12">
+          {slides.map((s, i) => (
+            <li key={s.slug}>
+              <button
+                type="button"
+                lang={s.nameLang}
+                onClick={() => go(i)}
+                aria-current={i === active ? "true" : undefined}
+                className={`min-h-11 font-display text-[clamp(1.0625rem,1rem+0.4vw,1.375rem)] font-bold tracking-[-0.015em] transition-colors duration-(--duration-base) ease-(--ease-out-soft) hover:text-ink ${
+                  i === active ? "text-ink" : "text-gray-600"
+                }`}
+              >
+                {s.name}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </nav>
     </div>
   );
 }

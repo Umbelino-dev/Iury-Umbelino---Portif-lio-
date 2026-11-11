@@ -2,17 +2,20 @@ import Image from "next/image";
 import type { Locale } from "@/i18n/routing";
 import type { Project } from "@/content/types";
 
-/** Placeholder tones, cycled per project so neighbours never match (Homepage R02). */
+/** Poster tones, cycled per project so neighbours never match. */
 const TONES = [
-  { bg: "bg-[#d3cfc5]", fg: "text-ink", meta: "text-[#3f3d39]" },
-  { bg: "bg-ink-800", fg: "text-paper", meta: "text-paper-300" },
-  { bg: "bg-[#c9c4b8]", fg: "text-ink", meta: "text-[#3f3d39]" },
-  { bg: "bg-[#2a2a2a]", fg: "text-paper", meta: "text-paper-300" },
+  { bg: "bg-ink-800", fg: "text-paper", note: "text-paper-300" },
+  { bg: "bg-[#d3cfc5]", fg: "text-ink", note: "text-[#3f3d39]" },
+  { bg: "bg-[#2a2a2a]", fg: "text-paper", note: "text-paper-300" },
+  { bg: "bg-[#c9c4b8]", fg: "text-ink", note: "text-[#3f3d39]" },
 ] as const;
 
 /**
- * A project's image: the real cover when `project.cover` exists, otherwise the
- * editorial placeholder (index, numeral, status). Fills its positioned container.
+ * A project's image: the real cover when `project.cover` exists. Otherwise a
+ * typographic poster, not a wireframe: the project's own name in Satoshi Black,
+ * set large enough that the frame crops it, with one line in serif saying the
+ * image is still to come. It is the name, so it carries no extra code or number.
+ * Fills its positioned container.
  */
 export function ProjectImage({
   project,
@@ -23,10 +26,9 @@ export function ProjectImage({
   project: Project;
   position: number;
   locale: Locale;
-  labels: { image: string; placeholder: string; status: string; frame?: string };
+  labels: { pending: string };
 }) {
   const tone = TONES[position % TONES.length]!;
-  const numeral = project.index.replace("P.", "");
 
   if (project.cover) {
     const contain = project.cover.fit === "contain";
@@ -44,22 +46,22 @@ export function ProjectImage({
     );
   }
 
+  // One word per line, so even long names become a stacked poster.
+  const words = project.name.split(" ");
   return (
-    <span aria-hidden="true" className={`absolute inset-0 block overflow-hidden ${tone.bg}`}>
-      {/* Index left, frame spec right: one line each, so small frames never wrap. */}
-      <span className={`absolute inset-x-3.5 top-3 flex justify-between gap-3 text-index whitespace-nowrap ${tone.meta}`}>
-        <span>{project.index}</span>
-        <span>
-          {labels.frame ? `${labels.frame} · ` : ""}
-          {labels.placeholder}
-        </span>
+    <span aria-hidden="true" className={`@container absolute inset-0 block overflow-hidden ${tone.bg}`}>
+      <span className={`text-note absolute top-[6cqw] left-[7cqw] text-[clamp(0.9375rem,4.6cqw,1.25rem)] ${tone.note}`}>
+        {labels.pending}
       </span>
       <span
-        className={`absolute bottom-0.5 left-3 font-display text-[clamp(4rem,7vw,7rem)] leading-[0.8] font-bold tracking-[-0.05em] ${tone.fg}`}
+        lang={project.nameLang && project.nameLang !== locale ? project.nameLang : undefined}
+        className={`absolute -bottom-[0.14em] left-[5cqw] flex flex-col font-display leading-[0.8] font-black tracking-[-0.055em] whitespace-nowrap ${tone.fg}`}
+        style={{ fontSize: `${words.length > 2 ? 24 : words.length > 1 ? 30 : 46}cqw` }}
       >
-        {numeral}
+        {words.map((w, i) => (
+          <span key={i}>{w}</span>
+        ))}
       </span>
-      <span className={`absolute right-3.5 bottom-3 text-index lowercase ${tone.meta}`}>{labels.status}</span>
     </span>
   );
 }

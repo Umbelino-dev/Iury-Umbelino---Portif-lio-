@@ -145,7 +145,7 @@ export function PhotoLoop({ photos }: { photos: LoopPhoto[] }) {
           className="h-full w-full object-cover object-[50%_20%] transition-transform duration-(--duration-slow) ease-(--ease-out-soft) group-hover:scale-[1.04]"
         />
       </div>
-      <figcaption className="text-index text-gray-600 uppercase transition-opacity duration-(--duration-fast)">{p.caption}</figcaption>
+      <figcaption className="text-note text-[#3f3d39] transition-opacity duration-(--duration-fast)">{p.caption}</figcaption>
     </figure>
   );
 

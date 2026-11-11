@@ -6,7 +6,7 @@ export default function NotFound() {
     <html lang="pt-BR" className={`${display.variable} ${sans.variable} ${serif.variable}`}>
       <body className="surface-dark min-h-dvh font-sans">
         <main className="page-grid min-h-dvh content-center gap-y-6 py-24">
-          <p className="col-span-full font-mono text-label uppercase text-gray-500">Erro 404 · Error 404</p>
+          <p className="text-note col-span-full text-[1.375rem] text-gray-500">Erro 404. Error 404.</p>
           <h1 className="col-span-full font-display text-headline-l font-bold md:col-span-8">
             Página não encontrada. <span lang="en">Page not found.</span>
           </h1>

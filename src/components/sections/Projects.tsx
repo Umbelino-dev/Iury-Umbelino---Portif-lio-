@@ -12,11 +12,6 @@ import { ProjectStage, type StageSlide } from "./ProjectStage";
  * A real cover sets its own proportion, kept between portrait 3:4 and 16:10.
  */
 const FRAMES = [3 / 4, 1, 4 / 3, 3 / 4, 1] as const;
-const FRAME_NAME = new Map<number, string>([
-  [3 / 4, "3:4"],
-  [1, "1:1"],
-  [4 / 3, "4:3"],
-]);
 
 /**
  * Projects — light editorial. Projects are evidence, so they sit in daylight.
@@ -47,30 +42,26 @@ export async function Projects() {
 
     return {
       slug: p.slug,
-      index: p.index,
       name: p.name,
       nameLang,
       ratio,
       href,
       external: Boolean(live),
       cursorLabel: caseHref ? tc("project") : live ? tc("visit") : undefined,
-      goLabel: t("show", { name: p.name }),
       image: (
         <ProjectImage
           project={p}
           position={i}
           locale={locale}
-          labels={{ image: t("image"), placeholder: t("placeholder"), status, frame: FRAME_NAME.get(ratio) }}
+          labels={{ pending: t("pending") }}
         />
       ),
       detail: (
         <article className="grid grid-cols-4 items-end gap-x-(--page-gutter) gap-y-5 md:grid-cols-12">
           <div className="col-span-4 flex flex-col gap-[clamp(0.75rem,1.2vw,1.25rem)] md:col-span-9">
-            <p className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-caption text-gray-600">
-              <span className="text-index">{p.index}</span>
-              <StatusMark status={p.status} label={status} className="text-ink" />
-              {p.year && <span>{p.year}</span>}
-              <span>{p.tags.map((tag) => tt(tag)).join(", ")}</span>
+            <p className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+              <StatusMark status={p.status} label={p.year ? `${status}, ${p.year}` : status} className="text-[1.25rem] text-ink" />
+              <span className="text-caption text-gray-600">{p.tags.map((tag) => tt(tag)).join(", ")}</span>
             </p>
             <h3
               data-rise
@@ -88,7 +79,7 @@ export async function Projects() {
                   href={href}
                   target={live ? "_blank" : undefined}
                   rel={live ? "noopener noreferrer" : undefined}
-                  className="flex min-h-11 items-center gap-2.5 self-start border-b border-ink text-ui font-medium transition-colors duration-(--duration-fast) hover:border-gray-600 hover:text-gray-600"
+                  className="flex min-h-11 items-center gap-2.5 self-start font-display text-[1.125rem] font-bold tracking-[-0.01em] underline decoration-1 underline-offset-[0.3em] transition-colors duration-(--duration-fast) hover:text-gray-600"
                 >
                   {live ? live.label[locale] : t("openCase")}
                   <span aria-hidden="true">{live ? "↗" : "→"}</span>
@@ -116,7 +107,7 @@ export async function Projects() {
       </div>
       <ProjectStage
         slides={slides}
-        labels={{ carousel: t("listLabel"), prev: t("prev"), next: t("next"), drag: tc("drag") }}
+        labels={{ carousel: t("listLabel"), index: t("indexLabel"), drag: tc("drag") }}
       />
     </section>
   );

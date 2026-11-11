@@ -8,14 +8,14 @@ export async function Footer({ topHref, tone = "dark" }: { topHref: string; tone
   const t = await getTranslations("footer");
   return (
     <footer
-      className={`flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t pt-2 pr-22 text-label font-medium tracking-label uppercase ${
-        tone === "dark" ? "border-[#2a2a2a] text-gray-500" : "border-paper-300 text-gray-600"
+      className={`flex flex-wrap items-center justify-between gap-x-4 gap-y-2 pt-2 pr-22 text-caption ${
+        tone === "dark" ? "text-gray-500" : "text-gray-600"
       }`}
     >
       <span>{t("rights")}</span>
       <a
         href={topHref}
-        className={`flex min-h-11 items-center transition-colors duration-(--duration-fast) ${tone === "dark" ? "text-paper hover:text-signal" : "text-ink"}`}
+        className={`flex min-h-11 items-center font-display font-bold transition-colors duration-(--duration-fast) ${tone === "dark" ? "text-paper hover:text-signal" : "text-ink"}`}
       >
         {t("top")} <span aria-hidden="true">&nbsp;↑</span>
       </a>

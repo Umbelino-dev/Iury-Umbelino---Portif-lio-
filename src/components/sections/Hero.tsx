@@ -94,13 +94,13 @@ export async function Hero() {
         <div className="grid grid-cols-4 gap-x-(--page-gutter) gap-y-6 md:grid-cols-12">
           {/* Visible from the first paint (no fade): this is the mobile LCP text. */}
           <div className="col-span-4 flex flex-col gap-4 md:col-span-6 lg:col-span-5">
-            <p className="text-label font-medium tracking-label text-gray-500 uppercase">{t("stack")}</p>
+            <p className="text-note text-[1.25rem] text-gray-500">{t("stack")}</p>
             <p className="max-w-[30ch] text-[clamp(1.1875rem,1rem+0.6vw,1.5rem)] leading-[1.45] md:leading-[1.35] text-pretty text-paper">
               {t("intro")}
             </p>
             <a
               href="#about"
-              className="flex min-h-11 items-center gap-2.5 self-start border-b border-paper text-ui font-medium transition-colors duration-(--duration-fast) hover:border-paper-0 hover:text-paper-0"
+              className="flex min-h-11 items-center gap-2.5 self-start font-display text-[1.125rem] font-bold tracking-[-0.01em] underline decoration-1 underline-offset-[0.3em] transition-colors duration-(--duration-fast) hover:text-paper-0"
             >
               {t("cta")} <span aria-hidden="true">↓</span>
             </a>
@@ -111,7 +111,7 @@ export async function Hero() {
   );
 }
 
-/** Atmosphere: blueprint grid, soft light, grain, vignette. Decorative only. */
+/** Atmosphere: soft light, grain, vignette. Decorative only. */
 function HeroBackdrop() {
   const grain =
     "url(\"data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")";
@@ -119,7 +119,6 @@ function HeroBackdrop() {
     <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
       <div className="absolute -top-44 -right-[6%] h-[420px] w-[62%] bg-[radial-gradient(ellipse_50%_50%_at_60%_50%,rgba(243,241,235,0.11),rgba(243,241,235,0.035)_45%,transparent_72%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_55%_60%_at_68%_52%,rgba(243,241,235,0.075),rgba(243,241,235,0.02)_45%,transparent_75%)]" />
-      <div className="hero-grid absolute inset-0" />
       <div className="absolute inset-0 opacity-[0.07] mix-blend-screen" style={{ backgroundImage: grain, backgroundSize: "240px 240px" }} />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_85%_85%_at_55%_45%,transparent_55%,rgba(0,0,0,0.55)_100%)]" />
     </div>

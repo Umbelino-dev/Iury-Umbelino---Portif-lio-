@@ -25,7 +25,6 @@
   --font-display: var(--font-satoshi), system-ui, sans-serif;
   --font-serif: var(--font-instrument-serif), Georgia, serif;
   --font-sans: var(--font-ibm-plex-sans), system-ui, sans-serif;
-  --font-mono: ui-monospace, "SFMono-Regular", Menlo, monospace;
 
   /* Type scale — fluid between 375px and 1440px (desktop → mobile values in CLAUDE.md) */
   --text-display-xxl: clamp(4rem, 0.831rem + 13.52vw, 13rem);
@@ -148,13 +147,17 @@
 }
 
 /*
- * Index voice: the small mono line that names or measures something
- * (P.01, 04.2024, E.02). One size, one tracking, everywhere.
+ * The annotation voice: Instrument Serif italic for what situates something
+ * (a date, a status, a caption, a place). It replaces codes and labels: the
+ * site names things in Satoshi, explains them in Plex, and annotates in serif.
  */
-@utility text-index {
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.04em;
+@utility text-note {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 1.125rem;
+  line-height: 1.3;
+  letter-spacing: 0;
 }
 
 /*
@@ -193,23 +196,6 @@
   }
 }
 
-/* Hero blueprint grid: one line per column (4 → 12) and every 96px, fading from the centre. */
-.hero-grid {
-  --cols: 4;
-  margin-inline: max(var(--page-margin), calc((100% - var(--container-page)) / 2 + var(--page-margin)));
-  background-image:
-    linear-gradient(90deg, rgb(243 241 235 / 0.055) 1px, transparent 1px),
-    linear-gradient(0deg, rgb(243 241 235 / 0.04) 1px, transparent 1px);
-  background-size: calc(100% / var(--cols)) 100%, 100% 96px;
-  background-position: 0 0, 0 24px;
-  mask-image: radial-gradient(ellipse 70% 75% at 62% 48%, #000 25%, transparent 80%);
-}
-@media (min-width: 768px) {
-  .hero-grid {
-    --cols: 12;
-  }
-}
-
 /*
  * Hero reveal start state — only when JS runs and motion is allowed, so the text
  * is never hidden for no-JS or reduced-motion visitors. GSAP animates from here;
@@ -232,19 +218,6 @@
   to {
     transform: none;
     opacity: 1;
-  }
-}
-
-/* Lab: the 12 columns stay visible behind the broken grid (4 on mobile). */
-.lab-columns {
-  --cols: 4;
-  margin-inline: max(var(--page-margin), calc((100% - var(--container-page)) / 2 + var(--page-margin)));
-  background-image: linear-gradient(90deg, rgb(243 241 235 / 0.05) 1px, transparent 1px);
-  background-size: calc(100% / var(--cols)) 100%;
-}
-@media (min-width: 768px) {
-  .lab-columns {
-    --cols: 12;
   }
 }
 

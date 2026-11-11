@@ -16,29 +16,29 @@ const MOBILE: Record<MediaSlot["aspect"], string> = {
   "1200/630": "aspect-[1200/630]", // brand pieces carry text: never reflowed or cropped
 };
 const TONE = {
-  paper: { bg: "bg-[#d3cfc5]", fg: "text-ink", meta: "text-[#3f3d39]", line: "bg-[#3f3d39]" },
-  stone: { bg: "bg-[#c9c4b8]", fg: "text-ink", meta: "text-[#3f3d39]", line: "bg-[#3f3d39]" },
-  ink: { bg: "bg-ink-800", fg: "text-paper", meta: "text-paper-300", line: "bg-paper-300" },
+  paper: { bg: "bg-[#d3cfc5]", note: "text-[#3f3d39]" },
+  stone: { bg: "bg-[#c9c4b8]", note: "text-[#3f3d39]" },
+  ink: { bg: "bg-ink-800", note: "text-paper-300" },
 } as const;
 
 /**
- * A case-study image: the real one when `slot.image` exists, otherwise the editorial
- * placeholder (spec bar, crosshair, optional numeral). Captions live outside, in <figcaption>.
+ * A case-study image: the real one when `slot.image` exists, otherwise a quiet
+ * tone with one serif line saying what will be shown there (the slot's own name)
+ * and that it is still to come. Captions live outside, in <figcaption>.
  */
 export function MediaFrame({
   slot,
   locale,
-  spec,
+  pending,
   tone = "paper",
-  numeral,
   priority = false,
   sizes = "(min-width: 768px) 90vw, 100vw",
 }: {
   slot: MediaSlot;
   locale: Locale;
-  spec: { left: string; right: string };
+  /** "em breve": said after the slot's name on the placeholder. */
+  pending: string;
   tone?: keyof typeof TONE;
-  numeral?: string;
   priority?: boolean;
   sizes?: string;
 }) {
@@ -56,19 +56,9 @@ export function MediaFrame({
           className="absolute inset-0 h-full w-full object-cover"
         />
       ) : (
-        <div aria-hidden="true" className={`absolute inset-0 text-index ${t.meta}`}>
-          <div className="absolute inset-x-4 top-3.5 flex justify-between gap-3 uppercase md:inset-x-5 md:top-4">
-            <span>{spec.left}</span>
-            <span className="hidden normal-case sm:inline">{spec.right}</span>
-          </div>
-          <span className={`absolute top-1/2 left-1/2 -ml-[22px] h-px w-11 ${t.line}`} />
-          <span className={`absolute top-1/2 left-1/2 -mt-[22px] h-11 w-px ${t.line}`} />
-          {numeral && (
-            <span className={`absolute bottom-1 left-4 font-display text-[clamp(4rem,14vw,15rem)] leading-[0.8] font-bold tracking-[-0.05em] ${t.fg}`}>
-              {numeral}
-            </span>
-          )}
-        </div>
+        <p aria-hidden="true" className={`text-note absolute bottom-[clamp(1rem,2vw,1.75rem)] left-[clamp(1.25rem,2.4vw,2rem)] text-[clamp(1.125rem,1rem+0.6vw,1.75rem)] ${t.note}`}>
+          {slot.label[locale]}, {pending}
+        </p>
       )}
     </div>
   );

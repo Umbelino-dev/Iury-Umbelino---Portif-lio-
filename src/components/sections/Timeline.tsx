@@ -2,22 +2,19 @@
 
 import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
 import { DUR, gsap, MQ, useGSAP } from "@/lib/gsap";
-import { Ruler, type RulerTick } from "@/components/layout/Ruler";
 
 export interface TimelineStep {
   role: string;
   org: string;
+  /** The period in words: "abril de 2024 – julho de 2025". */
   period: string;
-  /** First and last month as a month count (year × 12 + month); `to` is null while the role is current. */
-  from: number;
-  to: number | null;
   /** "1 ano e 4 meses" / "desde abril de 2026". */
   duration: string;
   area: string;
   summary: string;
   details: string[];
   more: string;
-  /** Extra lines for the expanded panel (the current role's CV highlights). */
+  /** Extra lines for the expanded account (the current role's CV highlights). */
   list?: string[];
   /** Tools named in the CV for this role. */
   stack?: string[];
@@ -26,91 +23,55 @@ export interface TimelineStep {
 
 export interface TimelineLabels {
   now: string;
-  today: string;
   seeMore: string;
   close: string;
-  area: string;
-  duration: string;
-  org: string;
   stack: string;
 }
 
-/** Height of one wiring level (px): each connector turns on its own level, so none cross. */
-const LEVEL = 26;
-
 /**
- * The career path drawn to scale.
+ * The career path as a staircase of type. No axis, no lines, no markers: each
+ * role is set one size larger and one step higher than the one before, so the
+ * path climbs and grows toward today, and the current role is the biggest thing
+ * in the composition. The period sits above each role in serif italic.
  *
- * Desktop (≥1024): a ruler of real months runs along the bottom; each role is an
- * ink segment on it, as long as the role lasted, so the gap and the quick
- * succession of roles show without a word. The four texts stand above it in even
- * columns, each one step higher than the last, and a hairline runs from every
- * text down to the month it began: verticals for the roles, horizontals for time.
- * On scroll the ink traces the axis from the first month to today.
+ * Desktop (≥1024): four columns standing on one baseline, each raised by `--rise`.
+ * Smaller screens: the same steps down the page, each a little larger and
+ * further in, so the growth still reads.
  *
- * Smaller screens: the same steps down the page, each indented one notch, with
- * a small copy of the axis showing where that role sits in the whole path.
- *
- * Each step shows period, role, organisation and one sentence. Hover or keyboard
- * focus reveals a few more lines in space the step already owns (nothing moves,
- * nothing pops up); on touch they are always shown. Click / Enter / tap opens the
- * full account under the axis (inside the step on small screens); Esc closes it.
- * Reduced motion: the axis is drawn and the panel opens without animation.
- *
- * Connectors assume each role starts at or after the left edge of its own column
- * (true while the path accelerates toward today); later roles turn on higher levels.
+ * Hover or keyboard focus quiets the other steps and unrolls a few details
+ * inside the step's own space (clip-path; nothing moves, nothing floats). On
+ * touch the details are always shown. Click / Enter opens the full account under
+ * the staircase (inside the step on small screens); Esc closes.
+ * On scroll the steps rise into place one after another, once.
+ * Reduced motion: no rise, the account opens without animation.
  */
-export function Timeline({ steps, now, labels }: { steps: TimelineStep[]; now: number; labels: TimelineLabels }) {
+export function Timeline({ steps, labels }: { steps: TimelineStep[]; labels: TimelineLabels }) {
   const root = useRef<HTMLDivElement>(null);
   const panel = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState<number | null>(null);
   const [hot, setHot] = useState<number | null>(null);
   const uid = useId();
 
-  const n = steps.length;
-  const first = steps[0]?.from ?? now;
-  const total = Math.max(1, now - first + 1); // months on the axis, both ends included
-  const at = (month: number) => (month - first) / total;
-  const start = (s: TimelineStep) => at(s.from);
-  const length = (s: TimelineStep) => ((s.to ?? now) - s.from + 1) / total;
-
-  // One tick per month; January (and the first month) is a major tick with its year.
-  const ticks: RulerTick[] = Array.from({ length: total + 1 }, (_, k) => {
-    const m = first + k;
-    const major = k === 0 || m % 12 === 0;
-    const label = k === 0 ? `${String((m % 12) + 1).padStart(2, "0")}.${Math.floor(m / 12)}` : major ? Math.floor(m / 12) : undefined;
-    // No label within three months of the start or the end ("hoje" sits there).
-    return { at: k / total, major, label: k === 0 || (k > 3 && k < total - 2) ? label : undefined };
-  });
-
-  // The ink traces the axis: each segment draws during its own share of the scroll.
+  // The climb: each step rises into place after the one before it.
   useGSAP(
     () => {
       const el = root.current;
       if (!el) return;
       const mm = gsap.matchMedia();
       mm.add(`${MQ.motion} and (min-width: 1024px)`, () => {
-        const axis = el.querySelector("[data-tl-axis]");
-        const segs = gsap.utils.toArray<HTMLElement>("[data-tl-seg]", el);
-        const marks = gsap.utils.toArray<HTMLElement>("[data-tl-mark]", el);
-        const tl = gsap.timeline({
-          defaults: { ease: "none" },
-          scrollTrigger: { trigger: axis, start: "top 92%", end: "top 55%", scrub: 0.4 },
-        });
-        segs.forEach((seg, i) => {
-          const a = Number(seg.dataset.at ?? 0);
-          const len = Number(seg.dataset.len ?? 0);
-          tl.fromTo(seg, { scaleX: 0 }, { scaleX: 1, duration: len }, a);
-          const mark = marks[i];
-          if (mark) tl.fromTo(mark, { scale: 0 }, { scale: 1, duration: 0.03 }, Math.max(0, a - 0.015));
-        });
+        const items = gsap.utils.toArray<HTMLElement>("[data-tl-h] [data-step]", el);
+        gsap.fromTo(
+          items,
+          { y: (i) => 40 + i * 12, autoAlpha: 0 },
+          { y: 0, autoAlpha: 1, duration: DUR.slow * 1.4, stagger: 0.12, scrollTrigger: { trigger: el, start: "top 78%", once: true } },
+        );
       });
       return () => mm.revert();
     },
     { scope: root },
   );
 
-  // Panel reveal whenever the open step changes (clip-path only).
+  // Account reveal whenever the open step changes (clip-path only).
   useEffect(() => {
     const el = panel.current;
     if (open === null || !el) return;
@@ -132,48 +93,37 @@ export function Timeline({ steps, now, labels }: { steps: TimelineStep[]; now: n
 
   const toggle = (i: number) => setOpen((o) => (o === i ? null : i));
   const panelId = (i: number) => `${uid}-panel-${i}`;
-  /** A step is lit when hovered, focused or open; the others step back. */
-  const lit = (i: number) => hot === i || (hot === null && open === i);
-  const dimmed = (i: number) => hot !== null && hot !== i;
-  const line = (i: number) => (lit(i) ? "border-ink bg-ink" : "border-ink/25 bg-ink/25");
-  const lineMotion = "transition-colors duration-(--duration-base) ease-(--ease-out-soft)";
+  const quiet = (i: number) => hot !== null && hot !== i;
+  /** "desde abril de 2026" → "Desde abril de 2026" when it opens a sentence. */
+  const cap = (text: string) => text.charAt(0).toLocaleUpperCase() + text.slice(1);
+  const ease = "duration-(--duration-base) ease-(--ease-out-soft)";
+  /** Role size grows with each step: the path gets bigger toward today. */
+  const roleSize = (i: number) =>
+    `clamp(${(1.25 + i * 0.3).toFixed(2)}rem, ${(1.05 + i * 0.22).toFixed(2)}rem + ${(0.55 + i * 0.55).toFixed(2)}vw, ${(1.5 + i * 0.85).toFixed(2)}rem)`;
 
   // Render helpers (plain functions, not components: no remount, focus stays put).
-  const facts = (s: TimelineStep) => (
-    <dl className="text-index grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-gray-600 uppercase">
-      <dt>{labels.org}</dt>
-      <dd className="text-ink">{s.org}</dd>
-      <dt>{labels.area}</dt>
-      <dd className="text-ink">{s.area}</dd>
-      <dt>{labels.duration}</dt>
-      <dd className="text-ink">{s.duration}</dd>
-    </dl>
-  );
   const account = (s: TimelineStep) => (
-    <div className="flex flex-col gap-5">
-      <p className="max-w-[60ch] text-body text-pretty">{s.more}</p>
+    <div className="flex flex-col gap-6">
+      <p className="max-w-[54ch] text-[clamp(1.0625rem,1rem+0.3vw,1.25rem)] leading-normal text-pretty">{s.more}</p>
       {s.list && (
-        <ul className="flex flex-col border-t border-paper-300">
+        <ul className="flex max-w-[60ch] flex-col gap-4">
           {s.list.map((item, j) => (
-            <li key={j} className="grid grid-cols-[2.5rem_1fr] gap-x-3 border-b border-paper-300 py-3 text-ui leading-normal">
-              <span aria-hidden="true" className="text-index leading-6 text-gray-600">
-                E.{String(j + 1).padStart(2, "0")}
-              </span>
-              <span className="max-w-[60ch] text-pretty">{item}</span>
+            <li key={j} className="text-body text-pretty text-[#3f3d39]">
+              {item}
             </li>
           ))}
         </ul>
       )}
       {s.stack && (
-        <p className="text-ui leading-relaxed">
-          <span className="text-index mr-3 text-gray-600 uppercase">{labels.stack}</span>
-          {s.stack.join(" · ")}
+        <p className="max-w-[60ch] text-ui leading-relaxed text-[#3f3d39]">
+          <span className="font-display font-bold text-ink">{labels.stack}. </span>
+          {s.stack.join(", ")}.
         </p>
       )}
     </div>
   );
 
-  /** `always`: details are shown without hover (vertical layout, touch). */
+  /** `always`: details are shown without hover (small screens, touch). */
   const head = (s: TimelineStep, i: number, always = false) => (
     <button
       type="button"
@@ -184,35 +134,40 @@ export function Timeline({ steps, now, labels }: { steps: TimelineStep[]; now: n
       onBlur={() => setHot(null)}
       aria-expanded={open === i}
       aria-controls={`${panelId(i)} ${panelId(i)}-m`}
-      className={`group/step flex w-full cursor-pointer flex-col items-start gap-1.5 text-left transition-opacity duration-(--duration-base) ease-(--ease-out-soft) focus-visible:outline-ink ${dimmed(i) ? "opacity-45" : ""}`}
+      className={`group/step relative flex w-full cursor-pointer flex-col items-start gap-2 text-left transition-opacity ${ease} focus-visible:outline-ink ${quiet(i) ? "opacity-40" : ""}`}
     >
-      <span className="text-index text-gray-600">
-        {s.period}
-        {s.current && (
+      <span className="text-note text-[#3f3d39]">
+        {s.current ? (
           <>
-            {" "}
-            <span className="highlight px-1 text-ink">{labels.now}</span>
+            {s.period} <span className="highlight text-ink">{labels.now}</span>
           </>
+        ) : (
+          s.period
         )}
       </span>
-      <span className="font-display text-[clamp(1.125rem,1rem+0.5vw,1.5rem)] leading-[1.15] font-bold tracking-[-0.015em] text-balance">{s.role}</span>
+      <span className="font-display leading-[1.02] font-bold tracking-[-0.025em] text-balance" style={{ fontSize: roleSize(i) }}>
+        {s.role}
+      </span>
       <span className="text-caption font-medium">{s.org}</span>
       <span className="max-w-[30ch] text-ui leading-snug text-pretty text-gray-600">{s.summary}</span>
-      <span className="mt-1.5 text-label font-medium tracking-label uppercase">
-        {open === i ? labels.close : labels.seeMore} <span aria-hidden="true">{open === i ? "×" : "→"}</span>
-      </span>
-      {/* More, in the step's own space: unrolls downward, moves nothing. */}
+      {/* More: on the staircase it unrolls just under the step, in the free space
+          the climb leaves there (it takes no layout, so nothing moves); on small
+          screens it is part of the step. */}
       <span
-        className={`text-index mt-2 flex flex-col gap-1 text-ink transition-[clip-path,opacity] duration-(--duration-base) ease-(--ease-out-soft) ${
+        className={`flex flex-col gap-1 text-caption text-ink transition-[clip-path,opacity] ${ease} ${
           always
             ? ""
-            : "opacity-0 [clip-path:inset(0_0_100%_0)] group-hover/step:opacity-100 group-hover/step:[clip-path:inset(0)] group-focus-visible/step:opacity-100 group-focus-visible/step:[clip-path:inset(0)] [@media(hover:none)]:opacity-100 [@media(hover:none)]:[clip-path:none]"
+            : "absolute top-full left-0 mt-4 opacity-0 [clip-path:inset(0_0_100%_0)] group-hover/step:opacity-100 group-hover/step:[clip-path:inset(0)] group-focus-visible/step:opacity-100 group-focus-visible/step:[clip-path:inset(0)] [@media(hover:none)]:opacity-100 [@media(hover:none)]:[clip-path:none]"
         }`}
       >
         {s.details.map((d) => (
-          <span key={d}>+ {d}</span>
+          <span key={d}>{d}</span>
         ))}
-        <span>+ {s.duration}</span>
+        {/* The current role's period already says "since…". */}
+        {!s.current && <span className="text-note text-[1rem] text-[#3f3d39]">{s.duration}</span>}
+      </span>
+      <span className="mt-1 font-display text-[1rem] font-bold tracking-[-0.01em] underline decoration-1 underline-offset-[0.3em]">
+        {open === i ? labels.close : labels.seeMore}
       </span>
     </button>
   );
@@ -221,71 +176,18 @@ export function Timeline({ steps, now, labels }: { steps: TimelineStep[]; now: n
 
   return (
     <div ref={root}>
-      {/* Desktop: texts climb in even columns; the axis below is to scale. */}
+      {/* Desktop: the staircase, climbing to the right. */}
       <div data-tl-h className="hidden lg:block">
         <ol
-          className="grid items-end [--rise:clamp(1.75rem,3.4vw,3.5rem)]"
-          style={{ gridTemplateColumns: `repeat(${n}, minmax(0, 1fr))` }}
+          className="grid items-end gap-x-[clamp(1.5rem,3vw,3.5rem)] pb-24 [--rise:clamp(2.5rem,5vw,5.5rem)]"
+          style={{ gridTemplateColumns: `repeat(${steps.length}, minmax(0, 1fr))` }}
         >
           {steps.map((s, i) => (
-            <li
-              key={s.period}
-              style={{ "--step": i } as CSSProperties}
-              className="relative mb-[calc(var(--step)*var(--rise))] pr-8 pl-5"
-            >
-              {/* The spine: runs beside the text and on down to the wiring. */}
-              <span
-                aria-hidden="true"
-                className={`absolute top-0 -bottom-[calc(var(--step)*var(--rise))] left-0 w-px ${line(i)} ${lineMotion}`}
-              />
+            <li key={s.period} data-step style={{ "--step": i } as CSSProperties} className="mb-[calc(var(--step)*var(--rise))]">
               {head(s, i)}
             </li>
           ))}
         </ol>
-
-        {/* Wiring: from each column across to the month the role began, then down. */}
-        <div aria-hidden="true" className="relative" style={{ height: (n + 1) * LEVEL }}>
-          {steps.map((s, i) => {
-            const col = i / n;
-            const x = start(s);
-            const level = (n - i) * LEVEL;
-            const right = x >= col;
-            return (
-              <span key={s.period}>
-                <span
-                  className={`absolute top-0 border-b bg-transparent! ${right ? "border-l" : "border-r"} ${line(i)} ${lineMotion}`}
-                  style={{ left: `${Math.min(col, x) * 100}%`, width: `${Math.abs(x - col) * 100}%`, height: level }}
-                />
-                <span
-                  className={`absolute bottom-0 w-px ${line(i)} ${lineMotion}`}
-                  style={{ left: `${x * 100}%`, top: level - 1 }}
-                />
-              </span>
-            );
-          })}
-        </div>
-
-        <div data-tl-axis className="relative">
-          <Ruler ticks={ticks} className="text-gray-600">
-            {steps.map((s, i) => (
-              <span key={s.period} aria-hidden="true">
-                <span
-                  data-tl-seg
-                  data-at={start(s)}
-                  data-len={length(s)}
-                  className={`absolute top-[11px] h-[3px] origin-left ${lit(i) || (hot === null && open === null) ? "bg-ink" : "bg-ink/35"} ${lineMotion}`}
-                  style={{ left: `${start(s) * 100}%`, width: `calc(${length(s) * 100}% - 2px)` }}
-                />
-                <span
-                  data-tl-mark
-                  className="absolute top-2 -ml-1 size-[9px] bg-ink"
-                  style={{ left: `${start(s) * 100}%` }}
-                />
-              </span>
-            ))}
-            <span className="text-index absolute top-5 right-0 text-ink">{labels.today}</span>
-          </Ruler>
-        </div>
 
         {opened && open !== null && (
           <div
@@ -293,45 +195,36 @@ export function Timeline({ steps, now, labels }: { steps: TimelineStep[]; now: n
             id={panelId(open)}
             role="region"
             aria-label={opened.role}
-            className="page-grid relative mt-6 scroll-mb-8 gap-y-8 border-t border-ink px-0! pt-8"
+            className="mt-[clamp(3rem,5vw,5rem)] grid scroll-mb-8 grid-cols-12 gap-x-(--page-gutter) gap-y-8"
           >
-            <div className="col-span-4 flex flex-col gap-5">
-              <p className="font-display text-headline-m font-bold text-balance">{opened.role}</p>
-              <p className="text-index text-gray-600">{opened.current ? `${opened.period} ${labels.now}` : opened.period}</p>
-              {facts(opened)}
+            <div className="col-span-4 flex flex-col gap-4">
+              <p className="font-display text-headline-l leading-[0.98] font-bold tracking-[-0.03em] text-balance">{opened.role}</p>
+              <p className="text-note text-[1.25rem] text-[#3f3d39]">
+                {opened.org}, {opened.area}. {cap(opened.duration)}.
+              </p>
+              <button
+                type="button"
+                onClick={() => setOpen(null)}
+                className="mt-2 flex min-h-11 items-center self-start font-display text-[1rem] font-bold underline decoration-1 underline-offset-[0.3em] transition-colors duration-(--duration-fast) hover:text-gray-600 focus-visible:outline-ink"
+              >
+                {labels.close}
+              </button>
             </div>
-            <div className="col-span-6 col-start-6">{account(opened)}</div>
-            <button
-              type="button"
-              onClick={() => setOpen(null)}
-              aria-label={labels.close}
-              className="col-start-12 flex size-11 items-center justify-center justify-self-end text-xl transition-colors duration-(--duration-fast) hover:bg-ink/6 focus-visible:outline-ink"
-            >
-              <span aria-hidden="true">×</span>
-            </button>
+            <div className="col-span-7 col-start-6">{account(opened)}</div>
           </div>
         )}
       </div>
 
-      {/* Small screens: down the page, one notch in per step. */}
-      <ol data-tl-v className="flex flex-col lg:hidden">
+      {/* Small screens: down the page, each step larger and a little further in. */}
+      <ol data-tl-v className="flex flex-col gap-[clamp(2.5rem,8vw,3.5rem)] lg:hidden">
         {steps.map((s, i) => (
-          <li
-            key={s.period}
-            style={{ "--step": i } as CSSProperties}
-            className={`relative ml-[calc(var(--step)*0.75rem)] flex flex-col gap-4 border-l pb-10 pl-5 last:pb-0 ${lit(i) ? "border-ink" : "border-ink/25"} ${lineMotion}`}
-          >
-            {i > 0 && <span aria-hidden="true" className="absolute top-0 -left-[calc(0.75rem+1px)] h-px w-3 bg-ink/25" />}
-            <span aria-hidden="true" className="absolute top-0 -left-[5px] size-[9px] bg-ink" />
-            {/* Where this role sits in the whole path, to scale. */}
-            <span aria-hidden="true" className="relative -mt-px block h-[9px] w-full max-w-64">
-              <span className="absolute inset-x-0 top-1 h-px bg-ink/20" />
-              <span className="absolute top-[3px] h-[3px] bg-ink" style={{ left: `${start(s) * 100}%`, width: `${length(s) * 100}%` }} />
-            </span>
+          <li key={s.period} style={{ "--step": i } as CSSProperties} className="flex flex-col gap-5 pl-[calc(var(--step)*clamp(0.75rem,4vw,2rem))]">
             {head(s, i, true)}
             {open === i && (
-              <div id={`${panelId(i)}-m`} role="region" aria-label={s.role} className="flex flex-col gap-5 border-t border-ink pt-5">
-                {facts(s)}
+              <div id={`${panelId(i)}-m`} role="region" aria-label={s.role} className="flex flex-col gap-4">
+                <p className="text-note text-[#3f3d39]">
+                  {s.org}, {s.area}. {cap(s.duration)}.
+                </p>
                 {account(s)}
               </div>
             )}

@@ -5,14 +5,13 @@ type Step = { title: string; text: string };
 
 /**
  * 06 · Approach — light editorial (Homepage R02 · N15, "a line of thought").
- * No bullets, no icons: a large numeral, a one-word verb and one sentence per step.
- * Columns step down a little at a time so the eye reads a sequence; "05 → back to 01"
- * closes the loop. Offsets only apply where the five columns sit side by side.
+ * No bullets, numbers or rules: a one-word verb in Satoshi Black and one sentence
+ * per step. Columns step down a little at a time so the eye reads the order on
+ * its own. Offsets only apply where the five columns sit side by side.
  */
 export async function Approach() {
   const t = await getTranslations("approach");
   const steps = t.raw("steps") as Step[];
-  const n = (i: number) => String(i + 1).padStart(2, "0");
 
   return (
     <section
@@ -40,16 +39,10 @@ export async function Approach() {
             <li
               key={step.title}
               style={{ "--step": i } as React.CSSProperties}
-              className="flex flex-col gap-3.5 border-t border-ink pt-3.5 lg:mt-[calc(var(--step)*clamp(0px,3vw,3.5rem))]"
+              className="flex flex-col gap-4 lg:mt-[calc(var(--step)*clamp(0px,3.4vw,4rem))]"
             >
-              <span className="text-index text-gray-600">
-                {n(i)} → {i === steps.length - 1 ? t("back") : n(i + 1)}
-              </span>
-              <span aria-hidden="true" className="font-display text-[clamp(4.5rem,9vw,10rem)] leading-[0.8] font-bold tracking-[-0.05em]">
-                {n(i)}
-              </span>
-              <h3 className="font-display text-[clamp(1.5rem,1.2rem+1vw,2.125rem)] leading-none font-bold tracking-[-0.02em]">{step.title}</h3>
-              <p className="max-w-[24ch] text-[0.875rem] leading-normal text-pretty text-[#3f3d39]">{step.text}</p>
+              <h3 className="font-display text-[clamp(2rem,1.2rem+3.4vw,3rem)] leading-[0.95] font-black tracking-[-0.04em] lg:text-[clamp(1.5rem,0.4rem+1.75vw,2.25rem)]">{step.title}</h3>
+              <p className="max-w-[24ch] text-ui leading-normal text-pretty text-[#3f3d39]">{step.text}</p>
             </li>
           ))}
         </ol>

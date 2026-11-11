@@ -11,10 +11,10 @@ import { LabFrame } from "./LabFrame";
  * 05 · Lab — dark editorial. "Projects are evidence, so they sit in daylight. The Lab
  * is possibility again, so the page goes back to night" (Homepage R02 · N12).
  *
- * Controlled broken grid (N13): the 12 columns stay visible, and each entry breaks
- * them once — E.01's numeral cuts its frame, E.02 drops and bleeds off the right
- * edge, E.03 is indented with its text beside it. Below ~720px everything stacks.
- * Each entry is a frame, not a box: hairline, crop marks, mono spec bar, big numeral.
+ * A broken composition: the first entry stands high on the left, the second drops
+ * and bleeds off the right edge, the third is indented with its text beside it.
+ * Below ~720px everything stacks. No numerals, codes, crop marks or grid lines:
+ * each entry is its own picture, a title and a line in serif saying where it is.
  *
  * The cat's perch on E.01 is reserved for the single CatAssistant (M5).
  */
@@ -25,15 +25,11 @@ export async function Lab() {
   const [e1, e2, e3] = lab;
   if (!e1 || !e2 || !e3) return null;
 
-  const numeral =
-    "pointer-events-none absolute z-20 font-display text-[clamp(5.5rem,11vw,12.5rem)] leading-[0.8] font-bold tracking-[-0.05em] text-paper";
   const entryText = (e: LabEntry, maxCh: string) => (
     <div className="flex flex-col gap-3.5">
-      <p className="flex flex-wrap items-center gap-x-3.5 gap-y-1.5 text-index text-gray-500 uppercase">
-        <span>{e.index}</span>
-        <span>{e.topic[locale]}</span>
-        {e.year && <span>{e.year}</span>}
-        <StatusMark status={e.status} label={ts(e.status)} className="font-sans text-label text-paper-300 normal-case tracking-normal" />
+      <p className="text-note text-[1.25rem] text-paper-300">
+        {e.topic[locale]}, <StatusMark status={e.status} label={ts(e.status).toLowerCase()} />
+        {e.year ? `, ${e.year}` : ""}
       </p>
       <h3 className="font-display text-[clamp(1.875rem,1.2rem+2.6vw,3.5rem)] leading-[0.96] font-bold tracking-[-0.03em] text-balance">
         {e.title[locale]}
@@ -61,68 +57,51 @@ export async function Lab() {
             <p className="font-display text-[clamp(1.25rem,1.1rem+0.7vw,1.75rem)] leading-[1.15] font-medium tracking-[-0.015em] text-balance">
               {t("intro")}
             </p>
-            <p className="text-index text-gray-500 uppercase">{t("meta", { count: lab.length })}</p>
+            <p className="text-note text-[1.125rem] text-gray-500">{t("meta", { count: lab.length })}</p>
           </div>
         </header>
 
         <ol className="relative flex flex-col gap-y-[clamp(4.5rem,8vw,8.75rem)] pt-[clamp(4.5rem,7vw,8rem)] min-[720px]:flex-row min-[720px]:flex-wrap min-[720px]:items-start">
-          {/* E.01 — numeral cuts the frame */}
-          <li className="flex w-full flex-col gap-7 pt-[clamp(4rem,9vw,9.5rem)] min-[720px]:w-[max(300px,41.66%)]">
+          {/* First entry: high on the left */}
+          <li className="flex w-full flex-col gap-7 min-[720px]:w-[max(300px,41.66%)]">
             <div className="relative">
-              <CropMarks />
-              <span aria-hidden="true" className={`${numeral} top-0 -left-[0.04em] -translate-y-[64%]`}>
-                01
-              </span>
               <LabFrame cube className="aspect-square bg-[#141414]">
                 <Media entry={e1} locale={locale} />
                 {!e1.media && <Cube />}
-                <span aria-hidden="true" className="absolute inset-x-[12%] bottom-[22%] h-px bg-[repeating-linear-gradient(90deg,#5e5c57_0_4px,transparent_4px_8px)]" />
-                <span aria-hidden="true" className="absolute bottom-[calc(22%+8px)] left-[12%] font-mono text-[10px] text-gray-500">
-                  {t("ground")}
-                </span>
-                <SpecBar left="" right={`${e1.index} / 3D · 1:1`} drop={t("drop")} />
+                {!e1.media && <Pending text={t("drop")} />}
               </LabFrame>
             </div>
             {entryText(e1, "max-w-[30ch]")}
           </li>
 
-          {/* E.02 — drops low and bleeds off the right edge */}
+          {/* Second entry: drops low and bleeds off the right edge */}
           <li className="flex w-full flex-col gap-7 min-[720px]:mt-[clamp(0px,calc((100vw-720px)*0.3),340px)] min-[720px]:-mr-(--page-margin) min-[720px]:ml-auto min-[720px]:w-[max(260px,33.33%)]">
             <div className="min-[720px]:pr-(--page-margin)">{entryText(e2, "max-w-[28ch]")}</div>
             <div className="relative min-[720px]:pr-(--page-margin)">
-              <CropMarks inset="min-[720px]:[--crop-right:calc(var(--page-margin)-9px)]" />
-              <span aria-hidden="true" className={`${numeral} right-[0.02em] bottom-0 translate-y-[46%] min-[720px]:right-[calc(var(--page-margin)+0.02em)]`}>
-                02
-              </span>
-              <LabFrame className="aspect-[3/4] bg-[repeating-linear-gradient(135deg,#181818_0_6px,#141414_6px_12px)]">
+              <LabFrame className="aspect-[3/4] bg-[#161616]">
                 <Media entry={e2} locale={locale} />
                 {!e2.media && (
                   <>
-                    <span aria-hidden="true" className="absolute inset-x-3.5 inset-y-11 bg-[linear-gradient(90deg,rgb(243_241_235/0.06)_1px,transparent_1px),linear-gradient(0deg,rgb(243_241_235/0.06)_1px,transparent_1px)] bg-size-[24px_24px]" />
-                    <span aria-hidden="true" className="absolute top-[58%] left-[30%] size-2.5 rounded-full border border-paper" />
-                    <span aria-hidden="true" className="absolute top-[58%] left-[calc(30%+16px)] font-mono text-[10px] text-gray-500">
-                      {t("hesitation")}
-                    </span>
+                    <Trace label={t("hesitation")} />
+                    <Pending text={t("drop")} />
                   </>
                 )}
-                <SpecBar left={`${e2.index} / POINTER`} right="3:4" drop={t("drop")} dropLeft />
               </LabFrame>
             </div>
           </li>
 
-          {/* E.03 — indented two columns, text beside */}
+          {/* Third entry: indented, text beside */}
           <li className="flex w-full flex-wrap items-end gap-x-[clamp(1.5rem,3vw,3.5rem)] gap-y-8 min-[720px]:ml-[clamp(0px,calc((100vw-720px)*0.18),240px)] min-[720px]:w-[max(320px,83.33%)]">
-            <div className="relative min-w-0 flex-[1_1_440px] pt-[clamp(3rem,5vw,5.5rem)]">
+            <div className="relative min-w-0 flex-[1_1_440px]">
               <div className="relative">
-                <CropMarks />
-                <span aria-hidden="true" className={`${numeral} top-0 -right-[0.04em] -translate-y-[64%]`}>
-                  03
-                </span>
                 <LabFrame className="aspect-video bg-[#141414]">
                   <Media entry={e3} locale={locale} />
-                  {!e3.media && <Score playhead={t("playhead")} />}
-                  {/* Spec on the left: the "03" numeral cuts the top-right corner. */}
-                  <SpecBar left={`${e3.index} / ${e3.topic.en.toUpperCase()} · 16:9`} right="" drop={t("drop")} />
+                  {!e3.media && (
+                    <>
+                      <Score playhead={t("playhead")} />
+                      <Pending text={t("drop")} />
+                    </>
+                  )}
                 </LabFrame>
               </div>
             </div>
@@ -148,28 +127,33 @@ function Media({ entry, locale }: { entry: LabEntry; locale: Locale }) {
   );
 }
 
-function SpecBar({ left, right, drop, dropLeft = false }: { left: string; right: string; drop: string; dropLeft?: boolean }) {
+/** The honest note on a frame without media, in the annotation voice. */
+function Pending({ text }: { text: string }) {
   return (
-    <span aria-hidden="true" className="pointer-events-none absolute inset-0 text-index">
-      <span className="absolute inset-x-3.5 top-3 flex justify-between gap-3 text-paper-300">
-        <span>{left}</span>
-        <span>{right}</span>
-      </span>
-      <span className={`absolute bottom-3 text-gray-500 ${dropLeft ? "left-3.5" : "right-3.5"}`}>{drop}</span>
+    <span aria-hidden="true" className="text-note pointer-events-none absolute bottom-4 left-5 text-[1rem] text-gray-500">
+      {text}
     </span>
   );
 }
 
-/** Crop marks outside the four corners. `inset` can move the right pair (E.02 bleeds). */
-function CropMarks({ inset = "" }: { inset?: string }) {
-  const mark = "pointer-events-none absolute size-3.5 border-gray-600";
-  const right = "right-[var(--crop-right,-9px)]";
+/**
+ * A pointer's path drawn as one hand-made stroke: it wanders, slows, loops once
+ * where it hesitated, then leaves. The hesitation is marked by a ring.
+ */
+function Trace({ label }: { label: string }) {
   return (
-    <span aria-hidden="true" className={`[--crop-right:-9px] ${inset}`}>
-      <span className={`${mark} -top-[9px] -left-[9px] border-t border-l`} />
-      <span className={`${mark} -top-[9px] ${right} border-t border-r`} />
-      <span className={`${mark} -bottom-[9px] -left-[9px] border-b border-l`} />
-      <span className={`${mark} -bottom-[9px] ${right} border-b border-r`} />
+    <span aria-hidden="true" className="absolute inset-0">
+      <svg viewBox="0 0 300 400" preserveAspectRatio="none" className="absolute inset-0 h-full w-full" fill="none">
+        <path
+          d="M18 72 C 70 60, 92 118, 128 150 S 170 214, 104 236 S 60 284, 98 230 S 150 196, 92 236 C 74 250, 92 268, 116 262 C 168 248, 210 300, 282 330"
+          stroke="rgb(243 241 235 / 0.55)"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          vectorEffect="non-scaling-stroke"
+        />
+      </svg>
+      <span className="absolute top-[58%] left-[31%] size-4 -translate-1/2 rounded-full border border-paper" />
+      <span className="text-note absolute top-[58%] left-[calc(31%+18px)] -translate-y-1/2 text-[1rem] text-paper-300">{label}</span>
     </span>
   );
 }
@@ -204,7 +188,7 @@ function Score({ playhead }: { playhead: string }) {
         <span key={i} className={`flex-1 ${i < 21 ? "bg-paper/70" : "bg-paper/20"}`} style={{ height: `${h}%` }} />
       ))}
       <span className="absolute inset-y-[-12%] left-[37%] w-px bg-signal" />
-      <span className="absolute -top-[22%] left-[calc(37%+8px)] font-mono text-[10px] whitespace-nowrap text-gray-500">{playhead}</span>
+      <span className="text-note absolute -top-[26%] left-[calc(37%+8px)] text-[1rem] whitespace-nowrap text-paper-300">{playhead}</span>
     </span>
   );
 }
@@ -216,7 +200,6 @@ function LabBackdrop() {
     <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
       <div className="absolute inset-0 opacity-[0.07] mix-blend-screen" style={{ backgroundImage: grain, backgroundSize: "240px 240px" }} />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_30%_40%,rgba(243,241,235,0.05),transparent_70%)]" />
-      <div className="lab-columns absolute inset-0" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_90%_85%_at_50%_45%,transparent_55%,rgba(0,0,0,0.5)_100%)]" />
     </div>
   );

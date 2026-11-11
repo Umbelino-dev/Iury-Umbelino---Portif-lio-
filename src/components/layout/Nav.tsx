@@ -124,12 +124,8 @@ export function Nav({ variant = "home" }: { variant?: "home" | "case" }) {
       href={`#${id}`}
       aria-current={active === id ? "location" : undefined}
       onClick={() => setOpen(false)}
-      className={`flex min-h-11 items-center gap-2 rounded-pill px-3.5 text-[0.8125rem] font-medium ${focusRing} ${extra}`}
+      className={`flex min-h-11 items-center rounded-pill px-3.5 text-[0.8125rem] font-medium transition-opacity duration-(--duration-base) hover:opacity-100 ${active === id ? "opacity-100" : "opacity-65"} ${focusRing} ${extra}`}
     >
-      <span
-        aria-hidden="true"
-        className={`size-1.5 bg-current transition-opacity duration-(--duration-base) ${active === id ? "opacity-100" : "opacity-0"}`}
-      />
       {t(key)}
     </a>
   );
@@ -187,9 +183,8 @@ export function Nav({ variant = "home" }: { variant?: "home" | "case" }) {
             aria-expanded={open}
             aria-controls={menuId}
             onClick={() => setOpen((v) => !v)}
-            className={`${variant === "case" ? "!hidden" : ""} flex min-h-11 items-center gap-2 rounded-pill border px-4 text-[0.8125rem] font-medium md:hidden ${glass} ${glassBlur} ${transition} ${focusRing}`}
+            className={`${variant === "case" ? "!hidden" : ""} flex min-h-11 items-center rounded-pill border px-4 text-[0.8125rem] font-medium md:hidden ${glass} ${glassBlur} ${transition} ${focusRing}`}
           >
-            <span aria-hidden="true" className="size-1.5 bg-current" />
             {t("menu")}
           </button>
         </div>

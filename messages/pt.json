@@ -29,7 +29,7 @@
   "hero": {
     "intro": "Construo produtos com IA. Cada um começa com uma pergunta.",
     "cta": "Conheça a pessoa",
-    "stack": "Assistente de TI · SQL/PL-SQL · IA & Produtos",
+    "stack": "Assistente de TI. SQL, PL/SQL, IA e produtos.",
     "tagline": {
       "lead": "A curiosidade constrói",
       "rest": "o que vem",
@@ -42,7 +42,6 @@
     "lead": "Quase tudo que faço começa com uma pergunta que não me larga. Aqui eu mostro o que encontrei.",
     "traits": [
       {
-        "index": "T.01",
         "word": [
           "Tecno-",
           "logia"
@@ -50,7 +49,6 @@
         "text": "IA é meu material principal hoje. Assistentes, agentes e ferramentas que deixam a informação útil de verdade."
       },
       {
-        "index": "T.02",
         "word": [
           "Cria-",
           "tividade"
@@ -58,7 +56,6 @@
         "text": "Ligo para como as coisas são sentidas, não só para como funcionam. A interface faz parte da solução."
       },
       {
-        "index": "T.03",
         "word": [
           "Curio-",
           "sidade"
@@ -83,11 +80,7 @@
       "years": "{n, plural, one {# ano} other {# anos}}",
       "months": "{n, plural, one {# mês} other {# meses}}",
       "and": "e",
-      "since": "desde {date}",
-      "area": "Área",
-      "duration": "Duração",
-      "today": "hoje",
-      "org": "Empresa"
+      "since": "desde {date}"
     }
   },
   "tags": {
@@ -104,30 +97,25 @@
   "projects": {
     "label": "Projetos",
     "note": "Seis projetos em fases diferentes. Cada um mostra só o que existe hoje. Alguns status ainda podem mudar.",
-    "image": "Imagem do projeto",
-    "placeholder": "placeholder",
     "visit": "abre o site em nova aba",
     "listLabel": "Projetos",
-    "show": "Mostrar {name}",
-    "prev": "Projeto anterior",
-    "next": "Próximo projeto",
-    "openCase": "Ler o estudo de caso"
+    "openCase": "Ler o estudo de caso",
+    "pending": "imagem em breve",
+    "indexLabel": "Escolha um projeto"
   },
   "lab": {
     "label": "Laboratório experimental",
     "title": "Lab",
     "intro": "Coisas pequenas, feitas para responder uma pergunta cada. Ainda não são produtos.",
-    "meta": "{count} entradas · em andamento · atualizado 11.2026",
-    "drop": "placeholder · mídia pendente",
-    "ground": "plano do chão · y 0",
-    "hesitation": "hesitação · 640ms",
-    "playhead": "cursor · “por que ele”"
+    "meta": "{count} entradas, em andamento. Atualizado em novembro de 2026.",
+    "drop": "mídia em breve",
+    "hesitation": "hesitação",
+    "playhead": "“por que ele”"
   },
   "approach": {
     "label": "Abordagem",
     "title": "Como uma pergunta vira uma coisa.",
     "note": "Cinco passos, nessa ordem. O último devolve ao primeiro.",
-    "back": "volta ao 01",
     "steps": [
       {
         "title": "Observar",
@@ -152,7 +140,7 @@
     ]
   },
   "caseStudy": {
-    "label": "(02) Projetos / Estudo de caso",
+    "label": "Estudo de caso",
     "status": "Status",
     "year": "Ano",
     "role": "Papel",
@@ -163,9 +151,7 @@
     "next": "Próximo projeto",
     "index": "Índice",
     "allProjects": "Todos os projetos",
-    "figure": "Fig.",
-    "placeholder": "placeholder",
-    "pending": "captura pendente",
+    "pending": "em breve",
     "newTab": "abre em nova aba",
     "links": "Links",
     "progress": "Progresso de leitura"

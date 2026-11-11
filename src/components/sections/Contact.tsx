@@ -30,7 +30,7 @@ export async function Contact() {
       <div className="mx-auto flex max-w-(--container-page) flex-col gap-[clamp(3.5rem,6vw,7rem)] px-(--page-margin)">
         <div className="flex flex-col gap-5">
           <SectionTitle id="contact-title">{t("label")}</SectionTitle>
-          <p className="text-label font-medium tracking-label text-gray-500 uppercase">{t("open")}</p>
+          <p className="text-note text-[1.375rem] text-paper-300">{t("open")}</p>
         </div>
 
         <p data-split className="font-display text-[clamp(2.25rem,1rem+5.4vw,6.5rem)] leading-[0.92] font-bold tracking-[-0.04em] text-balance">
@@ -58,7 +58,7 @@ export async function Contact() {
           </div>
 
           {published.length > 0 && (
-            <nav aria-label={t("links")} className="flex max-w-[560px] flex-[1_1_360px] flex-col border-b border-[#2a2a2a]">
+            <nav aria-label={t("links")} className="flex max-w-[560px] flex-[1_1_360px] flex-col gap-2">
               {published.map((c) => (
                 <a
                   key={c.kind}
@@ -66,11 +66,11 @@ export async function Contact() {
                   target={c.kind === "email" ? undefined : "_blank"}
                   rel={c.kind === "email" ? undefined : "noopener noreferrer"}
                   // Mobile: label above the value, so a full email address fits on one line.
-                  className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-4 gap-y-1 border-t border-[#2a2a2a] py-4.5 transition-colors duration-(--duration-fast) hover:text-signal md:grid-cols-[5.5rem_minmax(0,1fr)_auto]"
+                  className="group/contact grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-4 gap-y-0.5 py-2.5 transition-colors duration-(--duration-fast) hover:text-signal md:grid-cols-[6rem_minmax(0,1fr)_auto]"
                 >
-                  <span className="col-span-2 text-index text-gray-500 uppercase md:col-span-1">{t(`kinds.${c.kind}`)}</span>
+                  <span className="text-note col-span-2 text-gray-500 md:col-span-1">{t(`kinds.${c.kind}`)}</span>
                   <span className="font-display text-[clamp(1.125rem,1rem+0.5vw,1.5rem)] font-medium tracking-[-0.01em] [overflow-wrap:anywhere]">{c.label}</span>
-                  <span aria-hidden="true" className="text-lg">↗</span>
+                  <span aria-hidden="true" className="text-lg transition-transform duration-(--duration-fast) group-hover/contact:translate-x-0.5 group-hover/contact:-translate-y-0.5">↗</span>
                 </a>
               ))}
             </nav>

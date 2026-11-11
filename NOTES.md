@@ -87,6 +87,12 @@ Temporary progress log. Permanent rules live in `CLAUDE.md`.
   - Validated in Playwright: 1440 / 768 / iPhone 13, PT + EN, reduced motion; buttons, ticks, keys, drag, click-behind, touch swipe; timeline hover, click, Esc; no horizontal overflow, no console errors; case study regression clean. `npm run check` passes. Lighthouse not re-measured.
   - Open: drag throw tuned by eye (factor 110); real covers for P.02–P.06 will change the strip's rhythm (placeholders cycle 3:4 / 1:1 / 4:3).
 
+- [x] **R7: no markers** (2026-11-11, Iury: remove T.01/E.02 codes, rules, lines and squares; keep the fonts; real design, not generic devices):
+  - Removed across home + case study: index codes (T./E./P./S./A.), numbered labels and big chapter/step/lab numerals, every content rule and divider, the `Ruler`, square markers (StatusMark, nav dots), hero blueprint grid, Lab column grid, crop marks, spec bars, crosshair + coordinates, monospace.
+  - New voice: Instrument Serif italic (`text-note`) for dates, status, captions and field names. Copy without codes or middle-dot strings (hero stack line, Lab notes; "640ms" dropped: unsourced).
+  - Projects: typographic posters for missing covers; the names are the index. Timeline: staircase of type, roles grow toward today. Approach: verbs step down, no numerals. Lab: hand-drawn pointer stroke.
+  - Validated (Playwright 1440/1024/768/390/iPhone 13, PT+EN, reduced motion): stage navigation, timeline hover/click/Esc, no overflow, no console errors; `npm run check` and copy check pass.
+
 ## Answers from Iury (2026-11-09)
 - Giassi, DOX, SQL and PL/SQL may be named publicly → `experience.publishEmployer = true`.
 - Contacts stay hidden; Iury will send the real email and LinkedIn.

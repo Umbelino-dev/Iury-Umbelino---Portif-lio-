@@ -706,7 +706,7 @@ export function CatAssistant({
             {/* Zzz — only while asleep */}
             <span
               aria-hidden="true"
-              className={`pointer-events-none absolute -top-3 -left-1 font-mono text-[11px] text-gray-500 ${state === "sleep" ? "" : "hidden"}`}
+              className={`pointer-events-none text-note absolute -top-4 -left-1 text-[0.9375rem] text-gray-500 ${state === "sleep" ? "" : "hidden"}`}
             >
               <span className="cat-z">z</span>
               <span className="cat-z [animation-delay:600ms]">z</span>
@@ -746,12 +746,12 @@ export function CatAssistant({
           <span className="h-1 w-10 rounded-full bg-paper/30" />
         </div>
 
-        <header className="flex shrink-0 items-start justify-between gap-3 border-b border-paper/10 px-5 pb-3.5 md:pt-4.5">
+        <header className="flex shrink-0 items-start justify-between gap-3 px-5 pb-2 md:pt-4.5">
           <div className="flex min-w-0 flex-col gap-1">
             <h2 id={titleId} ref={title} tabIndex={-1} className="font-display text-title font-bold outline-none">
               {ui.title}
             </h2>
-            <p className="text-index text-gray-500 uppercase">{ui.subtitle}</p>
+            <p className="text-note text-[1rem] text-gray-500">{ui.subtitle}</p>
           </div>
           <button
             type="button"
@@ -766,12 +766,12 @@ export function CatAssistant({
         <div role="log" aria-label={ui.log} aria-live="polite" className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-5 py-4">
           {messages.map((m, i) => (
             <div key={i} className={`flex max-w-[92%] flex-col gap-1 ${m.from === "you" ? "self-end text-right" : ""}`}>
-              <span className="text-index text-gray-500 uppercase">{m.from === "cat" ? ui.cat : ui.you}</span>
+              <span className="text-note text-[0.9375rem] text-gray-500">{m.from === "cat" ? ui.cat : ui.you}</span>
               <p className={`text-[0.9375rem] leading-normal text-pretty ${m.from === "you" ? "text-paper-300" : ""}`}>{m.text}</p>
             </div>
           ))}
           {typing && (
-            <p className="text-index text-gray-500" aria-live="off">
+            <p className="text-note text-[0.9375rem] text-gray-500" aria-live="off">
               {ui.thinking}
             </p>
           )}
@@ -792,7 +792,7 @@ export function CatAssistant({
           ))}
         </div>
 
-        <form onSubmit={onSubmit} className="flex shrink-0 items-center gap-2 border-t border-paper/10 px-4 py-3">
+        <form onSubmit={onSubmit} className="flex shrink-0 items-center gap-2 px-4 py-3">
           <label className="sr-only" htmlFor={`${titleId}-input`}>
             {ui.placeholder}
           </label>

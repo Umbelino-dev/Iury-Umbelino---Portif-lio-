@@ -85,7 +85,9 @@
       "and": "e",
       "since": "desde {date}",
       "area": "Área",
-      "duration": "Duração"
+      "duration": "Duração",
+      "today": "hoje",
+      "org": "Empresa"
     }
   },
   "tags": {
@@ -105,7 +107,11 @@
     "image": "Imagem do projeto",
     "placeholder": "placeholder",
     "visit": "abre o site em nova aba",
-    "listLabel": "Projetos"
+    "listLabel": "Projetos",
+    "show": "Mostrar {name}",
+    "prev": "Projeto anterior",
+    "next": "Próximo projeto",
+    "openCase": "Ler o estudo de caso"
   },
   "lab": {
     "label": "Laboratório experimental",
@@ -301,6 +307,7 @@
   "cursor": {
     "project": "ver projeto",
     "visit": "visitar site",
-    "ask": "pergunte"
+    "ask": "pergunte",
+    "drag": "arraste"
   }
 }

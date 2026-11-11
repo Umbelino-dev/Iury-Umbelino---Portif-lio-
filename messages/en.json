@@ -85,7 +85,9 @@
       "and": "and",
       "since": "since {date}",
       "area": "Area",
-      "duration": "Time"
+      "duration": "Time",
+      "today": "today",
+      "org": "Company"
     }
   },
   "tags": {
@@ -105,7 +107,11 @@
     "image": "Project image",
     "placeholder": "placeholder",
     "visit": "opens the site in a new tab",
-    "listLabel": "Projects"
+    "listLabel": "Projects",
+    "show": "Show {name}",
+    "prev": "Previous project",
+    "next": "Next project",
+    "openCase": "Read the case study"
   },
   "lab": {
     "label": "Experimental lab",
@@ -296,6 +302,7 @@
   "cursor": {
     "project": "view project",
     "visit": "visit site",
-    "ask": "ask me"
+    "ask": "ask me",
+    "drag": "drag"
   }
 }

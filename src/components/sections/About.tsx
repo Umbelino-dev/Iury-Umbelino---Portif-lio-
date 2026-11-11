@@ -91,23 +91,37 @@ async function Experience({ locale }: { locale: Locale }) {
     return parts.join(` ${tl("and")} `);
   };
   // Oldest first: the path reads as a progression up to today.
-  const steps = [...experience.path].reverse().map((s) => ({
-    role: s.role[locale],
-    period: s.period,
-    duration: duration(s.period),
-    area: s.area[locale],
-    summary: s.summary[locale],
-    details: s.details.map((d) => d[locale]),
-    more: s.more[locale],
-    list: s.highlights ? experience.highlights.map((h) => h[locale]) : undefined,
-    current: s.period.trim().endsWith("–"),
-  }));
+  const steps = [...experience.path].reverse().map((s) => {
+    const [from, to] = s.period.split("–").map((p) => p.trim());
+    return {
+      role: s.role[locale],
+      org: experience.employer,
+      period: s.period,
+      from: month(from ?? ""),
+      to: to ? month(to) : null,
+      duration: duration(s.period),
+      area: s.area[locale],
+      summary: s.summary[locale],
+      details: s.details.map((d) => d[locale]),
+      more: s.more[locale],
+      list: s.highlights ? experience.highlights.map((h) => h[locale]) : undefined,
+      // The CV lists the daily tools for the current role only.
+      stack: s.highlights ? experience.stack.daily : undefined,
+      current: !to,
+    };
+  });
+  // The axis ends on the month of the build: the site is static, so "today" is the last deploy.
+  const today = new Date();
+  const now = today.getFullYear() * 12 + today.getMonth();
   const timelineLabels = {
     now: t("now"),
+    today: tl("today"),
     seeMore: tl("seeMore"),
     close: tl("close"),
     area: tl("area"),
     duration: tl("duration"),
+    org: tl("org"),
+    stack: t("stack"),
   };
 
   return (
@@ -154,7 +168,7 @@ async function Experience({ locale }: { locale: Locale }) {
                 {education.map((e) => (
                   <li key={e.school} className="flex flex-col">
                     <span className="text-[0.9375rem] font-medium">{e.course[locale]}</span>
-                    <span className="font-mono text-[11px] tracking-[0.04em] text-gray-600">
+                    <span className="text-index text-gray-600">
                       {e.school} · {t("expected", { year: e.expected })}
                     </span>
                   </li>
@@ -167,7 +181,7 @@ async function Experience({ locale }: { locale: Locale }) {
       {/* The career path, full width: part of the page, not a side list. */}
       <div className="col-span-full flex flex-col gap-8 pt-[clamp(1rem,3vw,3rem)]">
         <h4 className={listTitle}>{t("path")}</h4>
-        <Timeline steps={steps} labels={timelineLabels} />
+        <Timeline steps={steps} now={now} labels={timelineLabels} />
       </div>
     </section>
   );

@@ -47,7 +47,7 @@ export function LabFrame({ children, cube = false, className = "" }: { children:
       <span
         data-xy
         aria-hidden="true"
-        className="pointer-events-none absolute top-[calc(var(--my)+8px)] left-[calc(var(--mx)+10px)] font-mono text-[11px] tracking-[0.04em] whitespace-nowrap text-paper opacity-(--h) transition-opacity duration-200"
+        className="pointer-events-none absolute top-[calc(var(--my)+8px)] left-[calc(var(--mx)+10px)] text-index whitespace-nowrap text-paper opacity-(--h) transition-opacity duration-200"
       >
         x 0.500 · y 0.500
       </span>

@@ -29,7 +29,7 @@ export async function Lab() {
     "pointer-events-none absolute z-20 font-display text-[clamp(5.5rem,11vw,12.5rem)] leading-[0.8] font-bold tracking-[-0.05em] text-paper";
   const entryText = (e: LabEntry, maxCh: string) => (
     <div className="flex flex-col gap-3.5">
-      <p className="flex flex-wrap items-center gap-x-3.5 gap-y-1.5 font-mono text-[11px] tracking-[0.04em] text-gray-500 uppercase">
+      <p className="flex flex-wrap items-center gap-x-3.5 gap-y-1.5 text-index text-gray-500 uppercase">
         <span>{e.index}</span>
         <span>{e.topic[locale]}</span>
         {e.year && <span>{e.year}</span>}
@@ -61,7 +61,7 @@ export async function Lab() {
             <p className="font-display text-[clamp(1.25rem,1.1rem+0.7vw,1.75rem)] leading-[1.15] font-medium tracking-[-0.015em] text-balance">
               {t("intro")}
             </p>
-            <p className="font-mono text-[11px] tracking-[0.04em] text-gray-500 uppercase">{t("meta", { count: lab.length })}</p>
+            <p className="text-index text-gray-500 uppercase">{t("meta", { count: lab.length })}</p>
           </div>
         </header>
 
@@ -150,7 +150,7 @@ function Media({ entry, locale }: { entry: LabEntry; locale: Locale }) {
 
 function SpecBar({ left, right, drop, dropLeft = false }: { left: string; right: string; drop: string; dropLeft?: boolean }) {
   return (
-    <span aria-hidden="true" className="pointer-events-none absolute inset-0 font-mono text-[11px] tracking-[0.04em]">
+    <span aria-hidden="true" className="pointer-events-none absolute inset-0 text-index">
       <span className="absolute inset-x-3.5 top-3 flex justify-between gap-3 text-paper-300">
         <span>{left}</span>
         <span>{right}</span>

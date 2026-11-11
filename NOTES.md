@@ -80,6 +80,13 @@ Temporary progress log. Permanent rules live in `CLAUDE.md`.
   - A11y fixes: no half-faded captions (contrast); step buttons keep their visible text as their name.
   - Lighthouse: /pt mobile 95/91/96 (TBT 240–370 ms), desktop 99; /en 96 / 99; case 99. A11y/BP/SEO 100, CLS 0.
 
+- [x] **R6: project stage, career axis, graphic system** (2026-11-11):
+  - Projects: the editorial list + floating preview became `ProjectStage` (horizontal strip, frames of different proportions, front project named at display size, drag / arrows / ruler ticks / keys, native scroll-snap underneath). `ProjectList.tsx` removed. The Envato reference could not be opened again (host blocked in this environment), so the composition follows the brief's words, not the reference.
+  - Timeline: drawn to scale on a month ruler (the 4-month gap and the quick succession of roles are visible), texts climbing in columns with elbow connectors, hover lights a role's whole path, panel under the axis with org / area / duration / CV highlights / daily stack (current role only, from the CV).
+  - System: `Ruler` primitive, `text-index` and `bleed-inset` utilities; 22 hand-written mono label classes replaced by `text-index`. Rules in CLAUDE.md §Graphic system.
+  - Validated in Playwright: 1440 / 768 / iPhone 13, PT + EN, reduced motion; buttons, ticks, keys, drag, click-behind, touch swipe; timeline hover, click, Esc; no horizontal overflow, no console errors; case study regression clean. `npm run check` passes. Lighthouse not re-measured.
+  - Open: drag throw tuned by eye (factor 110); real covers for P.02–P.06 will change the strip's rhythm (placeholders cycle 3:4 / 1:1 / 4:3).
+
 ## Answers from Iury (2026-11-09)
 - Giassi, DOX, SQL and PL/SQL may be named publicly → `experience.publishEmployer = true`.
 - Contacts stay hidden; Iury will send the real email and LinkedIn.

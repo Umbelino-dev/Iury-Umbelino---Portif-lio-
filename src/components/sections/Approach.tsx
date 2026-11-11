@@ -42,7 +42,7 @@ export async function Approach() {
               style={{ "--step": i } as React.CSSProperties}
               className="flex flex-col gap-3.5 border-t border-ink pt-3.5 lg:mt-[calc(var(--step)*clamp(0px,3vw,3.5rem))]"
             >
-              <span className="font-mono text-[11px] tracking-[0.04em] text-gray-600">
+              <span className="text-index text-gray-600">
                 {n(i)} → {i === steps.length - 1 ? t("back") : n(i + 1)}
               </span>
               <span aria-hidden="true" className="font-display text-[clamp(4.5rem,9vw,10rem)] leading-[0.8] font-bold tracking-[-0.05em]">

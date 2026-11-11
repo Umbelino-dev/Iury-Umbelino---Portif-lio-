@@ -26,7 +26,7 @@ export function NextProject({
     >
       <span className="flex flex-wrap justify-between gap-4 text-label font-medium tracking-label text-gray-500 uppercase">
         <span>{eyebrow}</span>
-        {index && <span className="font-mono text-[11px] tracking-[0.04em] normal-case">{index}</span>}
+        {index && <span className="text-index normal-case">{index}</span>}
       </span>
       <span
         lang={titleLang}

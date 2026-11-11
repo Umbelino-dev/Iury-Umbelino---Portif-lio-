@@ -56,7 +56,7 @@ export function MediaFrame({
           className="absolute inset-0 h-full w-full object-cover"
         />
       ) : (
-        <div aria-hidden="true" className={`absolute inset-0 font-mono text-[11px] tracking-[0.04em] ${t.meta}`}>
+        <div aria-hidden="true" className={`absolute inset-0 text-index ${t.meta}`}>
           <div className="absolute inset-x-4 top-3.5 flex justify-between gap-3 uppercase md:inset-x-5 md:top-4">
             <span>{spec.left}</span>
             <span className="hidden normal-case sm:inline">{spec.right}</span>

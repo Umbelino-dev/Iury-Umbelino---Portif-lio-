@@ -147,6 +147,26 @@
   padding-inline: 0.08em;
 }
 
+/*
+ * Index voice: the small mono line that names or measures something
+ * (P.01, 04.2024, E.02). One size, one tracking, everywhere.
+ */
+@utility text-index {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+}
+
+/*
+ * Full-bleed strips (the project stage) start on the page grid's left edge and
+ * run to the screen's edge: the same inset the grid uses, as padding.
+ */
+@utility bleed-inset {
+  --inset: max(var(--page-margin), calc((100% - var(--container-page)) / 2 + var(--page-margin)));
+  padding-inline-start: var(--inset);
+  scroll-padding-inline-start: var(--inset);
+}
+
 @utility surface-dark {
   background: var(--color-ink);
   color: var(--color-paper);
@@ -250,4 +270,30 @@ html.has-cursor * {
 }
 html.has-cursor :is(input, textarea, select, [contenteditable="true"]) {
   cursor: auto;
+}
+
+/*
+ * Project stage: the six project texts are all in the HTML. With JS they share
+ * one cell and only the project in front shows (its name rises a little as it
+ * arrives); without JS they simply stack.
+ */
+.js .stage-details {
+  display: grid;
+  align-items: end;
+}
+.js .stage-details > * {
+  grid-area: 1 / 1;
+  transition:
+    opacity var(--duration-base) var(--ease-out-soft),
+    visibility var(--duration-base);
+}
+.js .stage-details > [data-active="false"] {
+  opacity: 0;
+  visibility: hidden;
+}
+.js .stage-details [data-rise] {
+  transition: translate var(--duration-slow) var(--ease-out-soft);
+}
+.js .stage-details > [data-active="false"] [data-rise] {
+  translate: 0 0.16em;
 }

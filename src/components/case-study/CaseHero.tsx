@@ -22,14 +22,14 @@ export async function CaseHero({
   const t = await getTranslations("caseStudy");
   const ts = await getTranslations("status");
   const tt = await getTranslations("tags");
-  const key = "font-mono text-[11px] tracking-[0.04em] text-gray-600 uppercase";
+  const key = "text-index text-gray-600 uppercase";
   const value = "text-[0.9375rem] font-medium";
 
   return (
     <header className="flex flex-col gap-[clamp(2rem,4vw,4rem)] px-(--page-margin) pt-[clamp(7rem,12vw,12.5rem)] pb-[clamp(2.5rem,4vw,4rem)] max-md:pr-12">
       <div className="flex flex-wrap justify-between gap-4 text-label font-medium tracking-label text-gray-600 uppercase">
         <span>{t("label")}</span>
-        <span className="font-mono text-[11px] tracking-[0.04em] normal-case">
+        <span className="text-index normal-case">
           {project.index} / {String(total).padStart(2, "0")}
         </span>
       </div>

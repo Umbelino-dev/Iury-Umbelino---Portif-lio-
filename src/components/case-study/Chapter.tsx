@@ -38,7 +38,7 @@ export function Chapter({
     <section id={chapter.id} aria-labelledby={headingId} className="flex flex-col gap-[clamp(3rem,5vw,5.5rem)]">
       <div className="grid grid-cols-1 items-start gap-x-[clamp(1.5rem,4vw,5rem)] gap-y-6 px-(--page-margin) max-md:pr-12 md:grid-cols-3">
         <div className="flex flex-col gap-3.5 md:sticky md:top-24">
-          <p className="font-mono text-[11px] tracking-[0.04em] text-gray-600 uppercase">{label}</p>
+          <p className="text-index text-gray-600 uppercase">{label}</p>
           <span aria-hidden="true" className="hidden font-display text-[clamp(6rem,12vw,12.5rem)] leading-[0.8] font-bold tracking-[-0.05em] md:block">
             {n}
           </span>
@@ -81,7 +81,7 @@ export function Chapter({
                   key={i}
                   className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-4 border-t border-ink py-[clamp(1.25rem,2.4vw,2.25rem)] md:grid-cols-[3.5rem_minmax(0,1fr)]"
                 >
-                  <span className="pt-[0.7em] font-mono text-[11px] tracking-[0.04em] text-gray-600">
+                  <span className="pt-[0.7em] text-index text-gray-600">
                     {chapter.id === "audit" ? "A" : "S"}.{String(i + 1).padStart(2, "0")}
                   </span>
                   <div className="flex flex-col gap-3">

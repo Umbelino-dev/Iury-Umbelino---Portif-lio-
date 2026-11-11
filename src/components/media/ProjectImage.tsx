@@ -11,7 +11,7 @@ const TONES = [
 ] as const;
 
 /**
- * A project's 4:3 image: the real cover when `project.cover` exists, otherwise the
+ * A project's image: the real cover when `project.cover` exists, otherwise the
  * editorial placeholder (index, numeral, status). Fills its positioned container.
  */
 export function ProjectImage({
@@ -23,7 +23,7 @@ export function ProjectImage({
   project: Project;
   position: number;
   locale: Locale;
-  labels: { image: string; placeholder: string; status: string };
+  labels: { image: string; placeholder: string; status: string; frame?: string };
 }) {
   const tone = TONES[position % TONES.length]!;
   const numeral = project.index.replace("P.", "");
@@ -37,7 +37,7 @@ export function ProjectImage({
           alt={project.cover.alt[locale]}
           width={project.cover.width}
           height={project.cover.height}
-          sizes="(min-width: 768px) 380px, 100vw"
+          sizes="(min-width: 768px) 50vw, 80vw"
           className={`absolute inset-0 h-full w-full ${contain ? "object-contain" : "object-cover"}`}
         />
       </span>
@@ -46,18 +46,20 @@ export function ProjectImage({
 
   return (
     <span aria-hidden="true" className={`absolute inset-0 block overflow-hidden ${tone.bg}`}>
-      <span className={`absolute inset-x-3.5 top-3 flex justify-between gap-3 font-mono text-[11px] tracking-[0.04em] uppercase ${tone.meta}`}>
+      {/* Index left, frame spec right: one line each, so small frames never wrap. */}
+      <span className={`absolute inset-x-3.5 top-3 flex justify-between gap-3 text-index whitespace-nowrap ${tone.meta}`}>
+        <span>{project.index}</span>
         <span>
-          {labels.image} · {project.index}
+          {labels.frame ? `${labels.frame} · ` : ""}
+          {labels.placeholder}
         </span>
-        <span className="hidden normal-case sm:inline [@media(hover:hover)]:inline">4:3 · {labels.placeholder}</span>
       </span>
       <span
         className={`absolute bottom-0.5 left-3 font-display text-[clamp(4rem,7vw,7rem)] leading-[0.8] font-bold tracking-[-0.05em] ${tone.fg}`}
       >
         {numeral}
       </span>
-      <span className={`absolute right-3.5 bottom-3 font-mono text-[11px] tracking-[0.04em] lowercase ${tone.meta}`}>{labels.status}</span>
+      <span className={`absolute right-3.5 bottom-3 text-index lowercase ${tone.meta}`}>{labels.status}</span>
     </span>
   );
 }

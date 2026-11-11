@@ -751,7 +751,7 @@ export function CatAssistant({
             <h2 id={titleId} ref={title} tabIndex={-1} className="font-display text-title font-bold outline-none">
               {ui.title}
             </h2>
-            <p className="font-mono text-[11px] tracking-[0.04em] text-gray-500 uppercase">{ui.subtitle}</p>
+            <p className="text-index text-gray-500 uppercase">{ui.subtitle}</p>
           </div>
           <button
             type="button"
@@ -766,12 +766,12 @@ export function CatAssistant({
         <div role="log" aria-label={ui.log} aria-live="polite" className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-5 py-4">
           {messages.map((m, i) => (
             <div key={i} className={`flex max-w-[92%] flex-col gap-1 ${m.from === "you" ? "self-end text-right" : ""}`}>
-              <span className="font-mono text-[11px] tracking-[0.04em] text-gray-500 uppercase">{m.from === "cat" ? ui.cat : ui.you}</span>
+              <span className="text-index text-gray-500 uppercase">{m.from === "cat" ? ui.cat : ui.you}</span>
               <p className={`text-[0.9375rem] leading-normal text-pretty ${m.from === "you" ? "text-paper-300" : ""}`}>{m.text}</p>
             </div>
           ))}
           {typing && (
-            <p className="font-mono text-[11px] tracking-[0.04em] text-gray-500" aria-live="off">
+            <p className="text-index text-gray-500" aria-live="off">
               {ui.thinking}
             </p>
           )}

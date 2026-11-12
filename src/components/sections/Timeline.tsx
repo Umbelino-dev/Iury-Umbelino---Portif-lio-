@@ -149,7 +149,7 @@ export function Timeline({ steps, labels }: { steps: TimelineStep[]; labels: Tim
               progress = proxy.p;
               paint();
             },
-            scrollTrigger: { trigger: box, start: axis === "x" ? "top 72%" : "top 80%", end: axis === "x" ? "bottom 45%" : "bottom 55%", scrub: 0.8 },
+            scrollTrigger: { trigger: box, start: "top 85%", end: axis === "x" ? "bottom 92%" : "bottom 118%", scrub: 0.6 },
           });
           st = tween.scrollTrigger;
         }

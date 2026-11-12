@@ -107,6 +107,8 @@ Temporary progress log. Permanent rules live in `CLAUDE.md`.
 
 - [x] **R11** (2026-11-12): deck photos from Iury's LinkedIn (Startup Weekend team, Startup Weekend solo, CRIO Conecta selfie) + the portrait; summaries and the posts' text (verbatim from Iury's screenshots, EN translated) in `gallery.ts`. Open: the three lnkd.in links (dDd-BCfN, dqdj2qYm, dQYGyAR3) could not be resolved from the cloud session (LinkedIn is blocked), so which link is which post is unknown; `linkedin.url`/`embed` stay empty until Iury says. Third parties appear in two photos (posted publicly by Iury).
 
+- [x] **R12** (2026-11-12): photo panel with a fixed, centred photo; post copies replaced by "O que agregou" (from Iury's posts, to review; the academic side is not in the posts, waiting for Iury); LinkedIn links mapped (CRIO last day dDd-BCfN, second day dQYGyAR3, Startup Weekend dqdj2qYm; portrait → profile). Dot cursor kept inside dialogs (top-layer popovers). Career line finishes while in view.
+
 ## Answers from Iury (2026-11-09)
 - Giassi, DOX, SQL and PL/SQL may be named publicly → `experience.publishEmployer = true`.
 - Contacts stay hidden; Iury will send the real email and LinkedIn.

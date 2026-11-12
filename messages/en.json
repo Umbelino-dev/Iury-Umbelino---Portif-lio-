@@ -58,9 +58,11 @@
     "galleryMore": "Learn more",
     "galleryHint": "Click to learn more",
     "galleryPending": "The story behind this photo is coming soon.",
-    "galleryLinkedIn": "View on LinkedIn",
+    "galleryLinkedIn": "View post on LinkedIn",
     "galleryPost": "LinkedIn post",
-    "galleryClose": "Close"
+    "galleryClose": "Close",
+    "galleryTakeaways": "What it added",
+    "galleryProfile": "View profile on LinkedIn"
   },
   "experience": {
     "title": "Where curiosity becomes routine.",

@@ -27,6 +27,7 @@ export function Cursor() {
   const root = useRef<HTMLDivElement>(null);
   const dot = useRef<HTMLDivElement>(null);
   const label = useRef<HTMLSpanElement>(null);
+  const layer = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const el = root.current;
@@ -120,15 +121,39 @@ export function Cursor() {
     };
   }, []);
 
+  // Top layer: a modal <dialog> (the photo panel) is drawn above every z-index, so
+  // the cursor's two layers are manual popovers, in the top layer too, and are
+  // re-raised whenever a dialog opens. The dot then stays the cursor everywhere.
+  useEffect(() => {
+    const layers = [root.current, layer.current].filter((n): n is HTMLDivElement => Boolean(n));
+    if (!layers.length || typeof layers[0]?.showPopover !== "function") return;
+    const raise = () =>
+      layers.forEach((n) => {
+        if (n.matches(":popover-open")) n.hidePopover();
+        n.showPopover();
+      });
+    raise();
+    const mo = new MutationObserver((records) => {
+      if (records.some((r) => r.target instanceof HTMLDialogElement && r.target.open)) raise();
+    });
+    mo.observe(document.body, { subtree: true, attributes: true, attributeFilter: ["open"] });
+    return () => {
+      mo.disconnect();
+      layers.forEach((n) => n.matches(":popover-open") && n.hidePopover());
+    };
+  }, []);
+
   // Two layers: the blended one must itself be the fixed, stacked element, or the
   // blend would only see its own (transparent) group instead of the page.
+  // The popover reset (inset, size, margin, border, background) undoes the UA styles.
+  const popoverReset = "fixed inset-0 m-0 h-dvh max-h-none w-screen max-w-none overflow-visible border-0 bg-transparent p-0";
   return (
     <>
-      <div ref={root} data-cursor-root aria-hidden="true" className="pointer-events-none invisible fixed inset-0 z-[90] opacity-0 mix-blend-difference">
+      <div ref={root} popover="manual" data-cursor-root aria-hidden="true" className={`pointer-events-none invisible z-[90] opacity-0 mix-blend-difference ${popoverReset}`}>
         <div ref={dot} data-cursor-dot className="absolute -top-1 -left-1 size-2 rounded-full bg-paper" />
       </div>
       {/* Not blended: a paper pill with ink text stays legible on any surface. It sits beside the dot, never under it. */}
-      <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-[91]">
+      <div ref={layer} popover="manual" aria-hidden="true" className={`pointer-events-none z-[91] ${popoverReset}`}>
         <span
           ref={label}
           className="invisible absolute top-0 left-0 translate-x-4 translate-y-3 rounded-pill border border-ink/14 bg-paper px-3 py-1.5 text-[11px] font-medium tracking-[0.08em] whitespace-nowrap text-ink uppercase opacity-0"

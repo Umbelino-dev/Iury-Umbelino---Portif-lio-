@@ -58,9 +58,11 @@
     "galleryMore": "Saber mais",
     "galleryHint": "Clique para saber mais",
     "galleryPending": "A história desta foto entra em breve.",
-    "galleryLinkedIn": "Ver no LinkedIn",
+    "galleryLinkedIn": "Ver post no LinkedIn",
     "galleryPost": "Post no LinkedIn",
-    "galleryClose": "Fechar"
+    "galleryClose": "Fechar",
+    "galleryTakeaways": "O que agregou",
+    "galleryProfile": "Ver perfil no LinkedIn"
   },
   "experience": {
     "title": "Onde a curiosidade vira rotina.",

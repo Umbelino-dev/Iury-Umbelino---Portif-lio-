@@ -1,5 +1,5 @@
 import { getLocale, getTranslations } from "next-intl/server";
-import { education, experience } from "@/content/profile";
+import { contacts, education, experience } from "@/content/profile";
 import { gallery } from "@/content/gallery";
 import type { Locale } from "@/i18n/routing";
 import { SectionTitle } from "@/components/layout/SectionTitle";
@@ -137,8 +137,12 @@ export async function About() {
             caption: p.caption[locale],
             summary: p.summary?.[locale],
             story: p.story?.[locale],
-            linkedin: p.linkedin,
-            post: p.post?.[locale],
+            linkedin: p.linkedin && {
+              url: p.linkedin.url,
+              embed: p.linkedin.embed,
+              also: p.linkedin.also && { label: p.linkedin.also.label[locale], url: p.linkedin.also.url },
+            },
+            takeaways: p.takeaways?.[locale],
             focus: p.focus,
           }))}
           labels={{
@@ -149,7 +153,9 @@ export async function About() {
             pending: ta("galleryPending"),
             linkedin: ta("galleryLinkedIn"),
             post: ta("galleryPost"),
-            author: "Iury Umbelino",
+            takeaways: ta("galleryTakeaways"),
+            profile: ta("galleryProfile"),
+            profileUrl: contacts.find((c) => c.kind === "linkedin")?.href ?? "https://www.linkedin.com/in/iuryumbelino/",
             close: ta("galleryClose"),
           }}
         />

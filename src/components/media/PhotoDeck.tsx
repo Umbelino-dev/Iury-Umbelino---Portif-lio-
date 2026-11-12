@@ -14,9 +14,9 @@ export interface DeckPhoto {
   summary?: string;
   /** Shown when the card is opened. */
   story?: string;
-  linkedin?: { url: string; embed?: string };
-  /** The LinkedIn post's text, one string per paragraph. */
-  post?: string[];
+  linkedin?: { url: string; embed?: string; also?: { label: string; url: string } };
+  /** What the moment added (short points). */
+  takeaways?: string[];
   /** CSS object-position for the crop. */
   focus?: string;
 }
@@ -28,8 +28,10 @@ export interface DeckLabels {
   hint: string; // "Clique para saber mais"
   pending: string; // "A história desta foto entra em breve."
   linkedin: string; // "Ver no LinkedIn"
-  post: string; // "Post no LinkedIn"
-  author: string; // "Iury Umbelino"
+  post: string; // "Post no LinkedIn" (iframe title)
+  takeaways: string; // "O que agregou"
+  profile: string; // "Ver perfil no LinkedIn"
+  profileUrl: string; // the LinkedIn profile, when a photo has no post
   close: string;
 }
 
@@ -60,8 +62,9 @@ function pose(o: number, n: number) {
  * Choosing a card: on hover a card lifts a little out of the deck (its inner
  * layer, so it never fights the deck's own transforms) and a small box rises
  * from the pointer with the photo's name, a one-line summary and "click to learn
- * more". A click (or Enter) opens the card: the photo, its story, the LinkedIn
- * post embedded, and a link to it. The panel is a native <dialog> (focus trap,
+ * more". A click (or Enter) opens the card: the photo held still on the left, and
+ * on the right its story, what it added, and always a link to LinkedIn (the post,
+ * or the profile when there is none). The panel is a native <dialog> (focus trap,
  * Esc, backdrop click closes, focus returns to the card).
  *
  * Each card: rounded portrait, a rim of light, and a frosted base made from a
@@ -395,14 +398,19 @@ export function PhotoDeck({ photos, labels }: { photos: DeckPhoto[]; labels: Dec
           setOpened(null);
         }}
         onClick={(e) => e.target === e.currentTarget && close()}
-        className="m-auto max-h-[min(92dvh,56rem)] w-[min(64rem,calc(100vw-2rem))] overflow-y-auto rounded-[1.75rem] bg-paper p-0 text-ink shadow-[0_40px_90px_-30px_rgba(16,16,16,0.6)] backdrop:bg-ink/55 backdrop:backdrop-blur-sm"
+        className="m-auto max-h-[min(92dvh,46rem)] w-[min(64rem,calc(100vw-2rem))] overflow-y-auto rounded-[1.75rem] bg-paper p-0 text-ink shadow-[0_40px_90px_-30px_rgba(16,16,16,0.6)] backdrop:bg-ink/55 backdrop:backdrop-blur-sm md:overflow-hidden"
       >
         {story && (
-          <div className="grid gap-[clamp(1.5rem,3vw,2.5rem)] p-[clamp(1.25rem,3vw,2.5rem)] md:grid-cols-[minmax(0,0.85fr)_minmax(0,1fr)]">
-            <div className="relative aspect-[3/4] overflow-hidden rounded-[1.25rem] bg-ink-800 md:sticky md:top-0 md:self-start">
-              <Image src={story.src} alt={story.alt} width={story.width} height={story.height} sizes="(min-width: 768px) 30rem, 90vw" className="h-full w-full object-cover" style={{ objectPosition: story.focus ?? "50% 18%" }} />
+          /* Desktop: two fixed columns, the photo held still and centred on the left,
+             only the text on the right scrolls. Small screens: one column, the whole
+             panel scrolls. */
+          <div className="grid gap-[clamp(1.5rem,3vw,2.5rem)] p-[clamp(1.25rem,3vw,2.5rem)] md:h-[min(calc(92dvh-0px),46rem)] md:grid-cols-[minmax(0,0.85fr)_minmax(0,1fr)] md:grid-rows-[minmax(0,1fr)]">
+            <div className="flex items-center justify-center md:min-h-0">
+              <div className="relative aspect-[3/4] w-full overflow-hidden rounded-[1.25rem] bg-ink-800 md:max-h-full">
+                <Image src={story.src} alt={story.alt} width={story.width} height={story.height} sizes="(min-width: 768px) 30rem, 90vw" className="h-full w-full object-cover" style={{ objectPosition: story.focus ?? "50% 18%" }} />
+              </div>
             </div>
-            <div data-panel-in className="flex min-w-0 flex-col gap-5">
+            <div data-panel-in className="flex min-w-0 flex-col gap-5 md:min-h-0 md:overflow-y-auto md:pr-2 md:[scrollbar-width:thin]">
               <div className="flex items-start justify-between gap-4">
                 <h3 id="deck-story-title" className="font-display text-headline-m leading-[1.02] font-bold tracking-[-0.02em] text-balance">
                   {story.caption}
@@ -416,37 +424,45 @@ export function PhotoDeck({ photos, labels }: { photos: DeckPhoto[]; labels: Dec
                 </button>
               </div>
               {story.summary && <p className="text-lead leading-snug text-pretty">{story.summary}</p>}
-              {(story.story || !story.post) && <p className="max-w-[60ch] text-body text-pretty text-[#3f3d39]">{story.story ?? labels.pending}</p>}
-              {story.post && (
-                <article aria-label={labels.post} className="flex flex-col gap-3 rounded-[1.25rem] bg-paper-0 p-[clamp(1.125rem,2vw,1.5rem)]">
-                  <header className="flex items-baseline justify-between gap-3">
-                    <span className="font-display text-[1rem] font-bold">{labels.author}</span>
-                    <span className="text-note text-[0.875rem] text-gray-600">LinkedIn</span>
-                  </header>
-                  {story.post.map((para, k) => (
-                    <p key={k} className="text-ui leading-relaxed text-pretty text-[#2b2a27]">
-                      {para}
-                    </p>
-                  ))}
-                </article>
+              {(story.story || !story.takeaways) && <p className="max-w-[60ch] text-body text-pretty text-[#3f3d39]">{story.story ?? labels.pending}</p>}
+              {story.takeaways && (
+                <div className="flex flex-col gap-3">
+                  <h4 className="font-display text-title font-bold tracking-[-0.01em]">{labels.takeaways}</h4>
+                  <ul className="flex flex-col gap-3">
+                    {story.takeaways.map((item, k) => (
+                      <li key={k} className="max-w-[56ch] text-body leading-relaxed text-pretty">
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               )}
               {story.linkedin?.embed && (
                 <iframe
                   src={story.linkedin.embed}
                   title={labels.post}
                   loading="lazy"
-                  className="h-[min(34rem,60dvh)] w-full rounded-[1rem] border-0 bg-paper-0"
+                  className="h-[min(34rem,60dvh)] w-full shrink-0 rounded-[1rem] border-0 bg-paper-0"
                   allowFullScreen
                 />
               )}
-              {story.linkedin?.url && (
+              {/* Always a way to LinkedIn: the post, or the profile when there is none. */}
+              <a
+                href={story.linkedin?.url ?? labels.profileUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-1 flex min-h-12 shrink-0 items-center gap-2.5 self-start bg-ink px-5 py-3 font-display text-[1rem] font-bold text-paper transition-colors duration-(--duration-fast) hover:bg-[#2a2a2a]"
+              >
+                {story.linkedin?.url ? labels.linkedin : labels.profile} <span aria-hidden="true">↗</span>
+              </a>
+              {story.linkedin?.also && (
                 <a
-                  href={story.linkedin.url}
+                  href={story.linkedin.also.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex min-h-12 items-center gap-2.5 self-start bg-ink px-5 py-3 font-display text-[1rem] font-bold text-paper transition-colors duration-(--duration-fast) hover:bg-[#2a2a2a]"
+                  className="-mt-2 flex min-h-11 shrink-0 items-center gap-2 self-start font-display text-[1rem] font-bold underline decoration-1 underline-offset-[0.3em] transition-colors duration-(--duration-fast) hover:text-gray-600"
                 >
-                  {labels.linkedin} <span aria-hidden="true">↗</span>
+                  {story.linkedin.also.label} <span aria-hidden="true">↗</span>
                 </a>
               )}
             </div>

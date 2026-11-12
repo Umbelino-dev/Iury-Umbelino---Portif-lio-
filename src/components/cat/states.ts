@@ -28,13 +28,18 @@ export type CatEvent =
   | { type: "HERO_LEFT" } // hero ≥60% out of view
   | { type: "HERO_ENTERED" } // hero back in view → reverse jump
   | { type: "LANDED" } // jump timeline complete
-  | { type: "IDLE" } // 4s without scroll / input
+  | { type: "IDLE" } // IDLE_MS without scroll / input
   | { type: "ACTIVITY" } // scroll resumed
   | { type: "WOKE" } // wake-up timeline complete
   | { type: "OPEN" } // click / tap the cat (any of its places)
   | { type: "CLOSE" }; // ×, Escape, scrim, drag down
 
-export const IDLE_MS = 4000;
+/** A visitor this quiet makes the cat sleepy: it yawns (a director behaviour, see CatStage). */
+export const DROWSY_MS = 18_000;
+/** No scroll, pointer, key or touch for this long: it goes to sleep. */
+export const IDLE_MS = 28_000;
+/** Asleep this long without being disturbed: the sleep gets deeper, and waking takes longer. */
+export const DEEP_MS = 40_000;
 /** The hero counts as "left" once this much of it is out of view (jump trigger). */
 export const HERO_LEFT_AT = 0.5;
 

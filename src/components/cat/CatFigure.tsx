@@ -11,7 +11,9 @@
  * legs → (33,100) and (67,100) shoulders.
  * The two legs sit behind the body, only the feet showing: they walk, run,
  * stretch and wave. `paws` are hidden by default: they show only while the cat
- * grips the rail. `scripts/og.cjs` reads this markup: keep it static SVG.
+ * grips the rail; `hold` (paws on a ledge) and `yawn` (the open mouth) are hidden
+ * too, until a clip shows them; `eye-l` / `eye-r` let one eye open before the other.
+ * `scripts/og.cjs` reads this markup: keep it static SVG.
  */
 export function CatFigure({ className }: { className?: string }) {
   return (
@@ -58,13 +60,24 @@ export function CatFigure({ className }: { className?: string }) {
         <path d="M50 55 L50 56.6 M50 56.6 Q47.6 59.4 45 57.6 M50 56.6 Q52.4 59.4 55 57.6" fill="none" stroke="#3d3d3d" strokeWidth="0.9" strokeLinecap="round" />
         <g data-cat="gaze">
           <g data-cat="eyes">
-            <ellipse cx="35.5" cy="40" rx="9" ry="11" transform="rotate(-7 35.5 40)" fill="#c8f169" />
-            <ellipse cx="64.5" cy="40" rx="9" ry="11" transform="rotate(7 64.5 40)" fill="#c8f169" />
-            <ellipse cx="37" cy="40" rx="2.7" ry="7.2" fill="#101010" />
-            <ellipse cx="63" cy="40" rx="2.7" ry="7.2" fill="#101010" />
-            <circle cx="33.4" cy="35.2" r="1.8" fill="#f3f1eb" />
-            <circle cx="59.4" cy="35.2" r="1.8" fill="#f3f1eb" />
+            <g data-cat="eye-l">
+              <ellipse cx="35.5" cy="40" rx="9" ry="11" transform="rotate(-7 35.5 40)" fill="#c8f169" />
+              <ellipse cx="37" cy="40" rx="2.7" ry="7.2" fill="#101010" />
+              <circle cx="33.4" cy="35.2" r="1.8" fill="#f3f1eb" />
+            </g>
+            <g data-cat="eye-r">
+              <ellipse cx="64.5" cy="40" rx="9" ry="11" transform="rotate(7 64.5 40)" fill="#c8f169" />
+              <ellipse cx="63" cy="40" rx="2.7" ry="7.2" fill="#101010" />
+              <circle cx="59.4" cy="35.2" r="1.8" fill="#f3f1eb" />
+            </g>
           </g>
+        </g>
+        {/* The open mouth of a yawn: hidden until a clip shows it. */}
+        <ellipse data-cat="yawn" cx="50" cy="57.6" rx="3.6" ry="4.4" fill="#5a2630" stroke="#3d3d3d" strokeWidth="0.6" opacity="0" />
+        {/* Paws on a ledge, under the chin: shown while it peeks over an edge. */}
+        <g data-cat="hold" opacity="0">
+          <rect x="24" y="58" width="14" height="9" rx="4.5" fill="#1f1f1f" stroke="#333333" strokeWidth="1" />
+          <rect x="62" y="58" width="14" height="9" rx="4.5" fill="#1f1f1f" stroke="#333333" strokeWidth="1" />
         </g>
       </g>
       </g>

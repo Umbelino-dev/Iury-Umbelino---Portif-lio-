@@ -219,6 +219,9 @@ export function PhotoDeck({ photos, labels }: { photos: DeckPhoto[]; labels: Dec
         onPointerDown={onDown}
         onPointerUp={onUp}
         onPointerCancel={() => (drag.current = null)}
+        // A picture the cat can walk into and out of (CatStage): its feet go where the frosted base starts.
+        data-cat-portal=""
+        data-cat-floor="0.8"
         className="relative mx-auto h-[calc(var(--card-w)*4/3*1.12)] w-(--card-w) touch-pan-y select-none [--card-w:clamp(15rem,64vw,26rem)] md:[--card-w:clamp(17rem,27vw,26rem)]"
       >
         {cards.map((p, i) => {

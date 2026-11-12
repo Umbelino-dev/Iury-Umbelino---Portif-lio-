@@ -22,6 +22,10 @@ export interface CatParts {
   paws: SVGGElement | null;
   legL: SVGRectElement | null;
   legR: SVGRectElement | null;
+  eyeL: SVGGElement | null;
+  eyeR: SVGGElement | null;
+  yawn: SVGElement | null;
+  hold: SVGGElement | null;
 }
 
 export function catParts(scope: Element, frame?: Element | null): CatParts | null {
@@ -40,6 +44,10 @@ export function catParts(scope: Element, frame?: Element | null): CatParts | nul
     paws: q("paws"),
     legL: q("leg-l"),
     legR: q("leg-r"),
+    eyeL: q("eye-l"),
+    eyeR: q("eye-r"),
+    yawn: q("yawn"),
+    hold: q("hold"),
   };
 }
 
@@ -54,6 +62,9 @@ export function prime(p: CatParts) {
     [p.tail, "80 118"],
     [p.legL, "33 100"],
     [p.legR, "67 100"],
+    [p.eyeL, "35.5 40"],
+    [p.eyeR, "64.5 40"],
+    [p.yawn, "50 57.6"],
   ];
   for (const [el, origin] of svg) if (el) gsap.set(el, { svgOrigin: origin });
 }
@@ -156,10 +167,10 @@ export function land(p: CatParts) {
 
 /**
  * Settle into sleep: eyes first, then the body curls and the tail wraps.
- * Then slow breathing for a while (bounded: it stops on its own, and GSAP's
- * ticker does not run in a hidden tab).
+ * Then slow breathing for `breaths` breaths (bounded: it stops on its own, and
+ * GSAP's ticker does not run in a hidden tab).
  */
-export function settle(p: CatParts, delay = 0) {
+export function settle(p: CatParts, delay = 0, breaths = 11) {
   return gsap
     .timeline({ delay })
     .to(p.eyes, { scaleY: 0.1, duration: 0.2 }, 0)
@@ -168,7 +179,7 @@ export function settle(p: CatParts, delay = 0) {
     .to(p.head, { y: 6, rotation: -4, duration: 0.52 }, 0.2)
     .to(legs(p), { y: 2, rotation: 0, duration: 0.4 }, 0.2)
     .to(p.tail, { rotation: 26, duration: 0.6, ease: "power2.out" }, 0.3)
-    .to(p.frame, { scaleY: 1.03, duration: 1.4, ease: "sine.inOut", yoyo: true, repeat: 11 }, 0.9);
+    .to(p.frame, { scaleY: 1.03, duration: 1.4, ease: "sine.inOut", yoyo: true, repeat: breaths * 2 - 1 }, 0.9);
 }
 
 /** Wake: an ear twitch, eyes open, the body rises, a stretch. */
@@ -251,4 +262,120 @@ export function climbRest(p: CatParts) {
   const paws = p.paws ? Array.from(p.paws.children) : [];
   gsap.to(paws, { y: 0, duration: 0.16, overwrite: "auto" });
   gsap.to(legs(p), { rotation: 0, duration: 0.2, overwrite: "auto" });
+}
+
+/** A yawn: the head tips back, the eyes squeeze shut, the mouth opens wide, then it settles. */
+export function yawn(p: CatParts, d = 1.1) {
+  return gsap
+    .timeline()
+    .to(p.head, { rotation: -7, y: -1, duration: d * 0.25, ease: "sine.out" }, 0)
+    .to(p.eyes, { scaleY: 0.12, duration: d * 0.2 }, 0.05)
+    .to(p.ears, { y: 2, duration: d * 0.25 }, 0)
+    .fromTo(p.yawn, { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1.25, duration: d * 0.3, ease: "sine.out" }, d * 0.1)
+    .to(p.yawn, { scale: 0.3, opacity: 0, duration: d * 0.25, ease: "sine.in" }, d * 0.62)
+    .to(p.head, { rotation: 0, y: 0, duration: d * 0.3 }, d * 0.66)
+    .to(p.ears, { y: 0, duration: d * 0.2 }, d * 0.66)
+    .to(p.eyes, { scaleY: 0.62, duration: d * 0.2 }, d * 0.75); // heavy-lidded afterwards
+}
+
+/** Looking for a comfortable spot: a glance each way and a small shuffle on the spot. */
+export function nest(p: CatParts, d = 0.9) {
+  return gsap
+    .timeline()
+    .to(p.look, { rotation: -9, duration: d * 0.22 }, 0)
+    .to(p.look, { rotation: 8, duration: d * 0.26 }, d * 0.28)
+    .to(p.look, { rotation: 0, duration: d * 0.2 }, d * 0.6)
+    .to(p.frame, { x: -2, rotation: -3, duration: d * 0.2, ease: "sine.inOut" }, d * 0.1)
+    .to(p.frame, { x: 2, rotation: 3, duration: d * 0.3, ease: "sine.inOut" }, d * 0.35)
+    .to(p.frame, { x: 0, rotation: 0, duration: d * 0.25, ease: "sine.inOut" }, d * 0.7)
+    .to(p.tail, { rotation: 14, duration: d * 0.4, yoyo: true, repeat: 1 }, d * 0.1);
+}
+
+/** Asleep, something stirs: one ear, or the tip of the tail. */
+export function twitch(p: CatParts, ear = true) {
+  return ear
+    ? gsap.timeline().to(p.ears, { y: -2.5, duration: 0.09, yoyo: true, repeat: 3 })
+    : gsap.timeline().to(p.tail, { rotation: "+=9", duration: 0.16, yoyo: true, repeat: 1, ease: "sine.inOut" });
+}
+
+/**
+ * Waking, slowly (never an instant switch): an ear moves, one eye opens and
+ * looks, then the other, the head comes up, the body rises, a stretch. From a
+ * deep sleep it yawns first.
+ */
+export function wakeSlow(p: CatParts, deep = false) {
+  const tl = gsap.timeline();
+  tl.to(p.frame, { scaleY: 1, duration: 0.2 }, 0)
+    .to(p.ears, { y: -3, duration: 0.1, yoyo: true, repeat: deep ? 5 : 3 }, 0)
+    // one eye: the left stays shut while the pair opens
+    .set(p.eyeL, { scaleY: 0.1 }, 0.42)
+    .to(p.eyes, { scaleY: 1, duration: 0.18 }, 0.42)
+    .to(p.gaze, { x: 2, duration: 0.2 }, 0.62)
+    .to(p.gaze, { x: -2, duration: 0.24 }, 0.92)
+    .to(p.eyeL, { scaleY: 1, duration: 0.16 }, 1.2)
+    .to(p.gaze, { x: 0, duration: 0.2 }, 1.3)
+    .to(p.head, { y: 0, rotation: 0, duration: 0.36, ease: "power2.out" }, 1.3)
+    .to(p.body, { scaleY: 1, duration: 0.34, ease: "power2.out" }, 1.45)
+    .to(p.tail, { rotation: 0, duration: 0.4 }, 1.45);
+  if (deep) tl.add(yawn(p, 1), 1.8).to(p.eyes, { scaleY: 1, duration: 0.15 }, 2.8);
+  tl.add(stretch(p, 0.6), deep ? 2.85 : 1.8);
+  return tl;
+}
+
+/** A swipe of one front paw, up and across (`side`: 1 = its right paw, -1 = left). */
+export function pawSwipe(p: CatParts, side = 1) {
+  const leg = side > 0 ? p.legR : p.legL;
+  return gsap
+    .timeline()
+    .to(leg, { y: -15, rotation: -side * 128, duration: 0.14, ease: "power2.out" }, 0)
+    .to(p.frame, { rotation: side * 5, duration: 0.14 }, 0)
+    .to(leg, { rotation: -side * 92, duration: 0.09, ease: "power1.in" }, 0.14)
+    .to(leg, { y: 0, rotation: 0, duration: 0.22, ease: "power2.inOut" }, 0.26)
+    .to(p.frame, { rotation: 0, duration: 0.22 }, 0.26);
+}
+
+/** Startled: a jump on the spot, eyes wide, ears flat, tail up. */
+export function startle(p: CatParts) {
+  return gsap
+    .timeline()
+    .to(p.frame, { y: -9, scaleX: 0.92, scaleY: 1.12, duration: 0.09, ease: "power2.out" }, 0)
+    .to(p.eyes, { scale: 1.3, duration: 0.08 }, 0)
+    .to(p.ears, { y: 3, duration: 0.08 }, 0)
+    .to(p.tail, { rotation: -34, duration: 0.1 }, 0)
+    .to(p.frame, { y: 0, scaleX: 1.06, scaleY: 0.92, duration: 0.12, ease: "power2.in" }, 0.12)
+    .to(p.frame, { scaleX: 1, scaleY: 1, duration: 0.3, ease: "elastic.out(1, 0.5)" }, 0.24)
+    .to(p.eyes, { scale: 1, duration: 0.4 }, 0.5)
+    .to(p.ears, { y: 0, duration: 0.3 }, 0.5)
+    .to(p.tail, { rotation: 0, duration: 0.6, ease: "elastic.out(1, 0.4)" }, 0.4);
+}
+
+/** Round and round after its own tail, then a dizzy shake of the head. */
+export function tailChase(p: CatParts) {
+  return gsap
+    .timeline()
+    .to(p.look, { rotation: 12, duration: 0.2 }, 0)
+    .to(p.gaze, { x: 3, y: 2, duration: 0.2 }, 0)
+    .to(p.tail, { rotation: -18, duration: 0.12, yoyo: true, repeat: 3 }, 0.1)
+    .to(p.frame, { rotation: 720, scaleX: 0.9, scaleY: 0.9, duration: 1.1, ease: "power1.inOut" }, 0.5)
+    .set(p.frame, { rotation: 0 }, 1.6)
+    .to(p.frame, { scaleX: 1, scaleY: 1, duration: 0.2 }, 1.6)
+    .to(p.look, { rotation: -7, duration: 0.09, yoyo: true, repeat: 5, ease: "sine.inOut" }, 1.65)
+    .to(p.look, { rotation: 0, duration: 0.2 }, 2.25)
+    .to(p.gaze, { x: 0, y: 0, duration: 0.3 }, 2.25);
+}
+
+/** Nothing happened: a glance each way, then it licks a paw as if that was the plan. */
+export function pretend(p: CatParts) {
+  return gsap
+    .timeline()
+    .to(p.look, { rotation: -10, duration: 0.16 }, 0)
+    .to(p.look, { rotation: 10, duration: 0.2 }, 0.3)
+    .to(p.look, { rotation: 0, duration: 0.16 }, 0.62)
+    .to(p.legL, { y: -17, rotation: 138, duration: 0.2, ease: "power2.out" }, 0.8)
+    .to(p.head, { y: 3, rotation: 6, duration: 0.2 }, 0.8)
+    .to(p.eyes, { scaleY: 0.5, duration: 0.15 }, 0.85)
+    .to(p.head, { y: 1, duration: 0.14, yoyo: true, repeat: 3, ease: "sine.inOut" }, 1.0)
+    .to(p.legL, { y: 0, rotation: 0, duration: 0.22 }, 1.6)
+    .to(p.head, { y: 0, rotation: 0, duration: 0.22 }, 1.6)
+    .to(p.eyes, { scaleY: 1, duration: 0.15 }, 1.6);
 }

@@ -67,7 +67,7 @@ export async function Lab() {
           {/* First entry: high on the left */}
           <li className="flex w-full flex-col gap-7 min-[720px]:w-[max(300px,41.66%)]">
             <div className="relative">
-              <LabFrame turntable={e1.turntable} cursorLabel={tc("turn")} className="aspect-square bg-[#141414]">
+              <LabFrame turntable={e1.turntable} cursorLabel={tc("turn")} portal={{ floor: 0.93, cover: [0.26, 0.74, 0.1] }} className="aspect-square bg-[#141414]">
                 <Media entry={e1} locale={locale} />
                 {!e1.media && <Pending text={t("drop")} />}
               </LabFrame>
@@ -79,7 +79,7 @@ export async function Lab() {
           <li className="flex w-full flex-col gap-7 min-[720px]:mt-[clamp(0px,calc((100vw-720px)*0.3),340px)] min-[720px]:-mr-(--page-margin) min-[720px]:ml-auto min-[720px]:w-[max(260px,33.33%)]">
             <div className="min-[720px]:pr-(--page-margin)">{entryText(e2, "max-w-[28ch]")}</div>
             <div className="relative min-[720px]:pr-(--page-margin)">
-              <LabFrame className="aspect-[3/4] bg-[#161616]">
+              <LabFrame portal={{ floor: 0.94 }} className="aspect-[3/4] bg-[#161616]">
                 <Media entry={e2} locale={locale} />
                 {!e2.media && (
                   <>
@@ -95,7 +95,7 @@ export async function Lab() {
           <li className="flex w-full flex-wrap items-end gap-x-[clamp(1.5rem,3vw,3.5rem)] gap-y-8 min-[720px]:ml-[clamp(0px,calc((100vw-720px)*0.18),240px)] min-[720px]:w-[max(320px,83.33%)]">
             <div className="relative min-w-0 flex-[1_1_440px]">
               <div className="relative">
-                <LabFrame className="aspect-video bg-[#141414]">
+                <LabFrame portal={{ floor: 0.93 }} className="aspect-video bg-[#141414]">
                   <Media entry={e3} locale={locale} />
                   {!e3.media && (
                     <>

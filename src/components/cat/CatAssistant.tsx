@@ -3,10 +3,12 @@
 import { useCallback, useEffect, useId, useReducer, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import { gsap, MQ } from "@/lib/gsap";
 import { CatFigure } from "./CatFigure";
-import { airborne, brace, catParts, climbRest, climbStep, crouch, falling, grab, greet, land, letGo, prime, settle, wake, type CatParts } from "./clips";
+import { airborne, brace, catParts, climbRest, climbStep, crouch, falling, grab, greet, land, letGo, nest, pretend, prime, settle, twitch, wakeSlow, yawn, type CatParts } from "./clips";
+import { CatStage } from "./CatStage";
 import { sparkle } from "./magic";
 import { SectionRail } from "./SectionRail";
-import { CAT_OPEN, HERO_LEFT_AT, IDLE_MS, transition, type CatEvent, type CatState } from "./states";
+import { speedometer } from "./speed";
+import { CAT_OPEN, DEEP_MS, HERO_LEFT_AT, IDLE_MS, transition, type CatEvent, type CatState } from "./states";
 
 export interface AssistantChip {
   label: string;
@@ -44,7 +46,13 @@ const MOBILE = "(max-width: 767px)";
  */
 const RAIL = "(min-width: 1440px) and (hover: hover) and (pointer: fine)";
 const READING_LINE = 0.4; // the rail cat holds 40% of the viewport height
-/** A scroll faster than this (px per ms) is too fast to hold on to: the cat lets go. */
+/**
+ * The rail gets harder to hold with the scroll's speed and how suddenly it came
+ * (px per ms, plus a share of the acceleration). Below SLIP it rides; from SLIP
+ * its paws slide; from HANG one paw is off; from FAST it cannot hold on.
+ */
+const SLIP = 0.9;
+const HANG = 1.7;
 const FAST = 2.6;
 /** The hero's last letter, the one the cat sits on: it takes the leap and the landing. */
 const perch = () => document.querySelector<SVGPathElement>('[data-glyph="l2-o"]');
@@ -97,6 +105,10 @@ export function CatAssistant({
   const heroVisible = useRef(context === "home");
   const mounted = useRef(false);
   const replyTimer = useRef<number | undefined>(undefined);
+  /** A scene of CatStage is running: it does not fall asleep in the middle of one. */
+  const stageBusy = useRef(false);
+  /** The sleep has gone deep (DEEP_MS undisturbed): waking takes longer. */
+  const deepSleep = useRef(false);
   /** The panel's open/close timeline. Lives outside the per-state context: a state
    *  change (e.g. a keypress waking the cat mid-close) must not kill it half-way. */
   const panelTl = useRef<gsap.core.Timeline | null>(null);
@@ -167,13 +179,10 @@ export function CatAssistant({
   // ── Scroll speed, read by the leap (too fast = no time to jump: it falls) ──
   const speed = useRef({ v: 0, t: 0 });
   useEffect(() => {
-    let lastY = window.scrollY;
-    let lastT = performance.now();
+    const meter = speedometer();
     const onScroll = () => {
       const now = performance.now();
-      speed.current = { v: Math.abs(window.scrollY - lastY) / Math.max(8, now - lastT), t: now };
-      lastY = window.scrollY;
-      lastT = now;
+      speed.current = { v: meter(window.scrollY, now).v, t: now };
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -202,6 +211,7 @@ export function CatAssistant({
       };
     }
     const p = dockInner.current ? catParts(dockInner.current) : null;
+    const pawEls = p?.paws ? Array.from(p.paws.children) : [];
     const vh = window.innerHeight;
     const span = vh * 0.25; // holding on: how far the page can drag it
     const looseUp = vh * READING_LINE - 96; // loose: up to just under the nav
@@ -210,14 +220,18 @@ export function CatAssistant({
     const setY = gsap.quickSetter(d, "y", "px");
     const m = { offset: 0 };
     let lastY = window.scrollY;
-    let lastT = performance.now();
+    const meter = speedometer();
+    let level = 1; // 1 rides · 2 paws slide · 3 hangs by one paw · 4 lost it
+    let hangSince = 0;
+    let pull = 1; // which way the page drags it: 1 down, -1 up
     let frame = 0;
-    let loose = false;
-    let returning = false;
+    let busy = false; // falling, landing, climbing back: it does not follow the page
     let calm: number | undefined;
     let travelled = 0;
     let steps = 0;
     let hanging = false;
+    let slipping: gsap.core.Tween[] = [];
+    let recovery: gsap.core.Timeline | null = null;
 
     const swing = (deg: number) => {
       if (!p) return;
@@ -228,20 +242,69 @@ export function CatAssistant({
       }
       gsap.set(p.frame, { rotation: deg });
     };
-    // Holding on: the page drags it, it climbs back to the line (lerp 0.12).
-    // The rAF runs only while it is still moving.
+    const stopSlipping = () => {
+      slipping.forEach((t) => t.kill());
+      slipping = [];
+    };
+    /** What each level of grip looks like. The page's speed decides the level. */
+    const setLevel = (next: number) => {
+      if (next === level || !p) return;
+      const from = level;
+      level = next;
+      stopSlipping();
+      if (next === 1) {
+        // a firm grip again
+        gsap.to(pawEls, { y: 0, opacity: 1, duration: 0.14, overwrite: "auto" });
+        gsap.to(p.eyes, { scale: 1, duration: 0.25, overwrite: "auto" });
+        gsap.to(p.ears, { y: 0, duration: 0.25, overwrite: "auto" });
+        if (from === 3) gsap.fromTo(p.frame, { scaleX: 1.06, scaleY: 0.93 }, { scaleX: 1, scaleY: 1, duration: 0.3, ease: "power2.out" }); // the free paw catches the rail
+        return;
+      }
+      if (next === 2) {
+        // the paws slide and look for a new hold; the tail works fast
+        gsap.set(pawEls, { opacity: 1 });
+        slipping = [
+          gsap.to(pawEls, { y: (i) => (i ? 3.5 : -3), duration: 0.07, ease: "sine.inOut", yoyo: true, repeat: -1 }),
+          gsap.fromTo(p.tail, { rotation: -22 }, { rotation: 22, duration: 0.09, ease: "sine.inOut", yoyo: true, repeat: -1, svgOrigin: "80 118" }),
+        ];
+        gsap.to(p.eyes, { scale: 1.1, duration: 0.15, overwrite: "auto" });
+        gsap.to(p.ears, { y: 1.5, duration: 0.15, overwrite: "auto" });
+        return;
+      }
+      if (next === 3) {
+        // one paw is off: it hangs by the other and swings, reaching for the rail
+        hangSince = performance.now();
+        gsap.set(pawEls[1] ?? null, { opacity: 0 });
+        gsap.set(pawEls[0] ?? null, { y: 0, opacity: 1 });
+        slipping = [
+          gsap.fromTo(p.tail, { rotation: -30 }, { rotation: 30, duration: 0.08, ease: "sine.inOut", yoyo: true, repeat: -1, svgOrigin: "80 118" }),
+          gsap.fromTo(p.legR, { y: 4, rotation: -26 }, { y: 6, rotation: 22, duration: 0.14, ease: "sine.inOut", yoyo: true, repeat: -1 }),
+        ];
+        gsap.to(p.eyes, { scale: 1.2, duration: 0.12, overwrite: "auto" });
+        gsap.to(p.ears, { y: 2.5, duration: 0.12, overwrite: "auto" });
+        return;
+      }
+      // 4 · it cannot keep up
+      cancelAnimationFrame(frame);
+      frame = 0;
+      climbRest(p);
+      letGo(p, pull);
+    };
+    // Holding on (levels 1–3): the page drags it, it climbs back to the line
+    // (lerp 0.12). The rAF runs only while it is still moving.
     const tick = () => {
       const before = m.offset;
       m.offset += (0 - m.offset) * 0.12;
       setY(base + m.offset);
-      if (tail) gsap.set(tail, { rotation: clamp(-30, 30, m.offset * 0.3), svgOrigin: "80 118" });
-      swing(clamp(-13, 13, m.offset * 0.07));
+      if (tail && level === 1) gsap.set(tail, { rotation: clamp(-30, 30, m.offset * 0.3), svgOrigin: "80 118" });
+      // the harder the page pulls, the wider it swings; hanging by one paw it leans out
+      swing(clamp(-22, 22, m.offset * (level === 1 ? 0.07 : 0.11) + (level === 3 ? pull * 12 : 0)));
       travelled += Math.abs(m.offset - before);
-      if (p && travelled > 16) {
+      if (p && level < 3 && travelled > (level === 2 ? 9 : 16)) {
         travelled = 0;
-        climbStep(p, ++steps);
+        if (level === 1) climbStep(p, ++steps);
       }
-      if (Math.abs(m.offset) > 0.5) {
+      if (Math.abs(m.offset) > 0.5 || level > 1) {
         frame = requestAnimationFrame(tick);
       } else {
         frame = 0;
@@ -254,53 +317,85 @@ export function CatAssistant({
         }
       }
     };
-    // The speed is gone: it falls (or leaps up) to the line and catches the rail.
-    const regrip = () => {
-      loose = false;
-      returning = true;
-      gsap.to(m, {
-        offset: 0,
-        duration: 0.2 + Math.min(0.3, Math.abs(m.offset) / 900),
-        ease: m.offset < 0 ? "power2.in" : "power2.out",
-        onUpdate: () => setY(base + m.offset),
+    // Lost it: it falls down the rail to the corner, lands, gathers itself (and
+    // sometimes acts as if nothing happened), then climbs back up to the line.
+    const fallAndRecover = () => {
+      if (!p) return;
+      busy = true;
+      level = 1;
+      stopSlipping();
+      const drop = -base - m.offset; // px down to the corner
+      const tl = gsap.timeline({
         onComplete: () => {
-          returning = false;
-          if (!p) return;
-          grab(p);
-          gsap.to(p.eyes, { scale: 1, duration: 0.2 });
-          gsap.to(p.ears, { y: 0, duration: 0.2 });
+          busy = false;
+          recovery = null;
+          lastY = window.scrollY;
         },
       });
+      recovery = tl;
+      tl.add(falling(p, 0.12), 0)
+        .to(m, { offset: -base, duration: clamp(0.22, 0.62, 0.2 + Math.abs(drop) / 1400), ease: "power2.in", onUpdate: () => setY(base + m.offset) }, 0)
+        .add(land(p))
+        .to(p.eyes, { scale: 1, duration: 0.2 }, "<")
+        .to(p.ears, { y: 0, duration: 0.2 }, "<")
+        // dazed: a shake of the head
+        .to(p.look, { rotation: -8, duration: 0.08, yoyo: true, repeat: 5, ease: "sine.inOut", svgOrigin: "50 62" }, "+=0.1")
+        .to(p.look, { rotation: 0, duration: 0.15 });
+      if (Math.random() < 0.5) tl.add(pretend(p), "+=0.15");
+      // back up the rail, hand over hand
+      const climb = { n: 0 };
+      tl.set(p.paws, { opacity: 1 }, "+=0.2")
+        .set(pawEls, { opacity: 1, y: 0 }, "<")
+        .to(
+          m,
+          {
+            offset: 0,
+            duration: clamp(0.7, 1.5, Math.abs(base) / 420),
+            ease: "sine.inOut",
+            onUpdate: () => {
+              setY(base + m.offset);
+              const n = Math.floor(Math.abs(base + m.offset) / 16);
+              if (n !== climb.n) {
+                climb.n = n;
+                climbStep(p, n);
+              }
+            },
+          },
+          "<",
+        )
+        .add(() => climbRest(p));
+    };
+    const settleDown = () => {
+      if (level === 4) fallAndRecover();
+      else setLevel(1);
     };
     const onScroll = () => {
       const y = window.scrollY;
       const now = performance.now();
       const dy = y - lastY;
-      const v = Math.abs(dy) / Math.max(8, now - lastT);
       lastY = y;
-      lastT = now;
-      if (!dy) return;
+      const { v, a } = meter(y, now);
+      if (!dy || busy) return;
       gsap.killTweensOf(d, "y");
-      if (!loose && v > FAST) {
-        loose = true;
-        returning = false;
-        cancelAnimationFrame(frame);
-        frame = 0;
-        gsap.killTweensOf(m);
-        if (p) {
-          climbRest(p);
-          letGo(p, dy > 0 ? -1 : 1); // scrolling down carries it up, and the other way round
-        }
+      // grip = how fast the page moves, plus how suddenly it took off
+      const stress = v + clamp(0, 0.6, a * 14);
+      pull = dy > 0 ? -1 : 1; // scrolling down carries it up, and the other way round
+      window.clearTimeout(calm);
+      calm = window.setTimeout(settleDown, 160);
+      if (level < 4) {
+        const held = level === 3 && now - hangSince > 650; // one paw does not hold for long
+        if (stress > FAST || held) setLevel(4);
+        else if (stress > HANG) setLevel(3);
+        else if (stress > SLIP) setLevel(Math.max(level === 3 && stress > HANG * 0.75 ? 3 : 2, 2));
+        else if (stress < SLIP * 0.7) setLevel(1);
       }
-      if (loose) {
+      if (level === 4) {
         m.offset = clamp(-looseUp, looseDown, m.offset - dy);
         setY(base + m.offset);
-        window.clearTimeout(calm);
-        calm = window.setTimeout(regrip, 140);
         return;
       }
-      if (returning) return;
-      m.offset = clamp(-span, span, m.offset - dy);
+      const reach = level === 1 ? span : span * 1.3;
+      m.offset = clamp(-reach, reach, m.offset - dy);
       if (!frame) frame = requestAnimationFrame(tick);
     };
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -310,8 +405,11 @@ export function CatAssistant({
       window.clearTimeout(calm);
       gsap.killTweensOf(d, "y");
       gsap.killTweensOf(m);
+      recovery?.kill();
+      stopSlipping();
       if (p) {
         climbRest(p);
+        gsap.set(pawEls, { opacity: 1, y: 0 });
         gsap.killTweensOf(p.frame, "rotation");
         gsap.set(p.frame, { rotation: 0, transformOrigin: "50% 100%" });
       }
@@ -324,14 +422,13 @@ export function CatAssistant({
   useEffect(() => {
     if (rail || state !== "cling" || reduced()) return;
     let lastY = window.scrollY;
-    let lastT = performance.now();
+    const meter = speedometer();
     let rest = 0;
     const onScroll = () => {
       const now = performance.now();
       const dy = window.scrollY - lastY;
-      const v = Math.abs(dy) / Math.max(8, now - lastT);
       lastY = window.scrollY;
-      lastT = now;
+      const { v } = meter(window.scrollY, now);
       if (v <= FAST || now < rest) return;
       rest = now + 1000;
       const p = clipParts();
@@ -402,9 +499,12 @@ export function CatAssistant({
     let timer: number | undefined;
     let frame = 0;
     const { eyes } = parts();
-    const arm = () => {
+    const arm = (ms = IDLE_MS) => {
       window.clearTimeout(timer);
-      timer = window.setTimeout(() => send({ type: "IDLE" }), IDLE_MS);
+      timer = window.setTimeout(() => {
+        if (stageBusy.current) arm(2500); // mid-scene: ask again shortly
+        else send({ type: "IDLE" });
+      }, ms);
     };
     const onActivity = () => {
       if (state === "sleep") send({ type: "ACTIVITY" });
@@ -543,6 +643,10 @@ export function CatAssistant({
     const inner = dockInner.current;
     if (!d || !inner) return;
     if (state !== "jump") pendingOpen.current = false; // a leap that never landed drops its request
+    if (state !== "sleep" && state !== "waking") {
+      deepSleep.current = false;
+      if (root.current) delete root.current.dataset.catSleep;
+    }
     const first = !mounted.current;
     mounted.current = true;
     const rm = reduced();
@@ -701,28 +805,47 @@ export function CatAssistant({
         }
         const lifted = (Number(gsap.getProperty(d, "y")) || 0) < -1;
         const tl = gsap.timeline();
+        // Sleepy first: a yawn, then it looks for a comfortable spot.
+        tl.add(yawn(p, 1)).add(nest(p, 0.9), ">-0.05").addLabel("down");
         if (lifted) {
-          tl.to(p.eyes, { scaleY: 0.1, duration: 0.2 }, 0)
-            .set(p.paws, { opacity: 0 }, 0.2)
-            .add(falling(p, 0.2), 0.2)
-            .to(d, { y: 0, duration: 0.45, ease: "power2.in" }, 0.2)
-            .add(land(p), 0.65)
-            .add(settle(p), 0.8);
+          tl.to(p.eyes, { scaleY: 0.1, duration: 0.2 }, "down")
+            .set(p.paws, { opacity: 0 }, "down+=0.2")
+            .add(falling(p, 0.2), "down+=0.2")
+            .to(d, { y: 0, duration: 0.45, ease: "power2.in" }, "down+=0.2")
+            .add(land(p), "down+=0.65")
+            .add(settle(p, 0, 26), "down+=0.8");
         } else {
-          tl.add(settle(p), 0);
+          tl.add(settle(p, 0, 26), "down");
         }
+        // Asleep: now and then an ear or the tail stirs.
+        tl.addLabel("asleep");
+        for (let t = 7, i = 0; i < 9; i++, t += 6 + Math.random() * 7) tl.add(twitch(p, Math.random() < 0.6), `asleep+=${t}`);
+        // Left alone long enough, the sleep gets deeper: slower, fuller breaths,
+        // the head lower. Waking from it takes longer (wakeSlow).
+        gsap.delayedCall(DEEP_MS / 1000, () => {
+          deepSleep.current = true;
+          if (root.current) root.current.dataset.catSleep = "deep";
+          gsap.killTweensOf(p.frame, "scaleY");
+          gsap.to(p.head, { y: 8, duration: 1.2, ease: "sine.inOut" });
+          gsap.fromTo(p.frame, { scaleY: 1 }, { scaleY: 1.05, duration: 2.4, ease: "sine.inOut", yoyo: true, repeat: 59 });
+        });
         return;
       }
 
-      // WAKING: an ear twitch, eyes open, it rises and stretches; then it is awake
-      // (cling), and on the rail it climbs back up to the reading line.
+      // WAKING: never an instant switch. An ear moves, one eye opens and looks,
+      // then the other, the head comes up, it rises and stretches (from a deep
+      // sleep it yawns first); then it is awake (cling), and on the rail it climbs
+      // back up to the reading line.
       if (state === "waking") {
+        const wasDeep = deepSleep.current;
+        deepSleep.current = false;
+        if (root.current) delete root.current.dataset.catSleep;
         if (rm) {
           awakePose(p, false, 0);
           send({ type: "WOKE" });
           return;
         }
-        wake(p).call(() => send({ type: "WOKE" }));
+        wakeSlow(p, wasDeep).call(() => send({ type: "WOKE" }));
       }
 
     }, root);
@@ -876,6 +999,9 @@ export function CatAssistant({
       />
 
       {rail && <SectionRail shown={state !== "observer"} />}
+
+      {/* The roaming figure and the director of its spontaneous behaviour (awake and settled only). */}
+      <CatStage state={state} rail={rail} dockInner={dockInner} busy={stageBusy} />
 
       {/* The dock: the curled cat is the closed assistant button (S3/S4). In rail mode it sits on the rail. */}
       <div

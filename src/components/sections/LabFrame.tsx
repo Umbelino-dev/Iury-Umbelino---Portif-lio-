@@ -17,11 +17,18 @@ export function LabFrame({
   children,
   turntable,
   cursorLabel,
+  portal,
   className = "",
 }: {
   children: ReactNode;
   turntable?: Turntable;
   cursorLabel?: string;
+  /**
+   * A picture the cat can walk into and out of (CatStage): `floor` is where its
+   * feet go (0–1 of the height); `cover` is something in the picture it passes
+   * behind: [from x, to x, from y], each 0–1 of the frame.
+   */
+  portal?: { floor: number; cover?: [number, number, number] };
   className?: string;
 }) {
   const el = useRef<HTMLDivElement>(null);
@@ -104,6 +111,7 @@ export function LabFrame({
     <div
       ref={el}
       {...(turntable && cursorLabel ? { "data-cursor-label": cursorLabel } : { "data-cursor": "none" })}
+      {...(portal ? { "data-cat-portal": "", "data-cat-floor": portal.floor, "data-cat-cover": portal.cover?.join(",") } : {})}
       className={`group/frame relative overflow-hidden ${className}`}
     >
       {children}

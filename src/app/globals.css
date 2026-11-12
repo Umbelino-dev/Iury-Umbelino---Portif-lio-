@@ -244,6 +244,35 @@ html.has-cursor * {
 html.has-cursor :is(input, textarea, select, [contenteditable="true"]) {
   cursor: auto;
 }
+/*
+ * A modal <dialog> sits in the top layer, above the custom cursor, so the custom
+ * cursor cannot be seen there: while one is open, the native cursor comes back
+ * (and the custom one is hidden so it never peeks out at the edges).
+ */
+html.has-cursor:has(dialog[open]),
+html.has-cursor:has(dialog[open]) * {
+  cursor: auto;
+}
+html.has-cursor:has(dialog[open]) dialog :is(a, button) {
+  cursor: pointer;
+}
+html.has-cursor:has(dialog[open]) [data-cursor-root],
+html.has-cursor:has(dialog[open]) [data-cursor-root] + div {
+  visibility: hidden !important; /* GSAP sets visibility inline (autoAlpha) */
+}
+
+/* Photo panel backdrop: fades in on open, out while the panel shrinks away. */
+dialog::backdrop {
+  transition: opacity var(--duration-base) var(--ease-out-soft);
+}
+@starting-style {
+  dialog[open]::backdrop {
+    opacity: 0;
+  }
+}
+dialog.is-closing::backdrop {
+  opacity: 0;
+}
 
 /*
  * Project stage: the six project texts are all in the HTML. With JS they share

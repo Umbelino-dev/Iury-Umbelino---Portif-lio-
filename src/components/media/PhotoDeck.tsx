@@ -166,8 +166,22 @@ export function PhotoDeck({ photos, labels }: { photos: DeckPhoto[]; labels: Dec
     el.style.transform = `translate3d(${flip ? x - 18 - w : x + 18}px, ${y - el.offsetHeight - 14}px, 0)`;
   };
 
-  // Open / close the card's panel.
-  const open = (i: number) => {
+  // Open / close the card's panel. The panel grows out of the card that was
+  // clicked (its position and size), and shrinks back into the front card.
+  const origin = useRef<HTMLElement | null>(null);
+  const closing = useRef(false);
+  /** Offset and scale that put the panel exactly over `el`. */
+  const over = (d: HTMLElement, el: HTMLElement) => {
+    const a = el.getBoundingClientRect();
+    const b = d.getBoundingClientRect();
+    return {
+      x: a.left + a.width / 2 - (b.left + b.width / 2),
+      y: a.top + a.height / 2 - (b.top + b.height / 2),
+      scale: Math.max(0.2, Math.min(a.width / b.width, a.height / b.height)),
+    };
+  };
+  const open = (i: number, el: HTMLElement) => {
+    origin.current = el;
     go(i);
     setOpened(i % photos.length);
     setHovered(null);
@@ -175,12 +189,40 @@ export function PhotoDeck({ photos, labels }: { photos: DeckPhoto[]; labels: Dec
   useEffect(() => {
     const d = dialog.current;
     if (!d || opened === null) return;
+    closing.current = false;
+    d.classList.remove("is-closing");
     if (!d.open) d.showModal();
-    if (!window.matchMedia(MQ.reduced).matches) {
-      gsap.fromTo(d, { opacity: 0, y: 24, scale: 0.98 }, { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "power3.out" });
-    }
+    if (window.matchMedia(MQ.reduced).matches) return;
+    gsap.set(d, { x: 0, y: 0, scale: 1, opacity: 1 });
+    const from = origin.current ? over(d, origin.current) : { x: 0, y: 24, scale: 0.96 };
+    gsap.fromTo(d, { ...from, opacity: 0.4, transformOrigin: "50% 50%" }, { x: 0, y: 0, scale: 1, opacity: 1, duration: 0.62, ease: "expo.out" });
+    gsap.fromTo(
+      d.querySelectorAll("[data-panel-in]"),
+      { opacity: 0, y: 14 },
+      { opacity: 1, y: 0, duration: 0.5, ease: "power3.out", stagger: 0.06, delay: 0.18 },
+    );
   }, [opened]);
-  const close = () => dialog.current?.close();
+  const close = () => {
+    const d = dialog.current;
+    if (!d || !d.open || closing.current) return;
+    closing.current = true;
+    d.classList.add("is-closing"); // fades the backdrop (CSS)
+    const card = stage.current?.querySelectorAll<HTMLElement>("[data-deck-card] button")[front];
+    if (window.matchMedia(MQ.reduced).matches || !card) {
+      d.close();
+      return;
+    }
+    gsap.to(d, {
+      ...over(d, card),
+      opacity: 0,
+      duration: 0.42,
+      ease: "power3.in",
+      onComplete: () => {
+        d.close();
+        gsap.set(d, { x: 0, y: 0, scale: 1, opacity: 1 });
+      },
+    });
+  };
 
   // Drag / swipe: a horizontal flick deals the next or previous card.
   const drag = useRef<{ x: number; id: number; moved: boolean } | null>(null);
@@ -241,15 +283,14 @@ export function PhotoDeck({ photos, labels }: { photos: DeckPhoto[]; labels: Dec
                 tabIndex={copy ? -1 : 0}
                 aria-hidden={copy || undefined}
                 aria-label={`${labels.more}: ${p.caption}`}
-                data-cursor="none"
-                onClick={() => {
+                onClick={(e) => {
                   // A swipe that ended on a card is not a click.
                   if (drag.current?.moved) {
                     drag.current = null;
                     return;
                   }
                   drag.current = null;
-                  open(i);
+                  open(i, e.currentTarget);
                 }}
                 onPointerEnter={(e) => {
                   if (e.pointerType !== "mouse") return;
@@ -344,7 +385,15 @@ export function PhotoDeck({ photos, labels }: { photos: DeckPhoto[]; labels: Dec
       <dialog
         ref={dialog}
         aria-labelledby="deck-story-title"
-        onClose={() => setOpened(null)}
+        onCancel={(e) => {
+          // Esc: close with the animation instead of the instant default.
+          e.preventDefault();
+          close();
+        }}
+        onClose={() => {
+          closing.current = false;
+          setOpened(null);
+        }}
         onClick={(e) => e.target === e.currentTarget && close()}
         className="m-auto max-h-[min(92dvh,56rem)] w-[min(64rem,calc(100vw-2rem))] overflow-y-auto rounded-[1.75rem] bg-paper p-0 text-ink shadow-[0_40px_90px_-30px_rgba(16,16,16,0.6)] backdrop:bg-ink/55 backdrop:backdrop-blur-sm"
       >
@@ -353,7 +402,7 @@ export function PhotoDeck({ photos, labels }: { photos: DeckPhoto[]; labels: Dec
             <div className="relative aspect-[3/4] overflow-hidden rounded-[1.25rem] bg-ink-800 md:sticky md:top-0 md:self-start">
               <Image src={story.src} alt={story.alt} width={story.width} height={story.height} sizes="(min-width: 768px) 30rem, 90vw" className="h-full w-full object-cover" style={{ objectPosition: story.focus ?? "50% 18%" }} />
             </div>
-            <div className="flex min-w-0 flex-col gap-5">
+            <div data-panel-in className="flex min-w-0 flex-col gap-5">
               <div className="flex items-start justify-between gap-4">
                 <h3 id="deck-story-title" className="font-display text-headline-m leading-[1.02] font-bold tracking-[-0.02em] text-balance">
                   {story.caption}

@@ -73,6 +73,7 @@ Também roda sem o Blender instalado, com `pip install bpy pillow` e `python bui
 | `build_sr_bigodes.py` | junta tudo e salva o `.blend` |
 | `render_sr_bigodes.py` | renders de apresentação |
 | `make_sheet.py` | folha de apresentação |
+| `render_turntable.py` | giro 360° para o Lab do portfólio: escreve o pôster e a folha de 36 quadros em `assets/media/` (depois rode `npm run images` na raiz) |
 
 Para mudar proporções, edite os números no topo de `sb_model.py` (dicionário `J`, `build_field`, `EYE_R`, `ear_surface`) e reconstrua.
 

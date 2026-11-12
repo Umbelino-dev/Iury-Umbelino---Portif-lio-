@@ -112,6 +112,11 @@ Temporary progress log. Permanent rules live in `CLAUDE.md`.
 - Copiloto / Tendências / Zeff / UMB stay (product vision), `confirmed: false`, status only concept or in-development (Tendências moved prototype → concept).
 - M1 starts only after Iury sends Homepage R02 screenshots (desktop + mobile). Received so far: desktop Hero and desktop Night→Day transition (start state).
 
+- [x] **R11: Sr. Bigodes** (2026-11-12): the cat has a 3D model (`SR_BIGODES_3D/`: Blender file, build/render scripts, character sheet). On the site (Iury chose "Lab + redrawn cat"):
+  - Lab E.01: the CSS cube placeholder is gone. The frame shows a still render of the model; on fine pointers the pointer turns it through a 36-frame sheet (`LabFrame`, `Turntable` in `types.ts`, cursor label "girar"). Copy is still the design's placeholder (`confirmed: false`).
+  - `CatFigure` redrawn after the model, same hooks and pivots, so every clip and state runs unchanged. `icon.svg` follows; share images regenerated (`node scripts/og.cjs`).
+  - Not done: real-time 3D and rendered sprites for the hero cat (heavier, and the rail cat is 30px).
+
 ## Still open
 - Deploy (Iury): Cloudflare account, connect the repo, set `NEXT_PUBLIC_SITE_URL` (build variable), custom domain — steps in README.
 - Optional later: a real screenshot of the Care Radar (Fig. 04), Via Hebraica case study, real Lab experiments, field CWV after deploy, test on physical phones.

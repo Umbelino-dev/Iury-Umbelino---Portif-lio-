@@ -112,6 +112,18 @@ Temporary progress log. Permanent rules live in `CLAUDE.md`.
 - Copiloto / Tendências / Zeff / UMB stay (product vision), `confirmed: false`, status only concept or in-development (Tendências moved prototype → concept).
 - M1 starts only after Iury sends Homepage R02 screenshots (desktop + mobile). Received so far: desktop Hero and desktop Night→Day transition (start state).
 
+- [x] **R11: Sr. Bigodes** (2026-11-12): the cat has a 3D model (`SR_BIGODES_3D/`: Blender file, build/render scripts, character sheet). On the site (Iury chose "Lab + redrawn cat"):
+  - Lab E.01: the CSS cube placeholder is gone. The frame shows a still render of the model; on fine pointers the pointer turns it through a 36-frame sheet (`LabFrame`, `Turntable` in `types.ts`, cursor label "girar"). Copy is still the design's placeholder (`confirmed: false`).
+  - `CatFigure` redrawn after the model, same hooks and pivots, so every clip and state runs unchanged. `icon.svg` follows; share images regenerated (`node scripts/og.cjs`).
+  - Not done: real-time 3D and rendered sprites for the hero cat (heavier, and the rail cat is 30px).
+
+- [x] **R12: the cat's personality** (2026-11-12, from Iury's voice brief: fall when the scroll is too fast for the jump, hanging, walking, coming back, words falling because of him, magic into the corner button on phones):
+  - Rail: swing from the paws, hand-over-hand climb, let go on a fast scroll (> 2.6 px/ms), fall or leap back, grab. Dock: brace. Fast hero exit: falls instead of leaping. Way home: crouch, arc, landing.
+  - Letters: "n" and "o" give under its weight in the hero scrub; the leap knocks the "o" down, it springs back; the "o" takes the landing.
+  - Phones: puff of stars out of the hero, in at the corner button, and back.
+  - Tested in Playwright (1440 rail, 1280 dock, iPhone 13, reduced motion): every behaviour triggered, states in order, no console errors. Not tested on a physical phone or with a real trackpad: the `FAST` threshold may want tuning by feel.
+  - Reading of the brief I was least sure of: "words falling because of him" is done on the name's letters only, not on body copy.
+
 ## Still open
 - Deploy (Iury): Cloudflare account, connect the repo, set `NEXT_PUBLIC_SITE_URL` (build variable), custom domain — steps in README.
 - Optional later: a real screenshot of the Care Radar (Fig. 04), Via Hebraica case study, real Lab experiments, field CWV after deploy, test on physical phones.

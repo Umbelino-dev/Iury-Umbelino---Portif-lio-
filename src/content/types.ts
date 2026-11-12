@@ -96,11 +96,23 @@ export interface Project {
   confirmed: boolean;
 }
 
+/**
+ * A pre-rendered 360° turn: one sprite sheet of `cols` × `rows` cells, read left to
+ * right, top to bottom. Cell 0 is the same picture as the entry's `media`.
+ */
+export interface Turntable {
+  /** `/media/<name>.webp` — one file, no width variants. */
+  src: string;
+  frames: number;
+  cols: number;
+  rows: number;
+}
+
 /** Experimental Lab entry (Homepage R02 · Lab). */
 export interface LabEntry {
   index: string; // "E.01"
-  /** The frame study drawn in place of media: 3D cube, pointer trace or sound score. */
-  frame: "cube" | "pointer" | "sound";
+  /** What the frame holds: the 3D model, or a study drawn in place of media (pointer trace, sound score). */
+  frame: "model" | "pointer" | "sound";
   aspect: "1/1" | "3/4" | "16/9";
   status: ProjectStatus;
   year?: number;
@@ -108,6 +120,8 @@ export interface LabEntry {
   title: Localized;
   body: Localized;
   media?: MediaImage;
+  /** With `media`: the pointer turns the model (LabFrame). */
+  turntable?: Turntable;
   source: string;
   confirmed: boolean;
 }

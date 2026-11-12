@@ -201,3 +201,54 @@ export function greet(p: CatParts) {
 export function tailFlick(p: CatParts) {
   return gsap.timeline().to(p.tail, { rotation: -14, duration: 0.18, ease: "power1.out" }).to(p.tail, { rotation: 0, duration: 0.5, ease: "elastic.out(1, 0.4)" });
 }
+
+/**
+ * Lost its grip on the rail (a scroll too fast to hold on to): paws off, legs
+ * dangling, ears back, eyes wide, the tail thrown the other way. `dir` is the
+ * way the page pulls it (1 = down, -1 = up). `grab` catches the rail again.
+ */
+export function letGo(p: CatParts, dir: number, d = 0.12) {
+  return gsap
+    .timeline()
+    .set(p.paws, { opacity: 0 }, 0)
+    .to(p.frame, { rotation: dir * 9, scaleX: 0.94, scaleY: 1.1, duration: d, ease: "power1.out", overwrite: "auto" }, 0)
+    .to(legs(p), { y: 6, rotation: (i) => (i ? 12 : -12), duration: d, overwrite: "auto" }, 0)
+    .to(p.ears, { y: 2, duration: d, overwrite: "auto" }, 0)
+    .to(p.eyes, { scale: 1.2, duration: d, overwrite: "auto" }, 0)
+    .to(p.tail, { rotation: -dir * 30, duration: d, overwrite: "auto" }, 0);
+}
+
+/**
+ * Braced against a fast scroll (the dock, where there is nothing to fall from):
+ * low and wide, ears back, tail streaming with the page, then it straightens up.
+ */
+export function brace(p: CatParts, dir: number) {
+  return gsap
+    .timeline()
+    .to(p.frame, { scaleX: 1.08, scaleY: 0.88, duration: 0.1, ease: "power2.out", overwrite: "auto" }, 0)
+    .to(p.ears, { y: 2.5, duration: 0.1, overwrite: "auto" }, 0)
+    .to(p.eyes, { scale: 1.18, duration: 0.1, overwrite: "auto" }, 0)
+    .to(p.tail, { rotation: -dir * 26, duration: 0.12, overwrite: "auto" }, 0)
+    .to(p.frame, { scaleX: 1, scaleY: 1, duration: 0.5, ease: "elastic.out(1, 0.45)" }, 0.28)
+    .to(p.ears, { y: 0, duration: 0.2 }, 0.28)
+    .to(p.eyes, { scale: 1, duration: 0.2 }, 0.28)
+    .to(p.tail, { rotation: 0, duration: 0.7, ease: "elastic.out(1, 0.4)" }, 0.28);
+}
+
+/**
+ * Climbing the rail hand over hand: the two paws and the legs alternate.
+ * `step` is how many grips it has taken so far; call it as the cat moves.
+ */
+export function climbStep(p: CatParts, step: number) {
+  const paws = p.paws ? Array.from(p.paws.children) : [];
+  const odd = step % 2 === 1;
+  gsap.to(paws, { y: (i) => (i === (odd ? 0 : 1) ? -3 : 0), duration: 0.09, overwrite: "auto" });
+  gsap.to(legs(p), { rotation: (i) => (i === (odd ? 0 : 1) ? 9 : -9), duration: 0.09, overwrite: "auto" });
+}
+
+/** Back to a still grip after climbing. */
+export function climbRest(p: CatParts) {
+  const paws = p.paws ? Array.from(p.paws.children) : [];
+  gsap.to(paws, { y: 0, duration: 0.16, overwrite: "auto" });
+  gsap.to(legs(p), { rotation: 0, duration: 0.2, overwrite: "auto" });
+}

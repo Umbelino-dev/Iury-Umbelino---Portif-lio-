@@ -16,12 +16,14 @@ import { LabFrame } from "./LabFrame";
  * Below ~720px everything stacks. No numerals, codes, crop marks or grid lines:
  * each entry is its own picture, a title and a line in serif saying where it is.
  *
- * The cat's perch on E.01 is reserved for the single CatAssistant (M5).
+ * E.01 shows the cat's 3D model (Sr. Bigodes): a still render that the pointer
+ * turns through a pre-rendered 360° sheet (see LabFrame).
  */
 export async function Lab() {
   const locale = (await getLocale()) as Locale;
   const t = await getTranslations("lab");
   const ts = await getTranslations("status");
+  const tc = await getTranslations("cursor");
   const [e1, e2, e3] = lab;
   if (!e1 || !e2 || !e3) return null;
 
@@ -65,9 +67,8 @@ export async function Lab() {
           {/* First entry: high on the left */}
           <li className="flex w-full flex-col gap-7 min-[720px]:w-[max(300px,41.66%)]">
             <div className="relative">
-              <LabFrame cube className="aspect-square bg-[#141414]">
+              <LabFrame turntable={e1.turntable} cursorLabel={tc("turn")} className="aspect-square bg-[#141414]">
                 <Media entry={e1} locale={locale} />
-                {!e1.media && <Cube />}
                 {!e1.media && <Pending text={t("drop")} />}
               </LabFrame>
             </div>
@@ -122,7 +123,7 @@ function Media({ entry, locale }: { entry: LabEntry; locale: Locale }) {
       width={entry.media.width}
       height={entry.media.height}
       sizes="(min-width: 720px) 50vw, 100vw"
-      className="absolute inset-0 h-full w-full object-cover"
+      className="absolute inset-0 h-full w-full object-cover group-data-[turning=true]/frame:opacity-0"
     />
   );
 }
@@ -154,27 +155,6 @@ function Trace({ label }: { label: string }) {
       </svg>
       <span className="absolute top-[58%] left-[31%] size-4 -translate-1/2 rounded-full border border-paper" />
       <span className="text-note absolute top-[58%] left-[calc(31%+18px)] -translate-y-1/2 text-[1rem] text-paper-300">{label}</span>
-    </span>
-  );
-}
-
-/** Wireframe cube in CSS 3D — turned by LabFrame on pointer move. */
-function Cube() {
-  const faces = ["rotateY(0deg)", "rotateY(90deg)", "rotateY(180deg)", "rotateY(-90deg)", "rotateX(90deg)", "rotateX(-90deg)"];
-  return (
-    <span aria-hidden="true" className="absolute inset-0 flex items-center justify-center perspective-[700px]">
-      <span
-        data-cube
-        className="relative size-(--s) transform-3d transition-transform duration-[600ms] ease-(--ease-out-soft) [--s:clamp(80px,9vw,150px)] [transform:rotateX(-22deg)_rotateY(34deg)]"
-      >
-        {faces.map((f) => (
-          <span
-            key={f}
-            className="absolute inset-0 border border-paper/60 bg-paper/[0.025]"
-            style={{ transform: `${f} translateZ(calc(var(--s) / 2))` }}
-          />
-        ))}
-      </span>
     </span>
   );
 }

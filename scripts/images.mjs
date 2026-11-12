@@ -62,3 +62,12 @@ await variants("portrait-cyborg", cyborg);
 for (const name of ["koinonia-cover", "koinonia-map", "koinonia-brand"]) {
   await variants(name, await fs.readFile(path.join(SRC, `${name}.png`)));
 }
+
+// Sr. Bigodes, the cat's 3D model (SR_BIGODES_3D/scripts/render_turntable.py writes both
+// sources). The still goes through the usual widths; the 360° sheet is one file of
+// 6 × 6 cells with alpha, loaded only on fine pointers (LabFrame).
+await variants("sr-bigodes", await fs.readFile(path.join(SRC, "sr-bigodes-src.png")));
+await sharp(path.join(SRC, "sr-bigodes-turn-src.png"))
+  .webp({ quality: 72, alphaQuality: 90, effort: 6 })
+  .toFile(path.join(OUT, "sr-bigodes-turn.webp"));
+console.log("sr-bigodes-turn: one sheet");

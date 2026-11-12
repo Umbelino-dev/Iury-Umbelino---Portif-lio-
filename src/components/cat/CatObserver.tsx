@@ -204,6 +204,14 @@ export function CatObserver({
             .to(p.gaze, { x: 2.5, duration: 0.04 }, 0.34)
             .add(run(p, el, toEdge, { strides: 3, d: 0.1, dir: 1 }), 0.38)
             .add(crouch(p, 0.04), 0.48);
+          // The letters give under its weight: the "n" as it walks over it, the "o"
+          // when it comes back, deeper as it crouches. (`yPercent`, so the leap's own
+          // push on the "o", which uses `y`, adds to it instead of fighting it.)
+          const glyph = (id: string) => document.querySelector<SVGPathElement>(`[data-glyph="${id}"]`);
+          const n = glyph("l2-n");
+          const o = glyph("l2-o");
+          if (n) tl.fromTo(n, { yPercent: 0 }, { yPercent: 2.4, duration: 0.06, immediateRender: false }, 0.26).to(n, { yPercent: 0, duration: 0.06 }, 0.38);
+          if (o) tl.fromTo(o, { yPercent: 0 }, { yPercent: 2, duration: 0.04, immediateRender: false }, 0.44).to(o, { yPercent: 4, duration: 0.04 }, 0.48);
         } else {
           tl.add(stretch(p, 0.2), 0)
             .to(p.look, { rotation: -9, duration: 0.15 }, 0.22)

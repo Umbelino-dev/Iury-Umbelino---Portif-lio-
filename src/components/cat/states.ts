@@ -10,6 +10,13 @@
  * inside `observer` (CatObserver). Greeting at Contact is a one-shot clip, not a
  * state either.
  *
+ * Speed changes how a state plays, not which state it is (CatAssistant, `FAST`):
+ * a hero left too fast skips the leap (the cat is already in the air, falling);
+ * on the rail a scroll too fast shakes it loose, it travels with the page, then
+ * falls back and grabs again; in the dock it only braces. On phones the leap is
+ * replaced by a puff of stars (`magic.ts`): it vanishes from the hero and appears
+ * as the corner button, and back.
+ *
  * "cling" has two places (CatAssistant): the R03 rail from 1440px with a fine pointer
  * (home only), where the right page margin can hold the cat; otherwise the docked,
  * awake cat in the bottom-right corner (the dock R03 uses on mobile).

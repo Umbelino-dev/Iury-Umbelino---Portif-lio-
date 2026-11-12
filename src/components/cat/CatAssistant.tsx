@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useId, useReducer, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import { gsap, MQ } from "@/lib/gsap";
 import { CatFigure } from "./CatFigure";
-import { airborne, catParts, crouch, falling, grab, greet, land, prime, settle, wake, type CatParts } from "./clips";
+import { airborne, brace, catParts, climbRest, climbStep, crouch, falling, grab, greet, land, letGo, prime, settle, wake, type CatParts } from "./clips";
+import { sparkle } from "./magic";
 import { SectionRail } from "./SectionRail";
 import { CAT_OPEN, HERO_LEFT_AT, IDLE_MS, transition, type CatEvent, type CatState } from "./states";
 
@@ -43,6 +44,10 @@ const MOBILE = "(max-width: 767px)";
  */
 const RAIL = "(min-width: 1440px) and (hover: hover) and (pointer: fine)";
 const READING_LINE = 0.4; // the rail cat holds 40% of the viewport height
+/** A scroll faster than this (px per ms) is too fast to hold on to: the cat lets go. */
+const FAST = 2.6;
+/** The hero's last letter, the one the cat sits on: it takes the leap and the landing. */
+const perch = () => document.querySelector<SVGPathElement>('[data-glyph="l2-o"]');
 const subscribeRail = (cb: () => void) => {
   const mq = window.matchMedia(RAIL);
   mq.addEventListener("change", cb);
@@ -159,7 +164,27 @@ export function CatAssistant({
     if (!rail && dock.current) gsap.set(dock.current, { y: 0 });
   }, [rail]);
 
-  // ── S3 on the rail: hang, ride the page, climb back to the reading line ──
+  // ── Scroll speed, read by the leap (too fast = no time to jump: it falls) ──
+  const speed = useRef({ v: 0, t: 0 });
+  useEffect(() => {
+    let lastY = window.scrollY;
+    let lastT = performance.now();
+    const onScroll = () => {
+      const now = performance.now();
+      speed.current = { v: Math.abs(window.scrollY - lastY) / Math.max(8, now - lastT), t: now };
+      lastY = window.scrollY;
+      lastT = now;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  const tooFast = () => performance.now() - speed.current.t < 220 && speed.current.v > FAST;
+
+  // ── S3 on the rail: hang, ride the page, climb back to the reading line.
+  //    It hangs from its paws, so it swings as the page drags it, and climbs back
+  //    hand over hand. A scroll too fast to hold on to shakes it loose: it travels
+  //    with the page in the air, then falls (or leaps) back to the line and
+  //    catches the rail again.
   useEffect(() => {
     if (!rail || state !== "cling") return;
     const d = dock.current;
@@ -176,39 +201,144 @@ export function CatAssistant({
         if (eyes) gsap.set(eyes, { x: 0 });
       };
     }
-    // Scrolling drags the cat with the page; it then climbs back to the line
-    // (lerp 0.12). The rAF runs only while it is still moving.
-    const span = window.innerHeight * 0.25;
+    const p = dockInner.current ? catParts(dockInner.current) : null;
+    const vh = window.innerHeight;
+    const span = vh * 0.25; // holding on: how far the page can drag it
+    const looseUp = vh * READING_LINE - 96; // loose: up to just under the nav
+    const looseDown = vh * 0.42;
+    const clamp = gsap.utils.clamp;
     const setY = gsap.quickSetter(d, "y", "px");
-    let offset = 0;
+    const m = { offset: 0 };
     let lastY = window.scrollY;
+    let lastT = performance.now();
     let frame = 0;
+    let loose = false;
+    let returning = false;
+    let calm: number | undefined;
+    let travelled = 0;
+    let steps = 0;
+    let hanging = false;
+
+    const swing = (deg: number) => {
+      if (!p) return;
+      if (!hanging) {
+        // From here on the figure pivots where it holds the rail, not on its feet.
+        hanging = true;
+        gsap.set(p.frame, { transformOrigin: "50% 8%" });
+      }
+      gsap.set(p.frame, { rotation: deg });
+    };
+    // Holding on: the page drags it, it climbs back to the line (lerp 0.12).
+    // The rAF runs only while it is still moving.
     const tick = () => {
-      offset += (0 - offset) * 0.12;
-      setY(base + offset);
-      if (tail) gsap.set(tail, { rotation: gsap.utils.clamp(-30, 30, offset * 0.3), svgOrigin: "80 118" });
-      if (Math.abs(offset) > 0.5) {
+      const before = m.offset;
+      m.offset += (0 - m.offset) * 0.12;
+      setY(base + m.offset);
+      if (tail) gsap.set(tail, { rotation: clamp(-30, 30, m.offset * 0.3), svgOrigin: "80 118" });
+      swing(clamp(-13, 13, m.offset * 0.07));
+      travelled += Math.abs(m.offset - before);
+      if (p && travelled > 16) {
+        travelled = 0;
+        climbStep(p, ++steps);
+      }
+      if (Math.abs(m.offset) > 0.5) {
         frame = requestAnimationFrame(tick);
       } else {
         frame = 0;
+        m.offset = 0;
         setY(base);
         if (tail) gsap.to(tail, { rotation: 0, duration: 0.5, ease: "elastic.out(1, 0.4)" });
+        if (p) {
+          gsap.to(p.frame, { rotation: 0, duration: 0.8, ease: "elastic.out(1, 0.35)" });
+          climbRest(p);
+        }
       }
+    };
+    // The speed is gone: it falls (or leaps up) to the line and catches the rail.
+    const regrip = () => {
+      loose = false;
+      returning = true;
+      gsap.to(m, {
+        offset: 0,
+        duration: 0.2 + Math.min(0.3, Math.abs(m.offset) / 900),
+        ease: m.offset < 0 ? "power2.in" : "power2.out",
+        onUpdate: () => setY(base + m.offset),
+        onComplete: () => {
+          returning = false;
+          if (!p) return;
+          grab(p);
+          gsap.to(p.eyes, { scale: 1, duration: 0.2 });
+          gsap.to(p.ears, { y: 0, duration: 0.2 });
+        },
+      });
     };
     const onScroll = () => {
       const y = window.scrollY;
-      gsap.killTweensOf(d, "y");
-      offset = gsap.utils.clamp(-span, span, offset - (y - lastY));
+      const now = performance.now();
+      const dy = y - lastY;
+      const v = Math.abs(dy) / Math.max(8, now - lastT);
       lastY = y;
+      lastT = now;
+      if (!dy) return;
+      gsap.killTweensOf(d, "y");
+      if (!loose && v > FAST) {
+        loose = true;
+        returning = false;
+        cancelAnimationFrame(frame);
+        frame = 0;
+        gsap.killTweensOf(m);
+        if (p) {
+          climbRest(p);
+          letGo(p, dy > 0 ? -1 : 1); // scrolling down carries it up, and the other way round
+        }
+      }
+      if (loose) {
+        m.offset = clamp(-looseUp, looseDown, m.offset - dy);
+        setY(base + m.offset);
+        window.clearTimeout(calm);
+        calm = window.setTimeout(regrip, 140);
+        return;
+      }
+      if (returning) return;
+      m.offset = clamp(-span, span, m.offset - dy);
       if (!frame) frame = requestAnimationFrame(tick);
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
       window.removeEventListener("scroll", onScroll);
       cancelAnimationFrame(frame);
+      window.clearTimeout(calm);
       gsap.killTweensOf(d, "y");
+      gsap.killTweensOf(m);
+      if (p) {
+        climbRest(p);
+        gsap.killTweensOf(p.frame, "rotation");
+        gsap.set(p.frame, { rotation: 0, transformOrigin: "50% 100%" });
+      }
       if (eyes) gsap.to(eyes, { x: 0, duration: 0.2 });
     };
+  }, [rail, state]);
+
+  // ── S3 in the dock: there is nothing to fall from, so a scroll that fast only
+  //    makes it brace (low, ears back, tail streaming), at most once a second.
+  useEffect(() => {
+    if (rail || state !== "cling" || reduced()) return;
+    let lastY = window.scrollY;
+    let lastT = performance.now();
+    let rest = 0;
+    const onScroll = () => {
+      const now = performance.now();
+      const dy = window.scrollY - lastY;
+      const v = Math.abs(dy) / Math.max(8, now - lastT);
+      lastY = window.scrollY;
+      lastT = now;
+      if (v <= FAST || now < rest) return;
+      rest = now + 1000;
+      const p = clipParts();
+      if (p) brace(p, dy > 0 ? -1 : 1);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, [rail, state]);
 
   // ── Hero visibility drives S1 ⇄ S2 (home only) ───────────────────────────
@@ -449,10 +579,37 @@ export function CatAssistant({
           return;
         }
         gsap.set(hero, { autoAlpha: 0 });
+        const seen = hr.bottom > 0 && hr.top < window.innerHeight;
+        // Phones: no leap. It vanishes from the hero in a puff of stars and
+        // appears, by the same magic, as the corner button.
+        if (mobile()) {
+          const at = seen ? 0.14 : 0;
+          if (seen) sparkle(hr.left + hr.width / 2, hr.top + hr.height / 2);
+          gsap
+            .timeline({ onComplete: landed })
+            .set(inner, { x: 0, y: 0, scale: 0, rotation: -120 }, 0)
+            .add(() => {
+              sparkle(dr.left + dr.width / 2, dr.top + dr.height / 2, { count: 11, spread: 60 });
+            }, at)
+            .to(inner, { scale: 1, rotation: 0, duration: 0.42, ease: "back.out(1.8)" }, at)
+            .add(land(p), at + 0.34);
+          return;
+        }
+        // Too fast for the leap (no time to crouch, or the hero cat is long gone):
+        // it is already in the air, falling, and catches the rail or lands.
+        if (tooFast() || hr.bottom < -60) {
+          gsap
+            .timeline({ onComplete: landed })
+            .set(inner, { x: 0, y: -(dr.top + dr.height + 24), scale: 1, rotation: 0 }, 0)
+            .add(falling(p, 0.08), 0)
+            .to(inner, { y: 0, duration: 0.46, ease: "power2.in" }, 0)
+            .add(isRail() ? grab(p) : land(p), 0.46);
+          return;
+        }
         // Apex above both ends of the leap, but never above the visible page (under the nav).
         const apex = Math.max(Math.min(dy, 0) - 70, 90 - dr.top);
         const tl = gsap.timeline({ onComplete: landed });
-        tl.set(inner, { x: dx, y: dy, scale: hr.width / dr.width })
+        tl.set(inner, { x: dx, y: dy, scale: hr.width / dr.width, rotation: 0 })
           .add(crouch(p, 0.1))
           .addLabel("air")
           .add(airborne(p, 0.2), "air")
@@ -461,30 +618,64 @@ export function CatAssistant({
           .add(falling(p, 0.22), "air+=0.22")
           .to(inner, { y: 0, duration: 0.28, ease: "power2.in" }, "air+=0.22")
           .add(isRail() ? grab(p) : land(p), "air+=0.5");
+        // The push-off knocks its letter down; the letter springs back up.
+        const o = perch();
+        if (o) {
+          tl.to(o, { y: 150, rotation: 9, transformOrigin: "30% 100%", duration: 0.18, ease: "power2.in" }, "air").to(
+            o,
+            { y: 0, rotation: 0, duration: 1.1, ease: "elastic.out(1, 0.38)" },
+            "air+=0.24",
+          );
+        }
         return;
       }
 
       // S2–S4 → S1: reverse jump back into the hero slot.
       if (state === "observer" && from !== "observer") {
+        const o = perch();
         const back = () => {
           gsap.set(d, { autoAlpha: 0, y: 0 });
-          gsap.set(inner, { x: 0, y: 0, scale: 1 });
+          gsap.set(inner, { x: 0, y: 0, scale: 1, rotation: 0 });
           if (hero) gsap.to(hero, { autoAlpha: 1, duration: rm ? 0.16 : 0.12 });
         };
+        if (o) gsap.to(o, { y: 0, rotation: 0, duration: 0.2, overwrite: "auto" });
         if (rm || !hero) {
           gsap.to(d, { autoAlpha: 0, duration: 0.16, onComplete: back });
           return;
         }
         const hr = hero.getBoundingClientRect();
         const dr = inner.getBoundingClientRect();
-        gsap.to(inner, {
-          x: hr.left + hr.width / 2 - (dr.left + dr.width / 2),
-          y: hr.top + hr.height / 2 - (dr.top + dr.height / 2),
-          scale: hr.width / dr.width,
-          duration: 0.42,
-          ease: "power2.inOut",
-          onComplete: back,
-        });
+        const seen = hr.bottom > 0 && hr.top < window.innerHeight;
+        // Phones: the magic again, the other way round.
+        if (mobile()) {
+          sparkle(dr.left + dr.width / 2, dr.top + dr.height / 2, { count: 11, spread: 60 });
+          gsap.to(inner, {
+            scale: 0,
+            rotation: 120,
+            duration: 0.24,
+            ease: "power2.in",
+            onComplete: () => {
+              back();
+              if (seen) sparkle(hr.left + hr.width / 2, hr.top + hr.height / 2);
+            },
+          });
+          return;
+        }
+        // A real leap home: crouch, an arc, and it lands on its letter, which takes the weight.
+        const tx = hr.left + hr.width / 2 - (dr.left + dr.width / 2);
+        const ty = hr.top + hr.height / 2 - (dr.top + dr.height / 2);
+        const tl = gsap.timeline({ onComplete: back });
+        tl.set(p.paws, { opacity: 0 }, 0)
+          .add(crouch(p, 0.08))
+          .addLabel("air")
+          .add(airborne(p, 0.16), "air")
+          .to(inner, { x: tx, scale: hr.width / dr.width, duration: 0.42, ease: "power1.inOut" }, "air")
+          .to(inner, { y: Math.min(ty, 0) - 56, duration: 0.18, ease: "power2.out" }, "air")
+          .to(inner, { y: ty, duration: 0.24, ease: "power2.in" }, "air+=0.18")
+          .add(land(p), "air+=0.42");
+        if (o && seen) {
+          tl.to(o, { y: 46, duration: 0.07, ease: "power2.out" }, "air+=0.42").to(o, { y: 0, duration: 0.8, ease: "elastic.out(1, 0.4)" }, "air+=0.49");
+        }
         return;
       }
 

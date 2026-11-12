@@ -19,6 +19,9 @@ export function HeroMotion({ children, className }: { children: ReactNode; class
       mm.add(MQ.motion, () => {
         const glyphs = gsap.utils.toArray<SVGPathElement>("[data-glyph]");
         const tl = gsap.timeline({ delay: 0.1 });
+        // GSAP owns the glyphs from here: drop the CSS failsafe, whose `transform: none`
+        // would otherwise pin them and hide the cat's later pushes on the letters.
+        gsap.set([...glyphs, "[data-join]"], { animation: "none" });
         tl.fromTo(
           glyphs,
           { y: 140, autoAlpha: 0 },

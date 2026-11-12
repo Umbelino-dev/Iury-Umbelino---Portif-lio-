@@ -138,6 +138,8 @@ export async function About() {
             summary: p.summary?.[locale],
             story: p.story?.[locale],
             linkedin: p.linkedin,
+            post: p.post?.[locale],
+            focus: p.focus,
           }))}
           labels={{
             deck: ta("gallery"),
@@ -147,6 +149,7 @@ export async function About() {
             pending: ta("galleryPending"),
             linkedin: ta("galleryLinkedIn"),
             post: ta("galleryPost"),
+            author: "Iury Umbelino",
             close: ta("galleryClose"),
           }}
         />

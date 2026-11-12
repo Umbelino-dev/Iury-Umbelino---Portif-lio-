@@ -105,6 +105,8 @@ Temporary progress log. Permanent rules live in `CLAUDE.md`.
 
 - [x] **R10** (2026-11-11): About reordered: thesis line removed; summary + "O que faço" first, then tools/learning/education, the photo deck, the traits, the path. PhotoDeck: hover lift, a box rising from the pointer, click opens a dialog with story + LinkedIn embed + link. Open: Iury to send the LinkedIn photos and, per photo, summary, story, post URL and embed URL (`src/content/gallery.ts`).
 
+- [x] **R11** (2026-11-12): deck photos from Iury's LinkedIn (Startup Weekend team, Startup Weekend solo, CRIO Conecta selfie) + the portrait; summaries and the posts' text (verbatim from Iury's screenshots, EN translated) in `gallery.ts`. Open: the three lnkd.in links (dDd-BCfN, dqdj2qYm, dQYGyAR3) could not be resolved from the cloud session (LinkedIn is blocked), so which link is which post is unknown; `linkedin.url`/`embed` stay empty until Iury says. Third parties appear in two photos (posted publicly by Iury).
+
 ## Answers from Iury (2026-11-09)
 - Giassi, DOX, SQL and PL/SQL may be named publicly → `experience.publishEmployer = true`.
 - Contacts stay hidden; Iury will send the real email and LinkedIn.

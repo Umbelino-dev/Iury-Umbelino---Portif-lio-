@@ -15,6 +15,10 @@ export interface DeckPhoto {
   /** Shown when the card is opened. */
   story?: string;
   linkedin?: { url: string; embed?: string };
+  /** The LinkedIn post's text, one string per paragraph. */
+  post?: string[];
+  /** CSS object-position for the crop. */
+  focus?: string;
 }
 
 export interface DeckLabels {
@@ -24,7 +28,8 @@ export interface DeckLabels {
   hint: string; // "Clique para saber mais"
   pending: string; // "A história desta foto entra em breve."
   linkedin: string; // "Ver no LinkedIn"
-  post: string; // "Post no LinkedIn" (iframe title)
+  post: string; // "Post no LinkedIn"
+  author: string; // "Iury Umbelino"
   close: string;
 }
 
@@ -264,7 +269,8 @@ export function PhotoDeck({ photos, labels }: { photos: DeckPhoto[]; labels: Dec
                     height={p.height}
                     draggable={false}
                     sizes="(min-width: 768px) 27vw, 64vw"
-                    className="absolute inset-0 h-full w-full object-cover object-[50%_18%]"
+                    className="absolute inset-0 h-full w-full object-cover"
+                    style={{ objectPosition: p.focus ?? "50% 18%" }}
                   />
                   {/* Frosted base: a pre-blurred copy of the photo, revealed by a gradient. */}
                   <Image
@@ -275,7 +281,8 @@ export function PhotoDeck({ photos, labels }: { photos: DeckPhoto[]; labels: Dec
                     height={p.height}
                     draggable={false}
                     sizes="(min-width: 768px) 27vw, 64vw"
-                    className="absolute inset-0 h-full w-full scale-110 object-cover object-[50%_18%] blur-[14px] saturate-[1.25] [mask-image:linear-gradient(to_top,#000_30%,transparent_56%)]"
+                    className="absolute inset-0 h-full w-full scale-110 object-cover blur-[14px] saturate-[1.25] [mask-image:linear-gradient(to_top,#000_30%,transparent_56%)]"
+                    style={{ objectPosition: p.focus ?? "50% 18%" }}
                   />
                   <span
                     aria-hidden="true"
@@ -343,8 +350,8 @@ export function PhotoDeck({ photos, labels }: { photos: DeckPhoto[]; labels: Dec
       >
         {story && (
           <div className="grid gap-[clamp(1.5rem,3vw,2.5rem)] p-[clamp(1.25rem,3vw,2.5rem)] md:grid-cols-[minmax(0,0.85fr)_minmax(0,1fr)]">
-            <div className="relative aspect-[3/4] overflow-hidden rounded-[1.25rem] bg-ink-800 md:self-start">
-              <Image src={story.src} alt={story.alt} width={story.width} height={story.height} sizes="(min-width: 768px) 30rem, 90vw" className="h-full w-full object-cover object-[50%_18%]" />
+            <div className="relative aspect-[3/4] overflow-hidden rounded-[1.25rem] bg-ink-800 md:sticky md:top-0 md:self-start">
+              <Image src={story.src} alt={story.alt} width={story.width} height={story.height} sizes="(min-width: 768px) 30rem, 90vw" className="h-full w-full object-cover" style={{ objectPosition: story.focus ?? "50% 18%" }} />
             </div>
             <div className="flex min-w-0 flex-col gap-5">
               <div className="flex items-start justify-between gap-4">
@@ -360,7 +367,20 @@ export function PhotoDeck({ photos, labels }: { photos: DeckPhoto[]; labels: Dec
                 </button>
               </div>
               {story.summary && <p className="text-lead leading-snug text-pretty">{story.summary}</p>}
-              <p className="max-w-[60ch] text-body text-pretty text-[#3f3d39]">{story.story ?? labels.pending}</p>
+              {(story.story || !story.post) && <p className="max-w-[60ch] text-body text-pretty text-[#3f3d39]">{story.story ?? labels.pending}</p>}
+              {story.post && (
+                <article aria-label={labels.post} className="flex flex-col gap-3 rounded-[1.25rem] bg-paper-0 p-[clamp(1.125rem,2vw,1.5rem)]">
+                  <header className="flex items-baseline justify-between gap-3">
+                    <span className="font-display text-[1rem] font-bold">{labels.author}</span>
+                    <span className="text-note text-[0.875rem] text-gray-600">LinkedIn</span>
+                  </header>
+                  {story.post.map((para, k) => (
+                    <p key={k} className="text-ui leading-relaxed text-pretty text-[#2b2a27]">
+                      {para}
+                    </p>
+                  ))}
+                </article>
+              )}
               {story.linkedin?.embed && (
                 <iframe
                   src={story.linkedin.embed}

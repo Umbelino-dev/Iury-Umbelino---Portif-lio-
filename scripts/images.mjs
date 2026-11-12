@@ -62,3 +62,8 @@ await variants("portrait-cyborg", cyborg);
 for (const name of ["koinonia-cover", "koinonia-map", "koinonia-brand"]) {
   await variants(name, await fs.readFile(path.join(SRC, `${name}.png`)));
 }
+
+// Event photos for the About deck (from Iury's LinkedIn posts), kept as shot.
+for (const file of ["startup-weekend-team.webp", "startup-weekend.png", "crio-conecta.png"]) {
+  await variants(file.replace(/\.\w+$/, ""), await fs.readFile(path.join(SRC, file)));
+}

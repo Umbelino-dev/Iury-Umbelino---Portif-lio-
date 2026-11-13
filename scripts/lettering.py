@@ -48,7 +48,7 @@ OUT = ROOT / "src/components/hero/name-paths.ts"
 AXES = {"wght": float(os.environ.get("WGHT", 900))}  # Black: a poster-weight mark
 LINE = 880  # baseline-to-baseline in font units (tight, editorial)
 TRACK = int(os.environ.get("TRACK", -14))  # extra tracking per glyph, font units
-OVERLAP = 24  # how far the stem reaches into the b before the union (no seam)
+OVERLAP = 60  # how far the y's stem reaches down into the b's stem (two paths: no seam)
 PAD = 24  # breathing room inside the viewBox
 
 font = TTFont(SRC)
@@ -224,16 +224,17 @@ for ch, (name, x) in zip("Umbelino", line2):
         Tm = (1, 0, 0, -1, 0, B)  # line-2 x already applied below
         pm = pathops.Path()
         gs[name].draw(TransformPen(pm.getPen(), (1, 0, 0, -1, x + shift, B)))
-        # The leg stops where the ring starts; the ring (and 1 unit of overlap) takes over.
+        # The leg stops where the ring starts. The ring itself belongs to the b (below),
+        # which is painted after the m and reaches 40 units up into the leg, so the
+        # two paths overlap by several pixels instead of meeting on a hairline.
         pm = pathops.op(pm, rect(LEG_L - 1, LEG_L + B_W + 1, -200, TURN_CY, Tm), pathops.PathOp.DIFFERENCE)
-        ring = half_ring(TURN_CX, TURN_CY + 1, R_IN, R_OUT, Tm)
-        ring = pathops.op(ring, rect(LEG_L, LEG_L + B_W, TURN_CY - 1, TURN_CY + 2, Tm), pathops.PathOp.UNION)
-        # Its right end reaches a little up under the stem (drawn later, on top), so
-        # the two paths overlap instead of meeting on a hairline.
-        ring = pathops.op(ring, rect(STEM_L, STEM_L + B_W, TURN_CY - 1, TURN_CY + 3, Tm), pathops.PathOp.UNION)
-        pm = pathops.op(pm, ring, pathops.PathOp.UNION)
+        RING = half_ring(TURN_CX, TURN_CY + 1, R_IN, R_OUT, Tm)
+        RING = pathops.op(RING, rect(LEG_L, LEG_L + B_W, TURN_CY - 1, TURN_CY + 40, Tm), pathops.PathOp.UNION)
         glyphs.append({"id": "l2-m", "line": 2, "d": to_svg(pathops.simplify(pm))})
-    elif ch != "b":
+    elif ch == "b":
+        B_SLOT = len(glyphs)  # filled once the b is built (after the ligature section)
+        glyphs.append(None)
+    else:
         glyphs.append({"id": f"l2-{ch}", "line": 2, "d": path(name, x + shift, B)})
 
 # The ligature: (y above the cut) ∪ stem ∪ b, as one outline.
@@ -351,7 +352,12 @@ pb = pathops.op(pb, pathops.op(disk(TURN_CX, TURN_CY, R_OUT + SLIT, L2), rect(-9
 # Above the ring's centre the slit runs straight up beside the stem until it opens
 # into the counter, so the bowl hangs from the stem's top only.
 pb = pathops.op(pb, rect(STEM_L + B_W, STEM_L + B_W + SLIT, TURN_CY - 1, BOWL_CY, L2), pathops.PathOp.DIFFERENCE)
-yb = pathops.op(pathops.op(ytop, stem, pathops.PathOp.UNION), pb, pathops.PathOp.UNION)
+# The b (with the ring) is its own glyph, so it rises with line 2 like every other
+# letter; the ligature is the y and its stem, drawn down into the b. The stem runs
+# OVERLAP units into the b's stem and is painted last, so their joint has no seam.
+pb = pathops.op(pb, RING, pathops.PathOp.UNION)
+glyphs[B_SLOT] = {"id": "l2-b", "line": 2, "d": to_svg(pathops.simplify(pb))}
+yb = pathops.op(ytop, stem, pathops.PathOp.UNION)
 ligature = {"id": "yb", "d": to_svg(yb)}
 
 xs = []
@@ -401,7 +407,7 @@ OUT.write_text(
     f"// Satoshi {AXES}, line {LINE}, tracking {round(TRACK1, 1)} / {round(TRACK2, 1)} (flush left); y cut at {CUT} (stem {round(B_W, 1)}).\n"
     f"export const viewBox = {json.dumps(' '.join(str(v) for v in view))};\n"
     f"export const glyphs = {json.dumps(glyphs, indent=2)} as const;\n"
-    f"/** The y→b ligature: one outline, the y's V running into the b's stem (the m's half ring turns into it at the base). */\n"
+    f"/** The y's V and its stem, drawn down into the b (glyph l2-b, which carries the m's half ring). */\n"
     f"export const ligature = {json.dumps(ligature)} as const;\n"
     f"/** Positions in % of the mark (x of width, y of height). */\n"
     f"export const anchors = {json.dumps(anchors)} as const;\n"

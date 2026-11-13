@@ -127,4 +127,4 @@ Temporary progress log. Permanent rules live in `CLAUDE.md`.
 - Status `live` replaces the design's `Completed` (a product in use is not "completed").
 - Tagline stays English in both locales.
 - Hero keeps the poetic intro, with an eyebrow showing the current stack (Iury, 2026-11-09).
-- The About traits copy (T.01–T.03) is the design's, translated; it states intent, not achievements.
+- The About traits (Tecnologia, Criatividade, Curiosidade) were removed from the Profile (Iury, 2026-11-13).

@@ -41,20 +41,6 @@
   "about": {
     "label": "Perfil",
     "lead": "Quase tudo que faço começa com uma pergunta que não me larga. Aqui eu mostro o que encontrei.",
-    "traits": [
-      {
-        "word": "Tecnologia",
-        "text": "IA é meu material principal hoje. Assistentes, agentes e ferramentas que deixam a informação útil de verdade."
-      },
-      {
-        "word": "Criatividade",
-        "text": "Ligo para como as coisas são sentidas, não só para como funcionam. A interface faz parte da solução."
-      },
-      {
-        "word": "Curiosidade",
-        "text": "Prefiro um protótipo honesto a um palpite polido. Cada projeto me ensina uma coisa específica."
-      }
-    ],
     "gallery": "Fotos",
     "galleryShow": "Mostrar {caption}",
     "galleryMore": "Saber mais",

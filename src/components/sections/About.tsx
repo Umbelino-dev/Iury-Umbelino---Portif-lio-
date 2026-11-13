@@ -6,17 +6,14 @@ import { SectionTitle } from "@/components/layout/SectionTitle";
 import { PhotoDeck } from "@/components/media/PhotoDeck";
 import { Timeline } from "./Timeline";
 
-type Trait = { word: string; text: string };
-
 /**
  * About — light editorial. The section name opens it ("Sobre"); right under it,
  * who Iury is in brief and what he has done (verified CV facts); then the photo
- * deck (each card tells its story); the three traits; the career path.
+ * deck (each card tells its story); the career path.
  */
 export async function About() {
   const ta = await getTranslations("about");
   const locale = (await getLocale()) as Locale;
-  const traits = ta.raw("traits") as Trait[];
   const t = await getTranslations("experience");
   const tl = await getTranslations("experience.timeline");
   const intl = locale === "pt" ? "pt-BR" : "en";
@@ -161,21 +158,6 @@ export async function About() {
           }}
         />
       </div>
-
-      {/*
-        The three traits side by side, each word whole: the size follows the column's
-        own width (container units), so the longest word always fits on one line.
-      */}
-      <ul className="page-grid mt-[clamp(3.5rem,6vw,6rem)] gap-y-12">
-        {traits.map((trait) => (
-          <li key={trait.word} className="@container col-span-4 flex flex-col gap-4">
-            <h3 className="font-display text-[clamp(2rem,13cqw,4.25rem)] leading-[0.9] font-black tracking-[-0.045em] whitespace-nowrap">
-              {trait.word}
-            </h3>
-            <p className="max-w-[32ch] text-ui leading-normal text-pretty text-gray-600">{trait.text}</p>
-          </li>
-        ))}
-      </ul>
 
       {/* The career path, full width. */}
       <div className="page-grid mt-(--section-space)">

@@ -34,7 +34,9 @@
       "rest": "what comes",
       "accent": "next."
     },
-    "ctaContact": "Get in touch"
+    "ctaContact": "Get in touch",
+    "social": "Social",
+    "newTab": "opens in a new tab"
   },
   "about": {
     "label": "Profile",
@@ -270,7 +272,8 @@
     "kinds": {
       "email": "Email",
       "linkedin": "LinkedIn",
-      "github": "GitHub"
+      "github": "GitHub",
+      "instagram": "Instagram"
     }
   },
   "footer": {

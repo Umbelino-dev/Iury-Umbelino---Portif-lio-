@@ -12,7 +12,7 @@ export const site = {
 } as const;
 
 export interface ContactLink {
-  kind: "email" | "linkedin" | "github";
+  kind: "email" | "linkedin" | "github" | "instagram";
   label: string;
   href: string;
   /** Rendered only when true. */
@@ -24,6 +24,9 @@ export const contacts: ContactLink[] = [
   { kind: "email", label: "iuryumbelino1@gmail.com", href: "mailto:iuryumbelino1@gmail.com", publish: true },
   { kind: "linkedin", label: "in/iuryumbelino", href: "https://www.linkedin.com/in/iuryumbelino/", publish: true },
   { kind: "github", label: "@Umbelino-dev", href: "https://github.com/Umbelino-dev", publish: true },
+  // Instagram: not confirmed yet. Fill `label` and `href` (e.g. "https://www.instagram.com/<user>/")
+  // and set `publish: true`; it then shows in the hero and in Contact.
+  { kind: "instagram", label: "", href: "", publish: false },
 ];
 
 export const education: { course: Localized; school: string; expected: number }[] = [

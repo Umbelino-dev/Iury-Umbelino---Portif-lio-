@@ -34,7 +34,9 @@
       "rest": "o que vem",
       "accent": "a seguir."
     },
-    "ctaContact": "Fale comigo"
+    "ctaContact": "Fale comigo",
+    "social": "Redes",
+    "newTab": "abre em nova aba"
   },
   "about": {
     "label": "Perfil",
@@ -275,7 +277,8 @@
     "kinds": {
       "email": "E-mail",
       "linkedin": "LinkedIn",
-      "github": "GitHub"
+      "github": "GitHub",
+      "instagram": "Instagram"
     }
   },
   "footer": {

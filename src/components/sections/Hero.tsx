@@ -1,7 +1,9 @@
 import type { CSSProperties } from "react";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { CatObserver } from "@/components/cat/CatObserver";
+import { HeroPortrait, HeroSocial } from "@/components/hero/HeroPortrait";
 import { NameMark } from "@/components/hero/NameMark";
+import type { Locale } from "@/i18n/routing";
 import { anchors, viewBox } from "@/components/hero/name-paths";
 import { HeroMotion } from "./HeroMotion";
 
@@ -32,6 +34,7 @@ export async function Hero() {
   const t = await getTranslations("hero");
   const ta = await getTranslations("assistant.ui");
   const tc = await getTranslations("cursor");
+  const locale = (await getLocale()) as Locale;
 
   return (
     <section
@@ -93,7 +96,15 @@ export async function Hero() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-6">
+        {/*
+          Bottom row. Desktop: the intro on the left, the portrait card and the social
+          links on the right, sharing one baseline. Mobile: portrait, intro, links.
+        */}
+        <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between md:gap-10">
+          <div className="flex items-end gap-2 md:order-last">
+            <HeroSocial label={t("social")} newTab={t("newTab")} className="hidden md:block [&_ul]:flex-col" />
+            <HeroPortrait locale={locale} profileLabel={t("cta")} className="w-24 md:w-[clamp(8.5rem,11vw,11rem)]" />
+          </div>
           {/* Visible from the first paint (no fade): this is the mobile LCP text. */}
           <div className="flex max-w-[36rem] flex-col gap-4">
             <p className="text-note text-[1.25rem] text-gray-500">{t("stack")}</p>
@@ -115,6 +126,7 @@ export async function Hero() {
                 {t("ctaContact")}
               </a>
             </div>
+            <HeroSocial label={t("social")} newTab={t("newTab")} className="-ml-3 md:hidden" />
           </div>
         </div>
         </div>

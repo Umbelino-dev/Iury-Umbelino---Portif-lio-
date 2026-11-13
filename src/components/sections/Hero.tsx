@@ -5,7 +5,7 @@ import { HeroPortrait, HeroSocial } from "@/components/hero/HeroPortrait";
 import { HeroSpotlight } from "@/components/hero/HeroSpotlight";
 import { NameMark } from "@/components/hero/NameMark";
 import type { Locale } from "@/i18n/routing";
-import { anchors, viewBox } from "@/components/hero/name-paths";
+import { anchors, textLayer, viewBox } from "@/components/hero/name-paths";
 import { HeroMotion } from "./HeroMotion";
 
 /**
@@ -64,9 +64,30 @@ export async function Hero() {
         <div style={markVars} className="flex w-full flex-1 flex-col gap-12 md:mx-auto md:w-[clamp(50%,calc((100svh-24rem)*var(--mark-ratio)),100%)] md:gap-10">
         <div className="flex flex-col gap-5 md:flex-1 md:justify-center">
           <div data-hero-mark className="@container relative w-full">
-            <h1 id="hero-name" className="text-paper">
-              <span className="sr-only">Iury Umbelino</span>
-              <NameMark className="block h-auto w-full" />
+            {/*
+              The drawn mark is decoration (aria-hidden, no pointer); the h1's real
+              text lies over it, transparent but selectable, each line set where the
+              drawing puts it (textLayer, exported by scripts/lettering.py). Dragging
+              across the name selects and copies "Iury Umbelino"; screen readers and
+              search engines read the same text.
+            */}
+            <h1 id="hero-name" className="relative text-paper">
+              <NameMark className="pointer-events-none block h-auto w-full select-none" />
+              <span
+                className="absolute inset-0 font-display leading-none font-black whitespace-pre text-transparent select-text selection:bg-signal/30 selection:text-transparent"
+                style={{ fontSize: `${textLayer.fontSize}cqw` }}
+              >
+                {textLayer.lines.map((l, i) => (
+                  <span
+                    key={l.text}
+                    className="absolute block"
+                    style={{ left: `${l.left}%`, top: `${l.top}%`, letterSpacing: `${l.tracking}em` }}
+                  >
+                    {l.text}
+                    {i === 0 ? " " : null}
+                  </span>
+                ))}
+              </span>
             </h1>
             {/*
               Mobile: the statement is its own row under the name, with the cat at the

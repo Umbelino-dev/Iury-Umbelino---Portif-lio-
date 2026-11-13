@@ -19,14 +19,13 @@ export interface ContactLink {
   publish: boolean;
 }
 
-/** Contacts confirmed by Iury for publication (2026-11-09). */
+/** Contacts confirmed by Iury for publication (2026-11-09; Instagram 2026-11-13). */
 export const contacts: ContactLink[] = [
   { kind: "email", label: "iuryumbelino1@gmail.com", href: "mailto:iuryumbelino1@gmail.com", publish: true },
   { kind: "linkedin", label: "in/iuryumbelino", href: "https://www.linkedin.com/in/iuryumbelino/", publish: true },
   { kind: "github", label: "@Umbelino-dev", href: "https://github.com/Umbelino-dev", publish: true },
-  // Instagram: not confirmed yet. Fill `label` and `href` (e.g. "https://www.instagram.com/<user>/")
-  // and set `publish: true`; it then shows in the hero and in Contact.
-  { kind: "instagram", label: "", href: "", publish: false },
+  // Instagram: confirmed by Iury for publication (2026-11-13).
+  { kind: "instagram", label: "@umbelino.zs", href: "https://instagram.com/umbelino.zs", publish: true },
 ];
 
 export const education: { course: Localized; school: string; expected: number }[] = [

@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { gsap, MQ, useGSAP } from "@/lib/gsap";
 import { anchors } from "@/components/hero/name-paths";
 import { CatFigure } from "./CatFigure";
+import { TAIL_WAVE } from "./CatFigure";
 import { catParts, crouch, prime, run, stretch, tailFlick, walk } from "./clips";
 import { CAT_OPEN } from "./states";
 
@@ -21,7 +22,8 @@ type Pose = "idle" | "left" | "right" | "near";
  * walk, turn, run and crouch along the letters (scrubbed, below).
  * - Fine pointer + motion: head ±9°, body ±3°, eyes ±3px toward the pointer.
  * - Over text or links: no reaction (reading is not disturbed).
- * - Breathing (scaleY 1→1.025, 1.6s) only while idle; blink every 6–10s.
+ * - Breathing (scaleY 1→1.025, 1.6s) only while idle; blink every 4–6s; the tail
+ *   waves (shape tween, 2.2s) and the right ear twitches now and then.
  * - Touch: breathing + blink only. Reduced motion: fully static.
  * Work happens only while the hero is on screen and the tab is visible.
  */
@@ -74,6 +76,23 @@ export function CatObserver({
           paused: true,
         });
 
+        // Idle life, on hooks the clip library never touches: the tail's own shape
+        // waves (a slow sine between two curves) and the right ear twitches now and then.
+        const [tailWave] = q<SVGPathElement>('[data-cat="tail-wave"]');
+        const [earR] = q<SVGGElement>('[data-cat="ear-r"]');
+        if (earR) gsap.set(earR, { svgOrigin: "72 30" });
+        const wave = tailWave
+          ? gsap.to(tailWave, { attr: { d: TAIL_WAVE }, duration: 2.2, ease: "sine.inOut", yoyo: true, repeat: -1, paused: true })
+          : null;
+        const twitch = () => {
+          if (!earR) return;
+          gsap
+            .timeline()
+            .to(earR, { rotation: 9, duration: 0.08, ease: "power1.out" })
+            .to(earR, { rotation: -3, duration: 0.1 })
+            .to(earR, { rotation: 0, duration: 0.3, ease: "elastic.out(1, 0.5)" });
+        };
+
         let onScreen = false;
         let blinkTimer: number | undefined;
         const idleParts = catParts(el);
@@ -84,14 +103,15 @@ export function CatObserver({
             .to(eyes, { scaleY: 0.1, duration: 0.07, ease: "none" })
             .to(eyes, { scaleY: 1, duration: 0.07, ease: "none", delay: 0.07 });
           // Every other blink or so, a small tail flick: alive, not busy.
-          if (idleParts && Math.random() < 0.5) tailFlick(idleParts);
+          if (idleParts && Math.random() < 0.35) tailFlick(idleParts);
+          else if (Math.random() < 0.45) window.setTimeout(twitch, 900 + Math.random() * 1200);
         };
         const scheduleBlink = () => {
           window.clearTimeout(blinkTimer);
           blinkTimer = window.setTimeout(() => {
             blink();
             scheduleBlink();
-          }, 6000 + Math.random() * 4000);
+          }, 4000 + Math.random() * 2000);
         };
 
         // Pointer tracking — fine pointers only.
@@ -143,11 +163,13 @@ export function CatObserver({
 
         const start = () => {
           breath.play();
+          wave?.play();
           scheduleBlink();
           if (fine) window.addEventListener("pointermove", onMove, { passive: true });
         };
         const stop = () => {
           breath.pause();
+          wave?.pause();
           window.clearTimeout(blinkTimer);
           window.clearTimeout(stillTimer);
           cancelAnimationFrame(frame);

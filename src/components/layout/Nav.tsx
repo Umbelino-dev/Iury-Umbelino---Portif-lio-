@@ -110,7 +110,7 @@ export function Nav({ variant = "home" }: { variant?: "home" | "case" }) {
 
   const glass = light
     ? "border-ink/14 bg-paper/62 shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_8px_24px_rgba(16,16,16,0.06)]"
-    : "border-paper/20 bg-[linear-gradient(180deg,rgba(255,255,255,0.075),rgba(255,255,255,0.035))] shadow-[inset_0_1px_0_rgba(255,255,255,0.14),inset_0_-1px_0_rgba(0,0,0,0.35),0_8px_28px_rgba(0,0,0,0.45)]";
+    : "border-paper/24 bg-[linear-gradient(180deg,rgba(255,255,255,0.085),rgba(255,255,255,0.03))] shadow-[inset_0_1px_0_rgba(255,255,255,0.22),inset_0_-1px_0_rgba(0,0,0,0.35),0_8px_28px_rgba(0,0,0,0.45)]";
   const glassBlur = "backdrop-blur-[16px] backdrop-saturate-[1.4] backdrop-brightness-[1.15]";
   const transition = "transition-[color,background-color,border-color,box-shadow] duration-(--duration-base) ease-(--ease-out-soft)";
   const focusRing = light ? "focus-visible:outline-ink" : "focus-visible:outline-signal";

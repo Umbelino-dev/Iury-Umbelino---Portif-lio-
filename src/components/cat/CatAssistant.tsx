@@ -731,7 +731,7 @@ export function CatAssistant({
         aria-modal="true"
         aria-labelledby={titleId}
         style={{ visibility: "hidden", opacity: 0 }}
-        className="fixed z-[65] flex flex-col overflow-hidden border border-paper/14 bg-ink-800/90 text-paper backdrop-blur-[20px] backdrop-saturate-150 max-md:inset-x-0 max-md:bottom-0 max-md:h-[min(70dvh,590px)] max-md:rounded-t-[18px] max-md:border-b-0 max-md:pb-[env(safe-area-inset-bottom)] md:right-4 md:bottom-4 md:h-[min(520px,calc(100dvh-140px))] md:w-[min(360px,calc(100vw-2rem))] md:rounded-[18px]"
+        className="fixed z-[65] flex flex-col overflow-hidden border border-paper/20 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.015)_40%),linear-gradient(rgba(27,27,27,0.82),rgba(27,27,27,0.82))] text-paper shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_24px_48px_-24px_rgba(0,0,0,0.6)] backdrop-blur-[20px] backdrop-saturate-150 max-md:inset-x-0 max-md:bottom-0 max-md:h-[min(70dvh,590px)] max-md:rounded-t-[18px] max-md:border-b-0 max-md:pb-[env(safe-area-inset-bottom)] md:right-4 md:bottom-4 md:h-[min(520px,calc(100dvh-140px))] md:w-[min(360px,calc(100vw-2rem))] md:rounded-[18px]"
       >
         {/* Drag handle (mobile) */}
         <div

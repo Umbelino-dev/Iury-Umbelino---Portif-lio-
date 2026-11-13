@@ -8,8 +8,8 @@ import type { Locale } from "@/i18n/routing";
  * Hero portrait card + social links (bottom-right of the first screen).
  *
  * - Photo: `portrait.base` in src/content/portrait.ts (swap the file there, not here).
- * - Links: every `contacts` entry with `publish: true`, except email (the hero already
- *   has "Fale comigo"). To add Instagram, fill its entry in src/content/profile.ts.
+ * - Links: every `contacts` entry with `publish: true` that has an icon here
+ *   (LinkedIn, GitHub, Instagram, e-mail), in that order. Edit src/content/profile.ts.
  *
  * At rest the photo is black and white; on hover it takes its colour back and gets a
  * thin signal rim. The card links to the Profile section, but stays out of the tab
@@ -30,6 +30,12 @@ const ICONS: Partial<Record<ContactLink["kind"], ReactNode>> = {
       <circle cx="4" cy="4" r="2" />
     </>
   ),
+  email: (
+    <>
+      <rect x="2" y="4" width="20" height="16" rx="2" />
+      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+    </>
+  ),
   instagram: (
     <>
       <rect x="2" y="2" width="20" height="20" rx="5" />
@@ -39,7 +45,9 @@ const ICONS: Partial<Record<ContactLink["kind"], ReactNode>> = {
   ),
 };
 
-const social = contacts.filter((c) => c.publish && c.href && ICONS[c.kind]);
+const ORDER: ContactLink["kind"][] = ["linkedin", "github", "instagram", "email"];
+const NAMES: Record<ContactLink["kind"], string> = { linkedin: "LinkedIn", github: "GitHub", instagram: "Instagram", email: "E-mail" };
+const social = ORDER.map((k) => contacts.find((c) => c.kind === k && c.publish && c.href)).filter((c): c is ContactLink => !!c);
 
 export function HeroPortrait({ locale, profileLabel, className = "" }: { locale: Locale; profileLabel: string; className?: string }) {
   const img = portrait.base;
@@ -64,26 +72,30 @@ export function HeroPortrait({ locale, profileLabel, className = "" }: { locale:
   );
 }
 
-export function HeroSocial({ label, newTab, className = "" }: { label: string; newTab: string; className?: string }) {
+/** `column`: icons stacked and spread along the parent's height (beside the photo). */
+export function HeroSocial({ label, newTab, column = false, className = "" }: { label: string; newTab: string; column?: boolean; className?: string }) {
   if (social.length === 0) return null;
   return (
     <nav aria-label={label} className={className}>
-      <ul className="flex gap-1">
-        {social.map((c) => (
-          <li key={c.kind}>
-            <a
-              href={c.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={`${c.kind === "github" ? "GitHub" : c.kind === "linkedin" ? "LinkedIn" : "Instagram"} (${newTab})`}
-              className="flex size-11 items-center justify-center text-paper opacity-60 transition-[opacity,color] duration-(--duration-fast) hover:text-signal hover:opacity-100 focus-visible:opacity-100"
-            >
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                {ICONS[c.kind]}
-              </svg>
-            </a>
-          </li>
-        ))}
+      <ul className={`flex h-full gap-1 ${column ? "flex-col justify-between" : ""}`}>
+        {social.map((c) => {
+          const mail = c.kind === "email";
+          return (
+            <li key={c.kind}>
+              <a
+                href={c.href}
+                target={mail ? undefined : "_blank"}
+                rel={mail ? undefined : "noopener noreferrer"}
+                aria-label={mail ? `${NAMES[c.kind]}: ${c.label}` : `${NAMES[c.kind]} (${newTab})`}
+                className="flex size-11 items-center justify-center text-paper opacity-60 transition-[opacity,color] duration-(--duration-fast) hover:text-signal hover:opacity-100 focus-visible:opacity-100"
+              >
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  {ICONS[c.kind]}
+                </svg>
+              </a>
+            </li>
+          );
+        })}
       </ul>
     </nav>
   );

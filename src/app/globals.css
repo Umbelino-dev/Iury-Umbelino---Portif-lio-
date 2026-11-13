@@ -296,3 +296,24 @@ dialog.is-closing::backdrop {
   opacity: 0.16;
   translate: 0 12px;
 }
+
+/*
+ * The cat on hover / focus (observer in the hero, dock button): the slit pupils
+ * open round and a soft lime glow rises behind the eyes. CSS only, on hooks the
+ * GSAP clips never transform. Reduced motion: the global reset makes it a cut.
+ */
+[data-cat="pupils"] ellipse {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform var(--duration-base) var(--ease-out-soft);
+}
+[data-cat="glow"] {
+  opacity: 0;
+  transition: opacity var(--duration-base) var(--ease-out-soft);
+}
+:is(button:hover, button:focus-visible) [data-cat="pupils"] ellipse {
+  transform: scale(2.3, 1.08);
+}
+:is(button:hover, button:focus-visible) [data-cat="glow"] {
+  opacity: 1;
+}

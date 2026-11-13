@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { CatObserver } from "@/components/cat/CatObserver";
 import { HeroPortrait, HeroSocial } from "@/components/hero/HeroPortrait";
+import { HeroSpotlight } from "@/components/hero/HeroSpotlight";
 import { NameMark } from "@/components/hero/NameMark";
 import type { Locale } from "@/i18n/routing";
 import { anchors, viewBox } from "@/components/hero/name-paths";
@@ -28,6 +29,8 @@ const markVars = {
   "--stmt-max": `${100 - anchors.line1Right - 7}%`,
   "--o-center": `${anchors.oCenter}%`,
   "--o-bottom": `${100 - anchors.oTop}%`,
+  // Gap between a 44px link box's bottom and its underline (measured, 2026-11-13).
+  "--link-inset": "10px",
 } as CSSProperties;
 
 export async function Hero() {
@@ -101,9 +104,15 @@ export async function Hero() {
           links on the right, sharing one baseline. Mobile: portrait, intro, links.
         */}
         <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between md:gap-10">
-          <div className="flex items-end gap-2 md:order-last">
-            <HeroSocial label={t("social")} newTab={t("newTab")} className="hidden md:block [&_ul]:flex-col" />
-            <HeroPortrait locale={locale} profileLabel={t("cta")} className="w-24 md:w-[clamp(8.5rem,11vw,11rem)]" />
+          {/*
+            Photo + social column. The column is as tall as the photo (icons spread
+            along it); `md:mb-(--link-inset)` lifts both so the photo's bottom edge
+            meets the underline of the links on the left (their 44px hit area
+            reaches below the text).
+          */}
+          <div className="flex items-stretch gap-2 md:order-last md:mb-(--link-inset)">
+            <HeroSocial label={t("social")} newTab={t("newTab")} column className="hidden md:block" />
+            <HeroPortrait locale={locale} profileLabel={t("cta")} className="w-24 md:w-[clamp(9.25rem,11vw,11rem)]" />
           </div>
           {/* Visible from the first paint (no fade): this is the mobile LCP text. */}
           <div className="flex max-w-[36rem] flex-col gap-4">
@@ -135,7 +144,7 @@ export async function Hero() {
   );
 }
 
-/** Atmosphere: soft light, grain, vignette. Decorative only. */
+/** Atmosphere: soft light, a pointer spotlight with a dot grid (HeroSpotlight), film grain, vignette. Decorative only. */
 function HeroBackdrop() {
   const grain =
     "url(\"data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")";
@@ -143,6 +152,7 @@ function HeroBackdrop() {
     <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
       <div className="absolute -top-44 -right-[6%] h-[420px] w-[62%] bg-[radial-gradient(ellipse_50%_50%_at_60%_50%,rgba(243,241,235,0.11),rgba(243,241,235,0.035)_45%,transparent_72%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_55%_60%_at_68%_52%,rgba(243,241,235,0.075),rgba(243,241,235,0.02)_45%,transparent_75%)]" />
+      <HeroSpotlight />
       <div className="absolute inset-0 opacity-[0.07] mix-blend-screen" style={{ backgroundImage: grain, backgroundSize: "240px 240px" }} />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_85%_85%_at_55%_45%,transparent_55%,rgba(0,0,0,0.55)_100%)]" />
     </div>

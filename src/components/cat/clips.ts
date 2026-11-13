@@ -20,8 +20,8 @@ export interface CatParts {
   ears: SVGGElement | null;
   tail: SVGGElement | null;
   paws: SVGGElement | null;
-  legL: SVGRectElement | null;
-  legR: SVGRectElement | null;
+  legL: SVGGraphicsElement | null;
+  legR: SVGGraphicsElement | null;
 }
 
 export function catParts(scope: Element, frame?: Element | null): CatParts | null {
@@ -52,8 +52,8 @@ export function prime(p: CatParts) {
     [p.look, "50 62"],
     [p.eyes, "50 40"],
     [p.tail, "80 118"],
-    [p.legL, "33 100"],
-    [p.legR, "67 100"],
+    [p.legL, "41 86"],
+    [p.legR, "59 86"],
   ];
   for (const [el, origin] of svg) if (el) gsap.set(el, { svgOrigin: origin });
 }

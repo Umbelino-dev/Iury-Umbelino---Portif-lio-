@@ -323,6 +323,14 @@ dialog.is-closing::backdrop {
   transform: rotate(7deg) translateY(-1.5px);
 }
 
+/* Profile: earlier courses rise in when the disclosure opens. */
+@keyframes fade-rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
 /* Career line, "now" point: a discreet ping (Timeline). */
 @keyframes tl-ping {
   75%,

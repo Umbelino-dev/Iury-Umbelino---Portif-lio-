@@ -1,10 +1,11 @@
 import { getLocale, getTranslations } from "next-intl/server";
-import { contacts, education, experience, plain, term } from "@/content/profile";
+import { contacts, education, educationEarlier, experience, plain, skills, type Education } from "@/content/profile";
 import { gallery } from "@/content/gallery";
 import type { Locale } from "@/i18n/routing";
 import { Emphasis } from "@/components/layout/Emphasis";
 import { SectionTitle } from "@/components/layout/SectionTitle";
 import { PhotoDeck } from "@/components/media/PhotoDeck";
+import { SkillPills } from "./SkillPills";
 import { Timeline } from "./Timeline";
 
 /**
@@ -54,19 +55,20 @@ export async function About() {
       more: s.more[locale],
       list: s.highlights ? experience.highlights.map((h) => plain(h[locale])) : undefined,
       // The CV lists the daily tools for the current role only.
-      stack: s.highlights ? experience.stack.daily.map((item) => term(item, locale)) : undefined,
+      stack: s.highlights ? skills.filter((k) => k.daily).map((k) => k.name[locale]) : undefined,
       current: !to,
     };
   });
-  /** Small outlined pills: the tools read as a set, scannable at a glance. */
-  const pills = (items: readonly (string | { pt: string; en: string })[]) => (
-    <ul className="flex flex-wrap gap-1.5">
-      {items.map((item) => (
-        <li key={term(item, locale)} className="rounded-full border border-ink/10 bg-ink/[0.03] px-2.5 py-0.5 text-caption leading-relaxed">
-          {term(item, locale)}
-        </li>
-      ))}
-    </ul>
+  /** One course: its name, then the school and its years as a note. */
+  const course = (e: Education) => (
+    <li key={e.school} className="flex flex-col gap-0.5">
+      {e.course && <span className="text-ui font-medium">{e.course[locale]}</span>}
+      <span className={e.course ? "text-note text-gray-600" : "text-ui font-medium"}>
+        {e.school}
+        {e.from !== undefined && e.expected !== undefined && <>, {t("expected", { from: e.from, year: e.expected })}</>}
+        {e.from !== undefined && e.to !== undefined && <>, {t("span", { from: e.from, to: e.to })}</>}
+      </span>
+    </li>
   );
   const timelineLabels = { now: t("now"), seeMore: tl("seeMore"), close: tl("close"), stack: t("stack") };
 
@@ -113,30 +115,24 @@ export async function About() {
           </ul>
         </div>
 
-        <div className="col-span-4 grid gap-x-10 gap-y-10 sm:grid-cols-3 md:col-span-12">
-          <div className="flex flex-col gap-3">
-            <h3 className={subhead}>{t("stack")}</h3>
-            {pills(experience.stack.daily)}
-          </div>
-          <div className="flex flex-col gap-3">
-            <h3 className={subhead}>{t("learning")}</h3>
-            {pills(experience.stack.learning)}
-            <p className="mt-2 text-note text-gray-600">{t("deepening")}</p>
-            {pills(experience.stack.deepening)}
-          </div>
-          <div className="flex flex-col gap-3">
-            <h3 className={subhead}>{t("education")}</h3>
-            <ul className="flex flex-col gap-4">
-              {education.map((e) => (
-                <li key={e.school} className="flex flex-col gap-0.5">
-                  <span className="text-ui font-medium">{e.course[locale]}</span>
-                  <span className="text-note text-gray-600">
-                    {e.school}, {t("expected", { year: e.expected })}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
+        {/* Skills (no repeats) under the intro, education under "O que faço":
+            the same two columns as above. */}
+        <div className="col-span-4 flex flex-col gap-3 md:col-span-12 lg:col-span-6">
+          <h3 className={subhead}>{t("skills")}</h3>
+          <p className="text-note text-gray-600">{t("skillsHint")}</p>
+          <SkillPills skills={skills.map((k) => ({ name: k.name[locale], note: k.note[locale] }))} />
+        </div>
+        <div className="col-span-4 flex flex-col gap-3 md:col-span-12 lg:col-span-5 lg:col-start-8">
+          <h3 className={subhead}>{t("education")}</h3>
+          <ul className="flex flex-col gap-4">{education.map(course)}</ul>
+          {/* Earlier courses wait behind a native disclosure: no JS, keyboard ready. */}
+          <details className="group mt-2">
+            <summary className="flex min-h-11 w-fit cursor-pointer list-none items-center font-display text-[0.9375rem] font-bold underline decoration-1 underline-offset-[0.3em] hover:text-gray-600 [&::-webkit-details-marker]:hidden">
+              <span className="group-open:hidden">{t("earlierShow")}</span>
+              <span className="hidden group-open:inline">{t("earlierHide")}</span>
+            </summary>
+            <ul className="mt-3 flex flex-col gap-4 motion-safe:group-open:animate-[fade-rise_320ms_cubic-bezier(0.2,0.7,0.1,1)]">{educationEarlier.map(course)}</ul>
+          </details>
         </div>
       </div>
 

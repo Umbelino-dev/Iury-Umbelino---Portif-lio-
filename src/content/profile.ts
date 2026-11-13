@@ -28,12 +28,118 @@ export const contacts: ContactLink[] = [
   { kind: "instagram", label: "@umbelino.zs", href: "https://instagram.com/umbelino.zs", publish: true },
 ];
 
-export const education: { course: Localized; school: string; expected: number }[] = [
-  { course: { pt: "Bacharelado em Ciência da Computação", en: "BSc in Computer Science" }, school: "UNESC", expected: 2030 },
+export interface Education {
+  course?: Localized;
+  school: string;
+  /** Start year. */
+  from?: number;
+  /** Expected end year (current courses). */
+  expected?: number;
+  /** End year (finished courses). */
+  to?: number;
+}
+
+/** Current courses (CV; start years from Iury, 2026-11-13). */
+export const education: Education[] = [
+  { course: { pt: "Bacharelado em Ciência da Computação", en: "BSc in Computer Science" }, school: "UNESC", from: 2026, expected: 2030 },
   {
     course: { pt: "Tecnólogo em Análise e Desenvolvimento de Sistemas", en: "Associate degree in Systems Analysis and Development" },
     school: "UNOPAR",
+    from: 2026,
     expected: 2028,
+  },
+];
+
+/**
+ * Earlier courses, behind a disclosure (Iury, 2026-11-13). Iury named the Senac
+ * course as Administração; the Cebrac course is not named yet, so only the school shows.
+ */
+export const educationEarlier: Education[] = [
+  { course: { pt: "Administração", en: "Business Administration" }, school: "Centro Universitário Senac", from: 2024, to: 2025 },
+  { school: "Cebrac Santa Catarina", from: 2020, to: 2021 },
+];
+
+export interface Skill {
+  name: Localized;
+  /** Where Iury applies or studies it (his own words, 2026-11-13). */
+  note: Localized;
+  /** Used at work today (listed under the current role in the career path). */
+  daily: boolean;
+}
+
+/** Skills and stack, no repeats (Iury, 2026-11-13). */
+export const skills: Skill[] = [
+  {
+    name: { pt: "SQL & PL/SQL", en: "SQL & PL/SQL" },
+    note: {
+      pt: "Manipulação, consultas e correção de dados em banco Oracle para destravar processos na TI do Giassi.",
+      en: "Querying, handling and fixing data in an Oracle database to unblock processes in Giassi's IT.",
+    },
+    daily: true,
+  },
+  {
+    name: { pt: "DOX (EMA Sistemas)", en: "DOX (EMA Sistemas)" },
+    note: {
+      pt: "Administração do sistema corporativo na Matriz: criação de usuários, permissões e ajustes de fluxos.",
+      en: "Running the company system at head office: creating users, setting permissions and adjusting workflows.",
+    },
+    daily: true,
+  },
+  {
+    name: { pt: "Pascal Script", en: "Pascal Script" },
+    note: {
+      pt: "Desenvolvimento de regras de validação e automações internas dentro da plataforma DOX.",
+      en: "Writing validation rules and internal automations inside the DOX platform.",
+    },
+    daily: true,
+  },
+  {
+    name: { pt: "JavaScript", en: "JavaScript" },
+    note: {
+      pt: "Scripts de automação, lógica web e estudo contínuo aplicado a produtos e interfaces.",
+      en: "Automation scripts, web logic and ongoing study applied to products and interfaces.",
+    },
+    daily: true,
+  },
+  {
+    name: { pt: "Softdesk", en: "Softdesk" },
+    note: {
+      pt: "Atendimento técnico aos colaboradores, análise de logs de processos e resolução de chamados.",
+      en: "Technical support for colleagues, reading process logs and resolving tickets.",
+    },
+    daily: true,
+  },
+  {
+    name: { pt: "Linguagem C", en: "C" },
+    note: {
+      pt: "Fundamentos de programação estruturada, memória e lógica na graduação em Ciência da Computação (UNESC).",
+      en: "Structured programming, memory and logic fundamentals in the Computer Science degree (UNESC).",
+    },
+    daily: false,
+  },
+  {
+    name: { pt: "Python", en: "Python" },
+    note: {
+      pt: "Estudos de lógica, automação e análise no curso de Análise e Desenvolvimento de Sistemas (UNOPAR).",
+      en: "Logic, automation and analysis studies in the Systems Analysis and Development course (UNOPAR).",
+    },
+    daily: false,
+  },
+  {
+    name: { pt: "HTML & CSS", en: "HTML & CSS" },
+    note: {
+      pt: "Estruturação de interfaces web e padronização de templates de e-mails corporativos.",
+      en: "Structuring web interfaces and standardising the company's email templates.",
+    },
+    daily: true,
+  },
+  {
+    name: { pt: "Segurança da Informação", en: "Information Security" },
+    note: {
+      pt: "Princípios de proteção de dados e controle de acessos estudados na UNOPAR e aplicados na gestão de permissões.",
+      en: "Data protection and access control principles studied at UNOPAR and applied when managing permissions.",
+    },
+    daily: false,
   },
 ];
 
@@ -59,29 +165,26 @@ export const experience = {
   role: { pt: "Assistente de TI", en: "IT Assistant" } satisfies Localized,
   period: { pt: "abr 2026 – atual", en: "Apr 2026 – present" } satisfies Localized,
   /**
-   * Every line is a CV bullet (rev. 6), reworded only for length. `**…**` marks the
-   * key terms the UI sets in semibold (Iury, 2026-11-13); `plain()` strips the marks.
+   * "O que faço": four short lines in Iury's own words (2026-11-13; they replace the
+   * five CV bullets). `**…**` marks the key terms the UI sets in semibold; `plain()`
+   * strips the marks.
    */
   highlights: [
     {
-      pt: "Retomei, por iniciativa própria, **chamados parados desde 2020**: em duas semanas, encerrei 6 e mapeei outros 10.",
-      en: "On my own initiative, reopened **tickets stalled since 2020**: in two weeks I closed 6 and mapped 10 more.",
+      pt: "Gestão do sistema **DOX (EMA Sistemas)**: usuários, permissões e automações em **Pascal Script**.",
+      en: "Running the **DOX (EMA Sistemas)** system: users, permissions and automations in **Pascal Script**.",
     },
     {
-      pt: "Regras de validação e automações em **Pascal Script** na plataforma DOX (EMA Sistemas), com apoio de IA.",
-      en: "Validation rules and automations in **Pascal Script** on the DOX platform (EMA Sistemas), assisted by AI tools.",
+      pt: "Consultas, análise e correção de dados em **Oracle (SQL e PL/SQL)**.",
+      en: "Queries, analysis and data fixes on **Oracle (SQL and PL/SQL)**.",
     },
     {
-      pt: "Consultas, análises e correções de dados em **Oracle com SQL** e PL/SQL.",
-      en: "Queries, analysis and data fixes on **Oracle with SQL** and PL/SQL.",
+      pt: "Resolução de **chamados parados desde 2020** e suporte técnico via **Softdesk**.",
+      en: "Resolving **tickets stalled since 2020** and technical support through **Softdesk**.",
     },
     {
-      pt: "Padronizei os **e-mails automáticos** do sistema (HTML + SQL) num modelo único e mais legível.",
-      en: "Standardised the system's **automatic emails** (HTML + SQL) into one clearer template.",
-    },
-    {
-      pt: "Suporte a usuários por chamados (Softdesk) e e-mail; relatórios no ReportBuilder.",
-      en: "User support through tickets (Softdesk) and email; reports in ReportBuilder.",
+      pt: "Padronização de **e-mails automáticos (HTML + SQL)** e relatórios no **ReportBuilder**.",
+      en: "Standardising **automatic emails (HTML + SQL)** and reports in **ReportBuilder**.",
     },
   ] satisfies Localized[],
   /**
@@ -142,27 +245,8 @@ export const experience = {
       confirmed: false,
     },
   ] satisfies PathStep[],
-  /** Daily tools and studies, as Iury listed them (2026-11-13). Plain strings read the same in both locales. */
-  stack: {
-    daily: [
-      "SQL",
-      "Oracle",
-      "PL/SQL Developer",
-      "DOX (EMA Sistemas)",
-      "Pascal Script",
-      "JavaScript",
-      { pt: "Logs de processos", en: "Process logs" },
-      "Softdesk",
-    ] satisfies (string | Localized)[],
-    /** New ground. */
-    learning: ["HTML", "CSS", { pt: "Linguagem C", en: "C" }] satisfies (string | Localized)[],
-    /** Already in use, studied further. */
-    deepening: ["SQL", "Pascal Script", "JavaScript"] satisfies (string | Localized)[],
-  },
-};
 
-/** A stack item in the visitor's language. */
-export const term = (item: string | Localized, locale: keyof Localized) => (typeof item === "string" ? item : item[locale]);
+};
 
 /** A highlight without its `**` emphasis marks (plain-text contexts). */
 export const plain = (text: string) => text.replaceAll("**", "");

@@ -1,4 +1,4 @@
-import { contacts, experience, site, term } from "@/content/profile";
+import { contacts, experience, site, skills } from "@/content/profile";
 import type { Locale } from "@/i18n/routing";
 
 /**
@@ -13,7 +13,7 @@ export function PersonJsonLd({ locale }: { locale: Locale }) {
     url: `${site.url}/${locale}`,
     jobTitle: experience.role[locale],
     worksFor: experience.publishEmployer ? { "@type": "Organization", name: experience.employer } : undefined,
-    knowsAbout: [...experience.stack.daily.slice(0, 3).map((item) => term(item, "en")), "AI-assisted product development"],
+    knowsAbout: [...skills.filter((k) => k.daily).slice(0, 3).map((k) => k.name.en), "AI-assisted product development"],
     // No alumniOf: both degrees are still in progress, and alumniOf reads as "graduated".
   };
   const sameAs = contacts.filter((c) => c.publish && c.kind !== "email").map((c) => c.href);

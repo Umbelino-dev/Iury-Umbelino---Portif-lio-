@@ -7,6 +7,7 @@ import { routing } from "@/i18n/routing";
 import { display, sans, serif } from "@/lib/fonts";
 import { site } from "@/content/profile";
 import { Cursor } from "@/components/layout/Cursor";
+import { ScrollBar } from "@/components/layout/ScrollBar";
 import { SplitReveal } from "@/components/layout/SplitReveal";
 
 export function generateStaticParams() {
@@ -70,6 +71,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
         </a>
         <NextIntlClientProvider>{children as ReactNode}</NextIntlClientProvider>
         <Cursor />
+        <ScrollBar />
         <SplitReveal />
       </body>
     </html>

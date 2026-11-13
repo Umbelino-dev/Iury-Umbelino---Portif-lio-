@@ -21,7 +21,7 @@ Gato preto estilizado, construído com geometria real a partir da folha de refer
 | `LIGHTING` | 5 luzes de área presas ao `LIGHT_Rig` |
 | `ENVIRONMENT` | chão de estúdio |
 
-Números da malha: 17 malhas, cerca de 50 mil vértices no total (cabeça 13,6 mil, corpo 30,7 mil), só quads na pele. 42 ossos, 43 shape keys, 17 ações.
+Números da malha: 17 malhas, cerca de 50 mil vértices no total (cabeça 13,6 mil, corpo 30,7 mil), só quads na pele. 42 ossos, 43 shape keys, 21 ações.
 
 Escala: 1 unidade = altura do gato sentado, com as orelhas. O gato olha para −Y; `.L` é a esquerda dele (+X).
 
@@ -50,6 +50,10 @@ Escala: 1 unidade = altura do gato sentado, com as orelhas. O gato olha para −
 | `SB_Pendurado_UmaPata` | 1–41 | por uma pata, a outra tenta voltar (ciclo) |
 | `SB_Escalando` | 1–21 | sobe mão sobre mão (ciclo) |
 | `SB_Espiando` | 1–97 | queixo e patas numa borda (ciclo) |
+| `SB_Agarrado` | 1–73 | agarrado de perfil a uma barra vertical, rosto para quem olha (ciclo) |
+| `SB_Agarrado_Deslizando` | 1–17 | as patas escorregam na barra (ciclo) |
+| `SB_Agarrado_UmaPata` | 1–41 | por uma pata, as traseiras soltas (ciclo) |
+| `SB_Agarrado_Escalando` | 1–21 | sobe a barra (ciclo) |
 | `SB_Caindo` | 1–13 | no ar, patas abertas (ciclo) |
 | `SB_Pousando` | 1–24 | absorve o impacto e levanta |
 | `SB_Espreguicando` | 1–52 | reverência e dorso arqueado |

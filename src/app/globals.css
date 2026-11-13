@@ -295,3 +295,16 @@ html[data-cat3d="on"] [data-cat-dock] button {
   background-color: transparent;
   border-color: transparent;
 }
+
+/* The site's own scrollbar (components/layout/ScrollBar.tsx) replaces the native
+   one on fine pointers: the page still scrolls natively, only the bar is hidden. */
+html.has-scrollbar {
+  scrollbar-width: none;
+}
+html.has-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+html.is-dragging-scrollbar,
+html.is-dragging-scrollbar * {
+  user-select: none;
+}

@@ -11,12 +11,15 @@ import { CatAnimationController } from "./CatAnimationController";
 import { fitCamera } from "./CatCamera";
 import { CatInteractionController } from "./CatInteractionController";
 import { resolvePose, type Moment } from "./resolve";
+import { scrollThumb } from "@/components/layout/scrollThumb";
 
 /** The Blender character, exported by SR_BIGODES_3D/scripts/export_glb.py. */
 const MODEL = "/models/sr-bigodes.glb";
 /** Heights in the model (1 = the sitting cat, ears included); see public/models/sr-bigodes.json. */
 const GRIP = 1.07; // where the front paws hold on, in the hanging clips
 const LEDGE = 0.93; // the edge under the chin, in the peeking clip
+const POLE_Z = 0.92; // between the two front paws on the bar, in the clinging clips
+const POLE_X = 0.03; // the bar's line, in front of the belly (side-on: to the right of the origin)
 /** How big the model is next to the 2D figure's box, per place (model units per box height). */
 const SIZE = { hero: 1.12, rail: 2.6, dock: 1.4, actor: 1.3 };
 
@@ -52,7 +55,7 @@ export function CatModel() {
   const scene = useThree((s) => s.scene);
   const rig = useRef<Rig | null>(null);
   const quality = useRef<{ frames: number; time: number; dpr: number; fixed?: number }>({ frames: 0, time: 0, dpr: 1 });
-  const motion = useRef({ x: 0, y: 0, vx: 0, vy: 0, unit: 0, yaw: 0, seen: false, place: "", w: 0, h: 0 });
+  const motion = useRef({ x: 0, y: 0, vx: 0, vy: 0, unit: 0, yaw: 0, ox: 0, seen: false, place: "", w: 0, h: 0 });
 
   useEffect(() => {
     let alive = true;
@@ -175,6 +178,7 @@ export function CatModel() {
     if (!box || box.width < 1) {
       r.root.visible = false;
       motion.current.seen = false;
+      motion.current.ox = 0;
       return;
     }
 
@@ -221,20 +225,26 @@ export function CatModel() {
 
     // Anchor: the same point of the page under its feet, in its paws, or under its chin.
     let originY = box.bottom;
-    if (pose.anchor === "grip") originY = box.top + GRIP * m.unit;
+    let originX = cx;
+    if (pose.anchor === "pole") {
+      // its paws on the thumb's line, the body hanging beside the bar
+      originY = box.top + box.height / 2 + POLE_Z * m.unit;
+      originX = scrollThumb().x - POLE_X * m.unit;
+    } else if (pose.anchor === "grip") originY = box.top + GRIP * m.unit;
     else if (pose.anchor === "ledge") {
       const up = THREE.MathUtils.clamp((window.innerHeight - box.top) / (0.45 * box.height), 0, 1.1);
       originY = window.innerHeight + m.unit * (LEDGE + 0.5 * (1 - up));
     }
-    r.root.position.set(cx - size.width / 2, size.height / 2 - originY, 0);
+    m.ox = m.seen && m.ox ? m.ox + (originX - m.ox) * (still ? 1 : 1 - Math.exp(-dt * 18)) : originX;
+    r.root.position.set(m.ox - size.width / 2, size.height / 2 - originY, 0);
     r.root.scale.setScalar(m.unit);
-    const yawTarget = (pose.heading ?? 0) * 1.2;
+    const yawTarget = pose.yaw ?? (pose.heading ?? 0) * 1.2;
     m.yaw += (yawTarget - m.yaw) * (still ? 1 : 1 - Math.exp(-dt * 9));
     r.root.rotation.y = m.yaw;
     r.root.visible = true;
 
     r.face.setFace(pose.face);
-    r.face.update(dt, r.root, { x: cx, y: originY - 0.82 * m.unit }, !!pose.looks, still);
+    r.face.update(dt, r.root, { x: m.ox, y: originY - 0.82 * m.unit }, !!pose.looks, still);
 
     // The canvas follows the stage's own layering: behind a title's letters when
     // the scene says so, and cut where the cat is behind a picture's edge.

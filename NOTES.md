@@ -133,6 +133,8 @@ Temporary progress log. Permanent rules live in `CLAUDE.md`.
 
 - [x] **R15: the 3D cat in its place** (2026-11-13): tried shadows on the page, contact shadow, surface-dependent light and grain; Iury asked for no lighting, shadow or light effects on the cat, so all of it was removed. What stayed: a neutral base light only (the fur is black again, close to the Blender render), size continuity during the leap and the phone's magic (no more pop), the figure picked by what is actually on show (no teleport on the way back to the hero), peeks only over the bottom edge in 3D. Tested: hero, leap back, all grip levels, dock and panel, phone, reduced motion; no console errors.
 
+- [x] **R16: the scrollbar and the side-on cat** (2026-11-13, Iury): rail line and ticks removed, and the paper disc around the rail cat. The site draws its own scrollbar on fine pointers (ink/paper pill, inverted against the surface). The cat clings to its thumb side-on, with new clips authored on the rig (`Agarrado`, `_Deslizando`, `_UmaPata`, `_Escalando`: belly to the bar, front paws one above the other, hind paws on the bar, face to the visitor); the leap is side-on too (`Caindo`, turned). Tested: thumb tracking at three scroll positions, drag, track paging, every grip level, reduced motion, touch keeps the native bar; no console errors.
+
 ## Still open
 - Deploy (Iury): Cloudflare account, connect the repo, set `NEXT_PUBLIC_SITE_URL` (build variable), custom domain — steps in README.
 - Optional later: a real screenshot of the Care Radar (Fig. 04), Via Hebraica case study, real Lab experiments, field CWV after deploy, test on physical phones.

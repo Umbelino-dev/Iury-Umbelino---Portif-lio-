@@ -7,8 +7,8 @@ import { CatFigure } from "./CatFigure";
 import { airborne, brace, catParts, climbRest, climbStep, crouch, falling, grab, greet, land, letGo, nest, pretend, prime, settle, twitch, wakeSlow, yawn, type CatParts } from "./clips";
 import { CatStage } from "./CatStage";
 import { sparkle } from "./magic";
-import { SectionRail } from "./SectionRail";
 import { speedometer } from "./speed";
+import { scrollThumb } from "@/components/layout/scrollThumb";
 import { CAT_OPEN, DEEP_MS, HERO_LEFT_AT, IDLE_MS, transition, type CatEvent, type CatState } from "./states";
 
 export interface AssistantChip {
@@ -49,7 +49,8 @@ const MOBILE = "(max-width: 767px)";
  * covering copy; below that it keeps the bottom-right dock.
  */
 const RAIL = "(min-width: 1440px) and (hover: hover) and (pointer: fine)";
-const READING_LINE = 0.4; // the rail cat holds 40% of the viewport height
+/** On the rail the page only partly drags the cat: it holds the scrollbar's thumb, which moves far less than the page. */
+const DRAG = 0.3;
 /**
  * The rail gets harder to hold with the scroll's speed and how suddenly it came
  * (px per ms, plus a share of the acceleration). Below SLIP it rides; from SLIP
@@ -180,14 +181,15 @@ export function CatAssistant({
     gsap.to(p.tail, { rotation: 0, duration: d ? d * 1.4 : 0, ease: "elastic.out(1, 0.4)" });
     gsap.to(p.paws, { opacity: gripping ? 1 : 0, duration: d * 0.3 });
   };
-  /** Dock offset (px) that puts the cat's centre on the reading line. */
-  const railY = () => {
+  /** The docked cat's centre with no offset (px), in rail mode its rest spot at the corner. */
+  const restCentre = () => {
     const d = dock.current;
     if (!d) return 0;
     const r = d.getBoundingClientRect();
-    const base = r.top + r.height / 2 - (Number(gsap.getProperty(d, "y")) || 0);
-    return window.innerHeight * READING_LINE - base;
+    return r.top + r.height / 2 - (Number(gsap.getProperty(d, "y")) || 0);
   };
+  /** Dock offset (px) that puts the cat's centre on the scrollbar's thumb. */
+  const railY = () => scrollThumb().y - restCentre();
 
   // Leaving rail mode (resize): the cat goes back to the corner.
   useEffect(() => {
@@ -207,20 +209,22 @@ export function CatAssistant({
   }, []);
   const tooFast = () => performance.now() - speed.current.t < 220 && speed.current.v > FAST;
 
-  // ── S3 on the rail: hang, ride the page, climb back to the reading line.
-  //    It hangs from its paws, so it swings as the page drags it, and climbs back
-  //    hand over hand. A scroll too fast to hold on to shakes it loose: it travels
-  //    with the page in the air, then falls (or leaps) back to the line and
-  //    catches the rail again.
+  // ── S3 on the rail: the cat clings to the scrollbar's thumb, side-on, and
+  //    rides it. Scrolling drags it a little behind the thumb; it climbs back
+  //    hand over hand. A scroll too fast to hold on to shakes it loose: it
+  //    travels with the page in the air, falls to the corner, and climbs back up
+  //    to the thumb.
   useEffect(() => {
     if (!rail || state !== "cling") return;
     const d = dock.current;
     if (!d) return;
     const { eyes, tail } = parts();
-    const base = railY();
+    const rest = restCentre();
+    /** Where the thumb is now, as a dock offset: it moves as the page scrolls. */
+    const base = () => scrollThumb().y - rest;
     const rm = reduced();
     // Climb up (from the corner after sleep) or settle after the jump.
-    gsap.to(d, { y: base, duration: rm ? 0 : 0.4, ease: "power2.out" });
+    gsap.to(d, { y: base(), duration: rm ? 0 : 0.4, ease: "power2.out" });
     // Eyes turn toward the text, to the left of the rail.
     if (eyes) gsap.to(eyes, { x: -2.5, duration: rm ? 0 : 0.3 });
     if (rm) {
@@ -231,9 +235,12 @@ export function CatAssistant({
     const p = dockInner.current ? catParts(dockInner.current) : null;
     const pawEls = p?.paws ? Array.from(p.paws.children) : [];
     const vh = window.innerHeight;
-    const span = vh * 0.25; // holding on: how far the page can drag it
-    const looseUp = vh * READING_LINE - 96; // loose: up to just under the nav
-    const looseDown = vh * 0.42;
+    const span = vh * 0.12; // holding on: how far behind the thumb the page can drag it
+    /** Loose: it travels with the page, but stays in the window (under the nav, above the corner). */
+    const looseClamp = (o: number) => {
+      const y = scrollThumb().y;
+      return clamp(96 - y, vh - 60 - y, o);
+    };
     const clamp = gsap.utils.clamp;
     const setY = gsap.quickSetter(d, "y", "px");
     const m = { offset: 0 };
@@ -314,7 +321,7 @@ export function CatAssistant({
     const tick = () => {
       const before = m.offset;
       m.offset += (0 - m.offset) * 0.12;
-      setY(base + m.offset);
+      setY(base() + m.offset);
       if (tail && level === 1) gsap.set(tail, { rotation: clamp(-30, 30, m.offset * 0.3), svgOrigin: "80 118" });
       // the harder the page pulls, the wider it swings; hanging by one paw it leans out
       swing(clamp(-22, 22, m.offset * (level === 1 ? 0.07 : 0.11) + (level === 3 ? pull * 12 : 0)));
@@ -328,7 +335,7 @@ export function CatAssistant({
       } else {
         frame = 0;
         m.offset = 0;
-        setY(base);
+        setY(base());
         if (tail) gsap.to(tail, { rotation: 0, duration: 0.5, ease: "elastic.out(1, 0.4)" });
         if (p) {
           gsap.to(p.frame, { rotation: 0, duration: 0.8, ease: "elastic.out(1, 0.35)" });
@@ -344,7 +351,7 @@ export function CatAssistant({
       level = 1;
       d.dataset.catGrip = "4";
       stopSlipping();
-      const drop = -base - m.offset; // px down to the corner
+      const drop = -base() - m.offset; // px down to the corner
       const tl = gsap.timeline({
         onComplete: () => {
           busy = false;
@@ -355,7 +362,7 @@ export function CatAssistant({
       });
       recovery = tl;
       tl.add(falling(p, 0.12), 0)
-        .to(m, { offset: -base, duration: clamp(0.22, 0.62, 0.2 + Math.abs(drop) / 1400), ease: "power2.in", onUpdate: () => setY(base + m.offset) }, 0)
+        .to(m, { offset: -base(), duration: clamp(0.22, 0.62, 0.2 + Math.abs(drop) / 1400), ease: "power2.in", onUpdate: () => setY(base() + m.offset) }, 0)
         .add(() => (d.dataset.catGrip = "land"))
         .add(land(p))
         .add(() => (d.dataset.catGrip = "sit"), "+=0.75")
@@ -374,11 +381,11 @@ export function CatAssistant({
           m,
           {
             offset: 0,
-            duration: clamp(0.7, 1.5, Math.abs(base) / 420),
+            duration: clamp(0.7, 1.5, Math.abs(base()) / 420),
             ease: "sine.inOut",
             onUpdate: () => {
-              setY(base + m.offset);
-              const n = Math.floor(Math.abs(base + m.offset) / 16);
+              setY(base() + m.offset);
+              const n = Math.floor(Math.abs(base() + m.offset) / 16);
               if (n !== climb.n) {
                 climb.n = n;
                 climbStep(p, n);
@@ -414,12 +421,12 @@ export function CatAssistant({
         else if (stress < SLIP * 0.7) setLevel(1);
       }
       if (level === 4) {
-        m.offset = clamp(-looseUp, looseDown, m.offset - dy);
-        setY(base + m.offset);
+        m.offset = looseClamp(m.offset - dy);
+        setY(base() + m.offset);
         return;
       }
       const reach = level === 1 ? span : span * 1.3;
-      m.offset = clamp(-reach, reach, m.offset - dy);
+      m.offset = clamp(-reach, reach, m.offset - dy * DRAG);
       if (!frame) frame = requestAnimationFrame(tick);
     };
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -1024,7 +1031,6 @@ export function CatAssistant({
         className="invisible fixed inset-0 z-[60] bg-transparent opacity-0 max-md:bg-ink/40"
       />
 
-      {rail && <SectionRail shown={state !== "observer"} />}
 
       {/* The roaming figure and the director of its spontaneous behaviour (awake and settled only). */}
       <CatStage state={state} rail={rail} dockInner={dockInner} busy={stageBusy} />
@@ -1043,7 +1049,7 @@ export function CatAssistant({
             aria-haspopup="dialog"
             aria-expanded={open}
             onClick={() => (open ? close() : requestOpen())}
-            className={`group relative flex ${disc} items-end justify-center rounded-full border border-ink/14 bg-paper pb-1.5 focus-visible:outline-ink`}
+            className={`group relative flex ${disc} items-end justify-center rounded-full pb-1.5 focus-visible:outline-ink ${rail ? "" : "border border-ink/14 bg-paper"}`}
           >
             <CatFigure className={`${catSize} overflow-visible`} />
             {/* Zzz — only while asleep */}

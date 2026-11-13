@@ -12,6 +12,10 @@
   ],
   "fps": 24,
   "clips": {
+    "Agarrado": 3.0,
+    "Agarrado_Deslizando": 0.667,
+    "Agarrado_Escalando": 0.833,
+    "Agarrado_UmaPata": 1.667,
     "Andando": 1.333,
     "Caindo": 0.5,
     "Correndo": 0.583,

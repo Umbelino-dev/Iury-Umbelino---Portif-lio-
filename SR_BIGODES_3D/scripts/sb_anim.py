@@ -405,6 +405,77 @@ def pose_hang(P, sway=0.0, slip=0.0, one=0.0, reach=0.0, breath=0.0, climb=None,
     P.rot("ear.R", x=back)
 
 
+POLE = Vector((0.0, -0.03, 0.92))    # a barra vertical (a do site) passa na frente da barriga, neste ponto
+
+
+def _sway(point, deg):
+    """Gira um ponto em torno do apoio na barra, no plano lateral (visto de perfil)."""
+    return POLE + Matrix.Rotation(math.radians(deg), 3, "X") @ (Vector(point) - POLE)
+
+
+def pose_cling(P, sway=0.0, slip=0.0, one=0.0, reach=0.0, breath=0.0, climb=None):
+    """Agarrado a uma barra vertical, de perfil: barriga para a barra, patas dianteiras
+    uma acima da outra, traseiras apoiadas mais embaixo, cauda pendurada, cabeca
+    virada para quem olha.
+
+    sway = inclinacao para longe da barra (graus); slip = fase das patas escorregando;
+    one = 1 solta a pata de baixo e as traseiras (fica por uma pata); reach = quanto
+    ela tenta voltar (0-1); climb = fase da escalada (0-1) ou None.
+    """
+    lean = sway + 16.0 * one
+    hips0 = Vector(J["hips"]) + Vector((0.0, 0.0, 0.04))
+    if slip:
+        hips0.z -= 0.025 * abs(math.sin(slip))
+    if climb is not None:
+        hips0.z += 0.04 * (0.5 - 0.5 * math.cos(2 * PI2 * climb))
+    P.rot("hips", x=-84.0 + lean)
+    P.T["hips"] = _sway(hips0, lean) - P.H["hips"]
+    P.rot("spine", x=-3.0)
+    P.rot("chest", x=-4.0 + 0.5 * breath)
+    P.scale("chest", (1.0 + 0.012 * breath, 1.0, 1.0 + 0.015 * breath))
+    P.rot_abs("neck", x=-46.0 + 0.5 * lean, z=-16.0)
+    P.rot_abs("head", x=-4.0 + 0.4 * lean, z=-46.0, y=4.0)
+    for t, s in (("L", 1), ("R", -1)):
+        ph = slip + (0 if s > 0 else math.pi)
+        z = 0.98 if s > 0 else 0.87
+        if climb is not None:
+            z += 0.055 * math.sin(PI2 * climb + (0 if s > 0 else math.pi))
+        if slip:
+            z -= 0.045 * max(0.0, math.sin(ph))
+        w = Vector((s * 0.03, POLE.y, z))
+        hook = -62.0
+        if one and s < 0:                     # a pata de baixo soltou e tenta voltar
+            free = _sway((-0.07, 0.10, 0.66), lean * 1.2)
+            w = free.lerp(Vector((-0.03, POLE.y, 0.86)), reach)
+            hook = 10.0 - 72.0 * reach
+        P.place(f"CTRL_front_paw.{t}", w)
+        P.rot(f"CTRL_front_paw.{t}", x=hook)
+        if one:                               # sem apoio: as traseiras ficam soltas
+            kick = 0.03 * math.sin(ph * 2)
+            foot = _sway((s * 0.08, 0.13 - kick, 0.08), lean * 1.4)
+            P.place(f"CTRL_hind_paw.{t}", foot)
+            P.rot(f"CTRL_hind_paw.{t}", x=48.0)
+            P.rot(f"CTRL_hind_heel.{t}", x=22.0)
+            P.place(f"CTRL_hind_knee.{t}", _sway((s * 0.12, -0.30, 0.34), lean))
+            continue
+        fz = 0.34 if s > 0 else 0.29
+        if climb is not None:
+            fz += 0.05 * math.sin(PI2 * climb + (math.pi if s > 0 else 0))
+        if slip:
+            fz -= 0.04 * max(0.0, math.sin(ph + 1.0))
+        P.place(f"CTRL_hind_paw.{t}", Vector((s * 0.05, POLE.y + 0.015, fz)))
+        P.rot(f"CTRL_hind_paw.{t}", x=-48.0)
+        P.rot(f"CTRL_hind_heel.{t}", x=6.0)
+        P.place(f"CTRL_hind_knee.{t}", Vector((s * 0.11, -0.42, 0.52)))
+    whip = 20.0 * math.sin(slip * 2.0) if slip else 0.0
+    for i, pitch in enumerate((-100, -104, -106, -106, -102, -96, -88, -80)):
+        lag = i / 7.0
+        P.rot_abs(f"tail_{i + 1:02d}", x=pitch + lean * (1.0 + 1.5 * lag), y=whip * lag + (8.0 * lag if one else 0.0))
+    back = -18.0 * max(one, 1.0 if slip else 0.0)
+    P.rot("ear.L", x=back)
+    P.rot("ear.R", x=back)
+
+
 def pose_fall(P, ph=0.0):
     """No ar, caindo: patas abertas procurando o chao, cauda para cima, orelhas para tras."""
     w = PI2 * ph
@@ -567,6 +638,14 @@ def build_actions(rig):
     cycle("Escalando", 20, lambda u, f: pose_hang(P, sway=2.0 * S2(PI2 * u), climb=u), step=1)
     cycle("Espiando", 96, lambda u, f: pose_hang(P, sway=1.2 * S2(PI2 * u), breath=S2(PI2 * u * 2), peek=True))
     P.reset(); pose_hang(P, peek=True); report_reach(P, "espiando")
+
+    # agarrado a uma barra vertical, de perfil (a barra de rolagem do site)
+    cycle("Agarrado", 72, lambda u, f: pose_cling(P, sway=2.5 * S2(PI2 * u), breath=S2(PI2 * u * 2)))
+    P.reset(); pose_cling(P); report_reach(P, "agarrado")
+    cycle("Agarrado_Deslizando", 16, lambda u, f: pose_cling(P, sway=5.0 * S2(PI2 * u), slip=PI2 * u + 1e-3), step=1)
+    cycle("Agarrado_UmaPata", 40, lambda u, f: pose_cling(P, sway=9.0 * S2(PI2 * u), one=1.0, reach=max(0.0, S2(PI2 * u * 2 - 0.6)) ** 2), step=2)
+    P.reset(); pose_cling(P, one=1.0); report_reach(P, "agarrado, uma pata")
+    cycle("Agarrado_Escalando", 20, lambda u, f: pose_cling(P, sway=1.5 * S2(PI2 * u), climb=u), step=1)
 
     # queda (ciclo), pouso, espreguicar, curioso
     cycle("Caindo", 12, lambda u, f: pose_fall(P, u), step=1)

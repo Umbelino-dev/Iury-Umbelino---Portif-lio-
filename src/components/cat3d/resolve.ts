@@ -8,15 +8,17 @@ import type { CatState } from "@/components/cat/states";
  * is the one place that turns that into the body's movement. Nothing here moves
  * the model: it only names the clip the rig should be playing.
  */
-export type Anchor = "feet" | "grip" | "ledge";
+export type Anchor = "feet" | "grip" | "ledge" | "pole";
 export interface Pose {
   clip: string;
-  /** feet: the model stands on the point · grip: its front paws hold it · ledge: its paws rest on it, under the chin. */
+  /** feet: the model stands on the point · grip: its front paws hold it · ledge: its paws rest on it, under the chin · pole: it clings, side-on, to the scrollbar's thumb. */
   anchor: Anchor;
   once?: boolean;
   speed?: number;
   /** Which way it faces: 0 the visitor, ±1 along the screen. */
   heading?: number;
+  /** Exact turn (radians), when the pose needs a set side: π/2 = side-on, belly to the right edge. */
+  yaw?: number;
   /** It may turn its head and eyes to the pointer. */
   looks?: boolean;
   /** Expression morph targets, 0–1. */
@@ -40,6 +42,8 @@ export interface Moment {
 }
 
 const SCARED = { Surpreso: 0.8 };
+/** Side-on, belly to the right edge of the window (where the scrollbar is). */
+const SIDE = Math.PI / 2;
 
 /** Moving on its own feet: walk or run the way it goes; still: sit. */
 function onFoot(m: Moment): Pose {
@@ -59,7 +63,8 @@ export function resolvePose(m: Moment): Pose {
     case "observer":
       return onFoot(m);
     case "jump":
-      return { clip: "Caindo", anchor: "feet", face: SCARED };
+      // in the air, side-on, the way it leaps (to the scrollbar it always goes right)
+      return { clip: "Caindo", anchor: "feet", yaw: (m.rail || m.vx >= 0 ? 1 : -1) * SIDE, face: { Surpreso: 0.3 } };
     case "sleep":
       // on the rail it lets go and falls to the corner before it curls up
       if (m.vy > 2.5 * m.unit) return { clip: "Caindo", anchor: "feet" };
@@ -72,19 +77,19 @@ export function resolvePose(m: Moment): Pose {
       if (!m.rail) return { clip: "Sentado_Idle", anchor: "feet", looks: true };
       switch (m.grip) {
         case "2":
-          return { clip: "Pendurado_Deslizando", anchor: "grip", face: { Surpreso: 0.4 } };
+          return { clip: "Agarrado_Deslizando", anchor: "pole", yaw: SIDE, face: { Surpreso: 0.4 } };
         case "3":
-          return { clip: "Pendurado_UmaPata", anchor: "grip", face: { Surpreso: 0.7 } };
+          return { clip: "Agarrado_UmaPata", anchor: "pole", yaw: SIDE, face: { Surpreso: 0.7 } };
         case "4":
-          return { clip: "Caindo", anchor: "feet", face: SCARED };
+          return { clip: "Caindo", anchor: "feet", yaw: SIDE, face: SCARED };
         case "land":
-          return { clip: "Pousando", anchor: "feet", once: true };
+          return { clip: "Pousando", anchor: "feet", yaw: SIDE, once: true };
         case "sit":
           return { clip: "Sentado_Idle", anchor: "feet", looks: true };
         case "climb":
-          return { clip: "Escalando", anchor: "grip" };
+          return { clip: "Agarrado_Escalando", anchor: "pole", yaw: SIDE };
         default:
-          return { clip: "Pendurado", anchor: "grip", looks: true };
+          return { clip: "Agarrado", anchor: "pole", yaw: SIDE, looks: true };
       }
   }
 }

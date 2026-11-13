@@ -35,6 +35,19 @@ async function variants(name, input) {
   console.log(`${name}: ${meta.width}×${meta.height} → ${WIDTHS.join("/")}`);
 }
 
+/**
+ * A small, pre-blurred copy for the photo deck's frosted base
+ * (`<name>-blur.webp`): the blur is done once here, not by a CSS filter at
+ * runtime, which was the costliest paint while scrolling.
+ */
+async function blurred(name, input) {
+  await sharp(input)
+    .resize({ width: 240, withoutEnlargement: true })
+    .blur(6)
+    .webp({ quality: 70 })
+    .toFile(path.join(OUT, `${name}-blur.webp`));
+}
+
 async function alignedCyborg() {
   const src = path.join(SRC, "portrait-cyborg-src.webp");
   const real = await sharp(path.join(SRC, "portrait-real-src.webp")).metadata();
@@ -58,6 +71,8 @@ const real = await sharp(path.join(SRC, "portrait-real-src.webp")).extract(PORTR
 const cyborg = await sharp(await alignedCyborg()).extract(PORTRAIT_BOX).png().toBuffer();
 await variants("portrait-real", real);
 await variants("portrait-cyborg", cyborg);
+await blurred("portrait-real", real);
+await blurred("portrait-cyborg", cyborg);
 
 for (const name of ["koinonia-cover", "koinonia-map", "koinonia-brand"]) {
   await variants(name, await fs.readFile(path.join(SRC, `${name}.png`)));
@@ -65,5 +80,7 @@ for (const name of ["koinonia-cover", "koinonia-map", "koinonia-brand"]) {
 
 // Event photos for the About deck (from Iury's LinkedIn posts), kept as shot.
 for (const file of ["startup-weekend-team.webp", "startup-weekend.png", "crio-conecta.png"]) {
-  await variants(file.replace(/\.\w+$/, ""), await fs.readFile(path.join(SRC, file)));
+  const input = await fs.readFile(path.join(SRC, file));
+  await variants(file.replace(/\.\w+$/, ""), input);
+  await blurred(file.replace(/\.\w+$/, ""), input);
 }

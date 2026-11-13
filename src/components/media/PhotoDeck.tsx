@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
+import { memo, useCallback, useEffect, useRef, useState, type KeyboardEvent, type PointerEvent, type RefObject } from "react";
 import { gsap, MQ, useGSAP } from "@/lib/gsap";
 
 export interface DeckPhoto {
@@ -161,13 +161,22 @@ export function PhotoDeck({ photos, labels }: { photos: DeckPhoto[]; labels: Dec
   }, [front, go, opened]);
 
   // The box that rises from the pointer: follows it, appears with a short rise.
-  const placeTip = (x: number, y: number) => {
+  // Stable callbacks, so the memoised cards never re-render for hover or panel state.
+  const placeTip = useCallback((x: number, y: number) => {
     const el = tip.current;
     if (!el) return;
     const w = el.offsetWidth;
     const flip = x + 18 + w > window.innerWidth - 12;
     el.style.transform = `translate3d(${flip ? x - 18 - w : x + 18}px, ${y - el.offsetHeight - 14}px, 0)`;
-  };
+  }, []);
+  const onEnter = useCallback(
+    (i: number, x: number, y: number) => {
+      setHovered(i);
+      placeTip(x, y);
+    },
+    [placeTip],
+  );
+  const onLeave = useCallback((i: number) => setHovered((h) => (h === i ? null : h)), []);
 
   // Open / close the card's panel. The panel grows out of the card that was
   // clicked (its position and size), and shrinks back into the front card.
@@ -183,12 +192,15 @@ export function PhotoDeck({ photos, labels }: { photos: DeckPhoto[]; labels: Dec
       scale: Math.max(0.2, Math.min(a.width / b.width, a.height / b.height)),
     };
   };
-  const open = (i: number, el: HTMLElement) => {
-    origin.current = el;
-    go(i);
-    setOpened(i % photos.length);
-    setHovered(null);
-  };
+  const open = useCallback(
+    (i: number, el: HTMLElement) => {
+      // The deck stays as it is behind the panel: no second animation while it opens.
+      origin.current = el;
+      setOpened(i % photos.length);
+      setHovered(null);
+    },
+    [photos.length],
+  );
   useEffect(() => {
     const d = dialog.current;
     if (!d || opened === null) return;
@@ -198,7 +210,13 @@ export function PhotoDeck({ photos, labels }: { photos: DeckPhoto[]; labels: Dec
     if (window.matchMedia(MQ.reduced).matches) return;
     gsap.set(d, { x: 0, y: 0, scale: 1, opacity: 1 });
     const from = origin.current ? over(d, origin.current) : { x: 0, y: 24, scale: 0.96 };
-    gsap.fromTo(d, { ...from, opacity: 0.4, transformOrigin: "50% 50%" }, { x: 0, y: 0, scale: 1, opacity: 1, duration: 0.62, ease: "expo.out" });
+    // Its own compositor layer while it moves: scaled as a texture, not repainted.
+    d.style.willChange = "transform, opacity";
+    gsap.fromTo(
+      d,
+      { ...from, opacity: 0.4, transformOrigin: "50% 50%" },
+      { x: 0, y: 0, scale: 1, opacity: 1, duration: 0.62, ease: "expo.out", onComplete: () => void (d.style.willChange = "") },
+    );
     gsap.fromTo(
       d.querySelectorAll("[data-panel-in]"),
       { opacity: 0, y: 14 },
@@ -210,11 +228,13 @@ export function PhotoDeck({ photos, labels }: { photos: DeckPhoto[]; labels: Dec
     if (!d || !d.open || closing.current) return;
     closing.current = true;
     d.classList.add("is-closing"); // fades the backdrop (CSS)
-    const card = stage.current?.querySelectorAll<HTMLElement>("[data-deck-card] button")[front];
+    // Back into the card it came from (it is still where it was).
+    const card = origin.current;
     if (window.matchMedia(MQ.reduced).matches || !card) {
       d.close();
       return;
     }
+    d.style.willChange = "transform, opacity";
     gsap.to(d, {
       ...over(d, card),
       opacity: 0,
@@ -222,6 +242,7 @@ export function PhotoDeck({ photos, labels }: { photos: DeckPhoto[]; labels: Dec
       ease: "power3.in",
       onComplete: () => {
         d.close();
+        d.style.willChange = "";
         gsap.set(d, { x: 0, y: 0, scale: 1, opacity: 1 });
       },
     });
@@ -271,83 +292,20 @@ export function PhotoDeck({ photos, labels }: { photos: DeckPhoto[]; labels: Dec
         onPointerCancel={() => (drag.current = null)}
         className="relative mx-auto h-[calc(var(--card-w)*4/3*1.12)] w-(--card-w) touch-pan-y select-none [--card-w:clamp(15rem,64vw,26rem)] md:[--card-w:clamp(17rem,27vw,26rem)]"
       >
-        {cards.map((p, i) => {
-          const o = offset(i, front);
-          const copy = i >= photos.length;
-          return (
-            <figure
-              key={i}
-              data-deck-card
-              className="absolute inset-x-0 top-0 aspect-[3/4] will-change-transform"
-              style={{ zIndex: pose(o, n).z }}
-            >
-              <button
-                type="button"
-                tabIndex={copy ? -1 : 0}
-                aria-hidden={copy || undefined}
-                aria-label={`${labels.more}: ${p.caption}`}
-                onClick={(e) => {
-                  // A swipe that ended on a card is not a click.
-                  if (drag.current?.moved) {
-                    drag.current = null;
-                    return;
-                  }
-                  drag.current = null;
-                  open(i, e.currentTarget);
-                }}
-                onPointerEnter={(e) => {
-                  if (e.pointerType !== "mouse") return;
-                  setHovered(i);
-                  placeTip(e.clientX, e.clientY);
-                }}
-                onPointerMove={(e) => e.pointerType === "mouse" && placeTip(e.clientX, e.clientY)}
-                onPointerLeave={() => setHovered((h) => (h === i ? null : h))}
-                className="group/card block h-full w-full cursor-pointer text-left focus-visible:outline-ink"
-              >
-                {/* The lift: an inner layer, so it composes with the deck's own transforms. */}
-                <span className="relative block h-full overflow-hidden rounded-[clamp(1.25rem,2vw,1.875rem)] bg-ink-800 shadow-[0_34px_60px_-30px_rgba(16,16,16,0.6)] transition-[translate,box-shadow] duration-(--duration-base) ease-(--ease-out-soft) [@media(hover:hover)]:group-hover/card:-translate-y-4 [@media(hover:hover)]:group-hover/card:shadow-[0_48px_70px_-30px_rgba(16,16,16,0.7)] group-focus-visible/card:-translate-y-4">
-                  <Image
-                    src={p.src}
-                    alt={copy ? "" : p.alt}
-                    width={p.width}
-                    height={p.height}
-                    draggable={false}
-                    sizes="(min-width: 768px) 27vw, 64vw"
-                    className="absolute inset-0 h-full w-full object-cover"
-                    style={{ objectPosition: p.focus ?? "50% 18%" }}
-                  />
-                  {/* Frosted base: a pre-blurred copy of the photo, revealed by a gradient. */}
-                  <Image
-                    src={p.src}
-                    alt=""
-                    aria-hidden="true"
-                    width={p.width}
-                    height={p.height}
-                    draggable={false}
-                    sizes="(min-width: 768px) 27vw, 64vw"
-                    className="absolute inset-0 h-full w-full scale-110 object-cover blur-[14px] saturate-[1.25] [mask-image:linear-gradient(to_top,#000_30%,transparent_56%)]"
-                    style={{ objectPosition: p.focus ?? "50% 18%" }}
-                  />
-                  <span
-                    aria-hidden="true"
-                    className="absolute inset-x-0 bottom-0 h-1/2 bg-[linear-gradient(to_top,rgba(243,241,235,0.38),rgba(243,241,235,0.1)_55%,rgba(243,241,235,0))]"
-                  />
-                  <span className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-1 px-5 pb-[clamp(1.125rem,1.8vw,1.625rem)] text-center text-paper-0 [text-shadow:0_1px_14px_rgba(16,16,16,0.55)]">
-                    <span className="font-display text-[clamp(1.125rem,1rem+0.5vw,1.5rem)] leading-tight font-bold tracking-[-0.015em] text-balance">
-                      {p.caption}
-                    </span>
-                    <span className="font-display text-[0.9375rem] font-medium opacity-85">{labels.more}</span>
-                  </span>
-                  {/* Rim light: a bright edge and a soft inner glow. */}
-                  <span
-                    aria-hidden="true"
-                    className="pointer-events-none absolute inset-0 rounded-[inherit] shadow-[inset_0_0_0_1.5px_rgba(255,255,255,0.5),inset_0_1px_24px_rgba(255,255,255,0.2)]"
-                  />
-                </span>
-              </button>
-            </figure>
-          );
-        })}
+        {cards.map((p, i) => (
+          <DeckCard
+            key={i}
+            p={p}
+            i={i}
+            copy={i >= photos.length}
+            more={labels.more}
+            dragRef={drag}
+            onOpen={open}
+            onEnter={onEnter}
+            onMove={placeTip}
+            onLeave={onLeave}
+          />
+        ))}
       </div>
 
       {/* The captions are the index: the one in front is ink. */}
@@ -398,7 +356,7 @@ export function PhotoDeck({ photos, labels }: { photos: DeckPhoto[]; labels: Dec
           setOpened(null);
         }}
         onClick={(e) => e.target === e.currentTarget && close()}
-        className="m-auto max-h-[min(92dvh,46rem)] w-[min(64rem,calc(100vw-2rem))] overflow-y-auto rounded-[1.75rem] bg-paper p-0 text-ink shadow-[0_40px_90px_-30px_rgba(16,16,16,0.6)] backdrop:bg-ink/55 backdrop:backdrop-blur-sm md:overflow-hidden"
+        className="m-auto max-h-[min(92dvh,46rem)] w-[min(64rem,calc(100vw-2rem))] overflow-y-auto rounded-[1.75rem] bg-paper p-0 text-ink shadow-[0_28px_56px_-28px_rgba(16,16,16,0.55)] backdrop:bg-ink/62 md:overflow-hidden"
       >
         {story && (
           /* Desktop: two fixed columns, the photo held still and centred on the left,
@@ -472,3 +430,98 @@ export function PhotoDeck({ photos, labels }: { photos: DeckPhoto[]; labels: Dec
     </div>
   );
 }
+
+/**
+ * One card of the deck. Memoised: its props are stable (the photo object, plain
+ * values and stable callbacks), so hovering, dealing and opening the panel never
+ * re-render the card or its two images. The deck's position, scale and z-index
+ * are set by GSAP on the <figure> directly.
+ */
+const DeckCard = memo(function DeckCard({
+  p,
+  i,
+  copy,
+  more,
+  dragRef,
+  onOpen,
+  onEnter,
+  onMove,
+  onLeave,
+}: {
+  p: DeckPhoto;
+  i: number;
+  copy: boolean;
+  more: string;
+  dragRef: RefObject<{ x: number; id: number; moved: boolean } | null>;
+  onOpen: (i: number, el: HTMLElement) => void;
+  onEnter: (i: number, x: number, y: number) => void;
+  onMove: (x: number, y: number) => void;
+  onLeave: (i: number) => void;
+}) {
+  return (
+    <figure data-deck-card className="absolute inset-x-0 top-0 aspect-[3/4] will-change-transform">
+      <button
+        type="button"
+        tabIndex={copy ? -1 : 0}
+        aria-hidden={copy || undefined}
+        aria-label={`${more}: ${p.caption}`}
+        onClick={(e) => {
+          // A swipe that ended on a card is not a click.
+          if (dragRef.current?.moved) {
+            dragRef.current = null;
+            return;
+          }
+          dragRef.current = null;
+          onOpen(i, e.currentTarget);
+        }}
+        onPointerEnter={(e) => e.pointerType === "mouse" && onEnter(i, e.clientX, e.clientY)}
+        onPointerMove={(e) => e.pointerType === "mouse" && onMove(e.clientX, e.clientY)}
+        onPointerLeave={() => onLeave(i)}
+        className="group/card block h-full w-full cursor-pointer text-left focus-visible:outline-ink"
+      >
+        {/* The lift: an inner layer, so it composes with the deck's own transforms. */}
+        <span className="relative block h-full overflow-hidden rounded-[clamp(1.25rem,2vw,1.875rem)] bg-ink-800 shadow-[0_22px_36px_-22px_rgba(16,16,16,0.55)] transition-[translate] duration-(--duration-base) ease-(--ease-out-soft) [will-change:translate] [@media(hover:hover)]:group-hover/card:-translate-y-4 group-focus-visible/card:-translate-y-4">
+          <Image
+            src={p.src}
+            alt={copy ? "" : p.alt}
+            width={p.width}
+            height={p.height}
+            draggable={false}
+            sizes="(min-width: 768px) 27vw, 64vw"
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ objectPosition: p.focus ?? "50% 18%" }}
+          />
+          {/* Frosted base: a small copy blurred at build time (scripts/images.mjs,
+              `<name>-blur.webp`), revealed by a gradient. No CSS filter: it was the
+              costliest paint while scrolling. */}
+          <Image
+            src={p.src.replace(/\.webp$/, "-blur.webp")}
+            unoptimized
+            alt=""
+            aria-hidden="true"
+            width={240}
+            height={Math.round((240 * p.height) / p.width)}
+            draggable={false}
+            className="absolute inset-0 h-full w-full scale-110 object-cover [mask-image:linear-gradient(to_top,#000_30%,transparent_56%)]"
+            style={{ objectPosition: p.focus ?? "50% 18%" }}
+          />
+          <span
+            aria-hidden="true"
+            className="absolute inset-x-0 bottom-0 h-1/2 bg-[linear-gradient(to_top,rgba(243,241,235,0.38),rgba(243,241,235,0.1)_55%,rgba(243,241,235,0))]"
+          />
+          <span className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-1 px-5 pb-[clamp(1.125rem,1.8vw,1.625rem)] text-center text-paper-0 [text-shadow:0_1px_14px_rgba(16,16,16,0.55)]">
+            <span className="font-display text-[clamp(1.125rem,1rem+0.5vw,1.5rem)] leading-tight font-bold tracking-[-0.015em] text-balance">
+              {p.caption}
+            </span>
+            <span className="font-display text-[0.9375rem] font-medium opacity-85">{more}</span>
+          </span>
+          {/* Rim light: a bright edge and a soft inner glow. */}
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 rounded-[inherit] shadow-[inset_0_0_0_1.5px_rgba(255,255,255,0.5),inset_0_1px_24px_rgba(255,255,255,0.2)]"
+          />
+        </span>
+      </button>
+    </figure>
+  );
+});

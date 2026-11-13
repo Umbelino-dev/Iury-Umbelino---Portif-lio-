@@ -34,5 +34,11 @@
     "tailwindcss": "4.3.5",
     "typescript": "5.9.3",
     "wrangler": "4.158.0"
+  },
+  "allowScripts": {
+    "@swc/core@1.16.22": true,
+    "esbuild@0.28.2": true,
+    "workerd@1.20261104.1": true,
+    "@parcel/watcher@2.6.0": true
   }
 }

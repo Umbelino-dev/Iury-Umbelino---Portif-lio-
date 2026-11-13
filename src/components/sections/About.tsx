@@ -1,7 +1,8 @@
 import { getLocale, getTranslations } from "next-intl/server";
-import { contacts, education, experience } from "@/content/profile";
+import { contacts, education, experience, plain, term } from "@/content/profile";
 import { gallery } from "@/content/gallery";
 import type { Locale } from "@/i18n/routing";
+import { Emphasis } from "@/components/layout/Emphasis";
 import { SectionTitle } from "@/components/layout/SectionTitle";
 import { PhotoDeck } from "@/components/media/PhotoDeck";
 import { Timeline } from "./Timeline";
@@ -51,12 +52,22 @@ export async function About() {
       summary: s.summary[locale],
       details: s.details.map((d) => d[locale]),
       more: s.more[locale],
-      list: s.highlights ? experience.highlights.map((h) => h[locale]) : undefined,
+      list: s.highlights ? experience.highlights.map((h) => plain(h[locale])) : undefined,
       // The CV lists the daily tools for the current role only.
-      stack: s.highlights ? experience.stack.daily : undefined,
+      stack: s.highlights ? experience.stack.daily.map((item) => term(item, locale)) : undefined,
       current: !to,
     };
   });
+  /** Small outlined pills: the tools read as a set, scannable at a glance. */
+  const pills = (items: readonly (string | { pt: string; en: string })[]) => (
+    <ul className="flex flex-wrap gap-1.5">
+      {items.map((item) => (
+        <li key={term(item, locale)} className="rounded-full border border-ink/10 bg-ink/[0.03] px-2.5 py-0.5 text-caption leading-relaxed">
+          {term(item, locale)}
+        </li>
+      ))}
+    </ul>
+  );
   const timelineLabels = { now: t("now"), seeMore: tl("seeMore"), close: tl("close"), stack: t("stack") };
 
 
@@ -91,8 +102,12 @@ export async function About() {
           <h3 className={subhead}>{t("highlights")}</h3>
           <ul className="flex flex-col gap-5">
             {experience.highlights.map((h, i) => (
-              <li key={i} className="max-w-[60ch] text-[clamp(1rem,0.97rem+0.15vw,1.0625rem)] leading-[1.6] text-pretty">
-                {h[locale]}
+              <li key={i} className="flex max-w-[60ch] gap-3.5 text-[clamp(1rem,0.97rem+0.15vw,1.0625rem)] leading-[1.6] text-pretty">
+                {/* A thin dash leads each line: scannable without a coloured bullet. */}
+                <span aria-hidden="true" className="mt-[0.8em] h-[1.5px] w-3 shrink-0 bg-ink/35" />
+                <span>
+                  <Emphasis text={h[locale]} />
+                </span>
               </li>
             ))}
           </ul>
@@ -101,11 +116,13 @@ export async function About() {
         <div className="col-span-4 grid gap-x-10 gap-y-10 sm:grid-cols-3 md:col-span-12">
           <div className="flex flex-col gap-3">
             <h3 className={subhead}>{t("stack")}</h3>
-            <p className="text-ui leading-relaxed">{experience.stack.daily.join(", ")}.</p>
+            {pills(experience.stack.daily)}
           </div>
           <div className="flex flex-col gap-3">
             <h3 className={subhead}>{t("learning")}</h3>
-            <p className="text-ui leading-relaxed text-gray-600">{experience.stack.learning.join(", ")}.</p>
+            {pills(experience.stack.learning)}
+            <p className="mt-2 text-note text-gray-600">{t("deepening")}</p>
+            {pills(experience.stack.deepening)}
           </div>
           <div className="flex flex-col gap-3">
             <h3 className={subhead}>{t("education")}</h3>
@@ -155,6 +172,9 @@ export async function About() {
             profileUrl: contacts.find((c) => c.kind === "linkedin")?.href ?? "https://www.linkedin.com/in/iuryumbelino/",
             close: ta("galleryClose"),
             pause: ta("galleryPause"),
+            prev: ta("galleryPrev"),
+            next: ta("galleryNext"),
+            bring: ta("galleryBring"),
           }}
         />
       </div>

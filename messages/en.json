@@ -51,7 +51,10 @@
     "galleryClose": "Close",
     "galleryTakeaways": "What it added",
     "galleryProfile": "View profile on LinkedIn",
-    "galleryPause": "Pause photos"
+    "galleryPause": "Pause photos",
+    "galleryPrev": "Previous photo",
+    "galleryNext": "Next photo",
+    "galleryBring": "Click to bring it forward"
   },
   "experience": {
     "title": "Where curiosity becomes routine.",
@@ -60,6 +63,7 @@
     "path": "Path",
     "stack": "Daily tools",
     "learning": "Learning",
+    "deepening": "Going deeper",
     "education": "Education",
     "expected": "expected {year}",
     "now": "now",

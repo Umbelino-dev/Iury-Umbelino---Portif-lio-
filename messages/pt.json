@@ -51,7 +51,10 @@
     "galleryClose": "Fechar",
     "galleryTakeaways": "O que agregou",
     "galleryProfile": "Ver perfil no LinkedIn",
-    "galleryPause": "Pausar fotos"
+    "galleryPause": "Pausar fotos",
+    "galleryPrev": "Foto anterior",
+    "galleryNext": "Próxima foto",
+    "galleryBring": "Clique para trazer à frente"
   },
   "experience": {
     "title": "Onde a curiosidade vira rotina.",
@@ -60,6 +63,7 @@
     "path": "Trajetória",
     "stack": "Uso no dia a dia",
     "learning": "Estudando",
+    "deepening": "Aprofundando",
     "education": "Formação",
     "expected": "previsão {year}",
     "now": "atual",

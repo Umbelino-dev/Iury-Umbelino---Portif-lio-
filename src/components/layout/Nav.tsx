@@ -117,9 +117,12 @@ export function Nav({ variant = "home" }: { variant?: "home" | "case" }) {
 
   // Below md the page scrolls under the name: once past the hero it gets the same
   // glass pill as the other floating controls, so it never sits on top of text.
+  // From md up it is bare text: the whole backdrop-filter goes (brightness and
+  // saturate too, not only the blur) and the dark gradient image, or the box
+  // tints the page behind it.
   const overContent = variant === "case" || active !== "hero";
   const brand = `flex min-h-11 items-center whitespace-nowrap font-display text-[1.0625rem] font-bold tracking-[-0.01em] ${focusRing} ${
-    overContent ? `max-md:-ml-3 max-md:rounded-pill max-md:border max-md:px-3 ${glass} ${glassBlur} md:border-transparent md:bg-transparent md:shadow-none md:backdrop-blur-none` : ""
+    overContent ? `max-md:-ml-3 max-md:rounded-pill max-md:border max-md:px-3 ${glass} ${glassBlur} md:border-transparent md:bg-transparent md:bg-none md:shadow-none md:backdrop-filter-none` : ""
   }`;
 
   const link = (id: ItemId, key: (typeof ITEMS)[number]["key"], extra = "") => (

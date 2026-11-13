@@ -80,6 +80,21 @@ export function Timeline({ steps, labels }: { steps: TimelineStep[]; labels: Tim
         tip.setAttribute("class", "fill-signal");
         tip.style.filter = "drop-shadow(0 0 6px rgba(200,241,105,0.9)) drop-shadow(0 0 16px rgba(200,241,105,0.55))";
         svg.append(path, tip);
+        // "Now": where the line ends (the current role), a lime point with a soft
+        // pulse. HTML, not SVG, so the pulse is a composited transform/opacity
+        // animation; it runs only while the path is on screen, and never with
+        // reduced motion (the point stays, still).
+        const now = document.createElement("span");
+        now.setAttribute("aria-hidden", "true");
+        now.className = "pointer-events-none absolute size-2.5 -translate-1/2 rounded-full bg-signal opacity-0 shadow-[0_0_8px_rgba(200,241,105,0.9)]";
+        const ring = document.createElement("span");
+        ring.className = "absolute inset-0 rounded-full bg-signal opacity-60 motion-safe:animate-[tl-ping_2.4s_cubic-bezier(0,0,0.2,1)_infinite] motion-reduce:hidden";
+        now.append(ring);
+        box.append(now);
+        const seen = new IntersectionObserver(([e]) => {
+          ring.style.animationPlayState = e?.isIntersecting ? "running" : "paused";
+        });
+        seen.observe(box);
 
         let length = 0;
         let marks: number[] = []; // where each step starts, along the axis (px)
@@ -116,6 +131,9 @@ export function Timeline({ steps, labels }: { steps: TimelineStep[]; labels: Tim
           }
           path.setAttribute("d", d);
           length = path.getTotalLength();
+          const end = path.getPointAtLength(length);
+          now.style.left = `${end.x}px`;
+          now.style.top = `${end.y}px`;
           path.style.strokeDasharray = `${length}`;
           paint();
         };
@@ -126,6 +144,8 @@ export function Timeline({ steps, labels }: { steps: TimelineStep[]; labels: Tim
           tip.setAttribute("cx", `${at.x}`);
           tip.setAttribute("cy", `${at.y}`);
           tip.style.opacity = motion && progress > 0.001 && progress < 0.999 ? "1" : "0";
+          // The tip hands over to the "now" point once the line is fully drawn.
+          now.style.opacity = progress >= 0.999 ? "1" : "0";
           const head = axis === "x" ? at.x : at.y;
           items.forEach((it, i) => {
             const reached = !motion || head >= (marks[i] ?? 0) - 2;
@@ -155,6 +175,8 @@ export function Timeline({ steps, labels }: { steps: TimelineStep[]; labels: Tim
         }
         return () => {
           ro.disconnect();
+          seen.disconnect();
+          now.remove();
           st?.kill();
           delete box.dataset.tlAnim;
           items.forEach((it) => delete it.dataset.reached);

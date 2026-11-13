@@ -34,6 +34,9 @@ export interface DeckLabels {
   profileUrl: string; // the LinkedIn profile, when a photo has no post
   close: string;
   pause: string; // "Pausar"
+  prev: string; // "Foto anterior"
+  next: string; // "Próxima foto"
+  bring: string; // "Clique para trazer à frente"
 }
 
 /** The deck always shows at least this many cards (photos repeat until then). */
@@ -68,9 +71,11 @@ function pose(o: number, n: number) {
  * or the profile when there is none). The panel is a native <dialog> (focus trap,
  * Esc, backdrop click closes, focus returns to the card).
  *
- * Each card: rounded portrait, a rim of light, and a frosted base made from a
- * pre-blurred copy of the photo under a gradient mask (painted once, then moved
- * as a texture), not a backdrop-filter, so the deck stays smooth.
+ * Each card: rounded portrait, a rim of light, and a dark gradient at the base
+ * under the white caption (painted once, then moved as a texture).
+ *
+ * Clicking a card beside the front one brings it forward; clicking the front
+ * card opens it. Arrow buttons under the deck deal too.
  *
  * - GSAP tweens only when the front card changes (transform + opacity), no loop.
  * - Swipe / drag sideways or ← → on the deck deal the next / previous card.
@@ -84,6 +89,14 @@ export function PhotoDeck({ photos, labels }: { photos: DeckPhoto[]; labels: Dec
   const tip = useRef<HTMLDivElement>(null);
   const dialog = useRef<HTMLDialogElement>(null);
   const [front, setFront] = useState(0);
+  // Read by the memoised cards' stable click handler.
+  const frontRef = useRef(0);
+  useEffect(() => {
+    frontRef.current = front;
+  }, [front]);
+  // The card whose text the hover box holds: kept while the box fades out, so it
+  // never flashes a placeholder; before any hover it holds nothing.
+  const [shownIdx, setShownIdx] = useState<number | null>(null);
   const [hovered, setHovered] = useState<number | null>(null);
   const [opened, setOpened] = useState<number | null>(null);
   // Auto-dealing can be paused (WCAG 2.2.2) and stops for good once the visitor
@@ -184,6 +197,7 @@ export function PhotoDeck({ photos, labels }: { photos: DeckPhoto[]; labels: Dec
   const onEnter = useCallback(
     (i: number, x: number, y: number) => {
       setHovered(i);
+      setShownIdx(i);
       placeTip(x, y);
     },
     [placeTip],
@@ -206,12 +220,18 @@ export function PhotoDeck({ photos, labels }: { photos: DeckPhoto[]; labels: Dec
   };
   const open = useCallback(
     (i: number, el: HTMLElement) => {
+      // A card beside the front one comes forward first (and ends auto-dealing);
+      // only the front card opens its panel.
+      if (offset(i, frontRef.current) !== 0) {
+        deal(i);
+        return;
+      }
       // The deck stays as it is behind the panel: no second animation while it opens.
       origin.current = el;
       setOpened(i % photos.length);
       setHovered(null);
     },
-    [photos.length],
+    [deal, offset, photos.length],
   );
   useEffect(() => {
     const d = dialog.current;
@@ -281,7 +301,8 @@ export function PhotoDeck({ photos, labels }: { photos: DeckPhoto[]; labels: Dec
     e.preventDefault();
   };
 
-  const hot = hovered !== null ? cards[hovered] : undefined;
+  const shown = shownIdx !== null ? cards[shownIdx] : undefined;
+  const isFront = shownIdx !== null && offset(shownIdx, front) === 0;
   const story = opened !== null ? photos[opened] : undefined;
 
   return (
@@ -320,8 +341,18 @@ export function PhotoDeck({ photos, labels }: { photos: DeckPhoto[]; labels: Dec
         ))}
       </div>
 
-      {/* The captions are the index: the one in front is ink. */}
+      {/* The captions are the index: the one in front is ink. The arrows frame
+          them: the same deal as ← → on the deck, for anyone who does not swipe. */}
       <div className="mt-[clamp(1.5rem,3vw,2.5rem)] flex flex-wrap items-center justify-center gap-x-8 gap-y-2 px-(--page-margin)">
+        <div className="flex items-center gap-x-4">
+        <button
+          type="button"
+          onClick={() => deal(front - 1)}
+          aria-label={labels.prev}
+          className="flex size-11 shrink-0 items-center justify-center rounded-full border border-ink/12 font-display text-[1.125rem] text-ink transition-colors duration-(--duration-fast) hover:border-ink/40 hover:bg-ink/[0.04] focus-visible:outline-ink"
+        >
+          <span aria-hidden="true">←</span>
+        </button>
         <ul className="flex flex-wrap justify-center gap-x-6">
           {photos.map((p, i) => {
             const active = front % photos.length === i;
@@ -343,6 +374,15 @@ export function PhotoDeck({ photos, labels }: { photos: DeckPhoto[]; labels: Dec
             );
           })}
         </ul>
+        <button
+          type="button"
+          onClick={() => deal(front + 1)}
+          aria-label={labels.next}
+          className="flex size-11 shrink-0 items-center justify-center rounded-full border border-ink/12 font-display text-[1.125rem] text-ink transition-colors duration-(--duration-fast) hover:border-ink/40 hover:bg-ink/[0.04] focus-visible:outline-ink"
+        >
+          <span aria-hidden="true">→</span>
+        </button>
+        </div>
         {playing && (
           <button
             type="button"
@@ -359,13 +399,17 @@ export function PhotoDeck({ photos, labels }: { photos: DeckPhoto[]; labels: Dec
           card's own label and the panel carry the same text). */}
       <div ref={tip} aria-hidden="true" className="pointer-events-none fixed top-0 left-0 z-[80] hidden [@media(hover:hover)_and_(pointer:fine)]:block">
         <div
-          className={`w-[min(18rem,70vw)] rounded-[1rem] bg-paper-0/95 p-4 text-ink shadow-[0_18px_40px_-18px_rgba(16,16,16,0.45)] backdrop-blur-md transition-[opacity,translate] duration-(--duration-base) ease-(--ease-out-soft) ${
-            hot ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"
+          className={`w-[min(18rem,70vw)] rounded-[1rem] bg-paper-0/95 p-4 text-ink shadow-[0_18px_40px_-18px_rgba(16,16,16,0.45)] backdrop-blur-md transition-[opacity,translate,visibility] duration-(--duration-base) ease-(--ease-out-soft) ${
+            hovered !== null ? "visible translate-y-0 opacity-100" : "invisible translate-y-3 opacity-0"
           }`}
         >
-          <p className="font-display text-[1.0625rem] leading-tight font-bold tracking-[-0.01em]">{hot?.caption}</p>
-          <p className="mt-1.5 text-caption leading-snug text-gray-600">{hot?.summary ?? labels.pending}</p>
-          <p className="mt-3 font-display text-[0.875rem] font-bold underline decoration-1 underline-offset-[0.3em]">{labels.hint}</p>
+          {shown && (
+            <>
+              <p className="font-display text-[1.0625rem] leading-tight font-bold tracking-[-0.01em]">{shown.caption}</p>
+              <p className="mt-1.5 text-caption leading-snug text-gray-600">{shown.summary ?? labels.pending}</p>
+              <p className="mt-3 font-display text-[0.875rem] font-bold underline decoration-1 underline-offset-[0.3em]">{isFront ? labels.hint : labels.bring}</p>
+            </>
+          )}
         </div>
       </div>
 
@@ -518,25 +562,13 @@ const DeckCard = memo(function DeckCard({
             className="absolute inset-0 h-full w-full object-cover"
             style={{ objectPosition: p.focus ?? "50% 18%" }}
           />
-          {/* Frosted base: a small copy blurred at build time (scripts/images.mjs,
-              `<name>-blur.webp`), revealed by a gradient. No CSS filter: it was the
-              costliest paint while scrolling. */}
-          <Image
-            src={p.src.replace(/\.webp$/, "-blur.webp")}
-            unoptimized
-            alt=""
-            aria-hidden="true"
-            width={240}
-            height={Math.round((240 * p.height) / p.width)}
-            draggable={false}
-            className="absolute inset-0 h-full w-full scale-110 object-cover [mask-image:linear-gradient(to_top,#000_30%,transparent_56%)]"
-            style={{ objectPosition: p.focus ?? "50% 18%" }}
-          />
+          {/* A dark base under the caption, only at the bottom: the face stays
+              clear and the white title keeps its contrast. */}
           <span
             aria-hidden="true"
-            className="absolute inset-x-0 bottom-0 h-1/2 bg-[linear-gradient(to_top,rgba(243,241,235,0.38),rgba(243,241,235,0.1)_55%,rgba(243,241,235,0))]"
+            className="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.85)_0%,rgba(0,0,0,0.3)_35%,transparent_60%)]"
           />
-          <span className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-1 px-5 pb-[clamp(1.125rem,1.8vw,1.625rem)] text-center text-paper-0 [text-shadow:0_1px_14px_rgba(16,16,16,0.55)]">
+          <span className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-1 px-5 pb-[clamp(1.125rem,1.8vw,1.625rem)] text-center text-paper-0 [text-shadow:0_1px_8px_rgba(0,0,0,0.35)]">
             <span className="font-display text-[clamp(1.125rem,1rem+0.5vw,1.5rem)] leading-tight font-bold tracking-[-0.015em] text-balance">
               {p.caption}
             </span>

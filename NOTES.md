@@ -128,3 +128,5 @@ Temporary progress log. Permanent rules live in `CLAUDE.md`.
 - Tagline stays English in both locales.
 - Hero keeps the poetic intro, with an eyebrow showing the current stack (Iury, 2026-11-09).
 - The About traits (Tecnologia, Criatividade, Curiosidade) were removed from the Profile (Iury, 2026-11-13).
+
+- **2026-11-13, Perfil refinements (Iury):** nav wordmark box fixed (backdrop brightness + gradient image leaked to md+); page scrollbar hidden; daily tools / studies updated to Iury's list (SQL, Oracle, PL/SQL Developer, DOX (EMA Sistemas), Pascal Script, JavaScript, Logs de processos, Softdesk · HTML, CSS, C · deepening SQL, Pascal Script, JavaScript) as pills; "O que faço" key terms semibold. PhotoDeck: dark base gradient, arrows, side card click brings it forward. Timeline: "now" point pulses at the path end. Open: "logs de processos" is not in any CV bullet, so it is not emphasised there; `-blur.webp` generation in `scripts/images.mjs` is now unused.

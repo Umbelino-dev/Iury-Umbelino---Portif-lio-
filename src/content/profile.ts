@@ -58,23 +58,26 @@ export const experience = {
   employer: "Giassi Supermercados",
   role: { pt: "Assistente de TI", en: "IT Assistant" } satisfies Localized,
   period: { pt: "abr 2026 – atual", en: "Apr 2026 – present" } satisfies Localized,
-  /** Every line is a CV bullet (rev. 6), reworded only for length. */
+  /**
+   * Every line is a CV bullet (rev. 6), reworded only for length. `**…**` marks the
+   * key terms the UI sets in semibold (Iury, 2026-11-13); `plain()` strips the marks.
+   */
   highlights: [
     {
-      pt: "Retomei, por iniciativa própria, chamados parados desde 2020: em duas semanas, encerrei 6 e mapeei outros 10.",
-      en: "On my own initiative, reopened tickets stalled since 2020: in two weeks I closed 6 and mapped 10 more.",
+      pt: "Retomei, por iniciativa própria, **chamados parados desde 2020**: em duas semanas, encerrei 6 e mapeei outros 10.",
+      en: "On my own initiative, reopened **tickets stalled since 2020**: in two weeks I closed 6 and mapped 10 more.",
     },
     {
-      pt: "Regras de validação e automações em Pascal Script na plataforma DOX (EMA Sistemas), com apoio de IA.",
-      en: "Validation rules and automations in Pascal Script on the DOX platform (EMA Sistemas), assisted by AI tools.",
+      pt: "Regras de validação e automações em **Pascal Script** na plataforma DOX (EMA Sistemas), com apoio de IA.",
+      en: "Validation rules and automations in **Pascal Script** on the DOX platform (EMA Sistemas), assisted by AI tools.",
     },
     {
-      pt: "Consultas, análises e correções de dados em Oracle com SQL e PL/SQL.",
-      en: "Queries, analysis and data fixes on Oracle with SQL and PL/SQL.",
+      pt: "Consultas, análises e correções de dados em **Oracle com SQL** e PL/SQL.",
+      en: "Queries, analysis and data fixes on **Oracle with SQL** and PL/SQL.",
     },
     {
-      pt: "Padronizei os e-mails automáticos do sistema (HTML + SQL) num modelo único e mais legível.",
-      en: "Standardised the system's automatic emails (HTML + SQL) into one clearer template.",
+      pt: "Padronizei os **e-mails automáticos** do sistema (HTML + SQL) num modelo único e mais legível.",
+      en: "Standardised the system's **automatic emails** (HTML + SQL) into one clearer template.",
     },
     {
       pt: "Suporte a usuários por chamados (Softdesk) e e-mail; relatórios no ReportBuilder.",
@@ -139,9 +142,27 @@ export const experience = {
       confirmed: false,
     },
   ] satisfies PathStep[],
+  /** Daily tools and studies, as Iury listed them (2026-11-13). Plain strings read the same in both locales. */
   stack: {
-    daily: ["SQL", "PL/SQL", "Oracle", "PL/SQL Developer", "DOX · Pascal Script", "ReportBuilder", "Softdesk"],
-    /** CV marks these as basic. */
-    learning: ["HTML", "JavaScript", "C++", "Git"],
+    daily: [
+      "SQL",
+      "Oracle",
+      "PL/SQL Developer",
+      "DOX (EMA Sistemas)",
+      "Pascal Script",
+      "JavaScript",
+      { pt: "Logs de processos", en: "Process logs" },
+      "Softdesk",
+    ] satisfies (string | Localized)[],
+    /** New ground. */
+    learning: ["HTML", "CSS", { pt: "Linguagem C", en: "C" }] satisfies (string | Localized)[],
+    /** Already in use, studied further. */
+    deepening: ["SQL", "Pascal Script", "JavaScript"] satisfies (string | Localized)[],
   },
 };
+
+/** A stack item in the visitor's language. */
+export const term = (item: string | Localized, locale: keyof Localized) => (typeof item === "string" ? item : item[locale]);
+
+/** A highlight without its `**` emphasis marks (plain-text contexts). */
+export const plain = (text: string) => text.replaceAll("**", "");

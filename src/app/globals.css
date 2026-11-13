@@ -323,19 +323,33 @@ dialog.is-closing::backdrop {
   transform: rotate(7deg) translateY(-1.5px);
 }
 
-/*
- * Scrollbar (Iury, 2026-11-13): thin, on the page's own dark, a graphite thumb that
- * lights up lime while hovered or dragged. Firefox gets the standard properties
- * (thin + colours, no hover state there); Chromium and Safari the ::-webkit ones.
- * Chromium 121+ would let `scrollbar-color` override the ::-webkit rules, so the
- * standard pair is scoped to browsers without ::-webkit-scrollbar support.
- */
-@supports not selector(::-webkit-scrollbar) {
-  html {
-    scrollbar-width: thin;
-    scrollbar-color: #2e2e2e var(--color-ink);
+/* Career line, "now" point: a discreet ping (Timeline). */
+@keyframes tl-ping {
+  75%,
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
   }
 }
+
+/*
+ * Page scrollbar hidden (Iury, 2026-11-13): the cat's rail is the page's scroll
+ * marker, and the dark native bar read as a black strip on the light sections.
+ * Scrolling is unchanged (wheel, trackpad, keys, touch). Only the page's own bar
+ * goes; inner scrollers (the photo panel's text) keep the thin bar below.
+ */
+html {
+  scrollbar-width: none;
+}
+html::-webkit-scrollbar {
+  display: none;
+}
+
+/*
+ * Inner scrollers: thin, a graphite thumb that lights up lime while hovered or
+ * dragged. Chromium 121+ would let the standard properties override these
+ * ::-webkit rules, so elements that set `scrollbar-width` themselves keep theirs.
+ */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;

@@ -13,8 +13,10 @@ fork whose foot is the b.
 At the bottom (Iury's reference, 2026-11-13) the m's last leg does not stop at the
 baseline: it turns in a half ring (the leg's own width all the way round) and rises
 into that same stem, leaving a narrow slit with a round bottom between them. The
-spacing is the font's: the slit is the gap the m and the b already have. The b is
-untouched, so its stem meets its bowl with Satoshi's own fine notch at the base.
+spacing is the font's: the slit is the gap the m and the b already have. Below the
+ring's centre the shared stem is the ring's own right side, rounded outward, and
+the b's bowl does not touch it: its lower curve stops short, leaving an open slit
+(SLIT) that follows the ring.
 The I is raised to the ascender height (the l, the b and the i's dot).
 
 The license (ITF Free Font License) allows wordmarks made with the font; the
@@ -226,6 +228,9 @@ for ch, (name, x) in zip("Umbelino", line2):
         pm = pathops.op(pm, rect(LEG_L - 1, LEG_L + B_W + 1, -200, TURN_CY, Tm), pathops.PathOp.DIFFERENCE)
         ring = half_ring(TURN_CX, TURN_CY + 1, R_IN, R_OUT, Tm)
         ring = pathops.op(ring, rect(LEG_L, LEG_L + B_W, TURN_CY - 1, TURN_CY + 2, Tm), pathops.PathOp.UNION)
+        # Its right end reaches a little up under the stem (drawn later, on top), so
+        # the two paths overlap instead of meeting on a hairline.
+        ring = pathops.op(ring, rect(STEM_L, STEM_L + B_W, TURN_CY - 1, TURN_CY + 3, Tm), pathops.PathOp.UNION)
         pm = pathops.op(pm, ring, pathops.PathOp.UNION)
         glyphs.append({"id": "l2-m", "line": 2, "d": to_svg(pathops.simplify(pm))})
     elif ch != "b":
@@ -243,8 +248,109 @@ depth = -(LINE - b_top) - OVERLAP  # font units below line 1's baseline
 stem = pathops.Path()
 sp = TransformPen(stem.getPen(), T)
 sp.moveTo((CUT_L, depth)); sp.lineTo((CUT_R, depth)); sp.lineTo((CUT_R, CUT + 2)); sp.lineTo((CUT_L, CUT + 2)); sp.closePath()
+# The b's foot (Iury's reference): below the ring's centre the stem is the ring's
+# right side, rounded outward; the bowl does not touch it. The bowl's lower curve
+# runs on round the stem and stops short of it, leaving an open slit of SLIT units
+# that follows the ring's outer edge (its end is cut parallel to it).
+SLIT = 22  # font units, about a seventh of the stem
+L2 = (1, 0, 0, -1, 0, B)  # line-2 coordinates, font units, y up
 pb = pathops.Path()
 gs[b].draw(TransformPen(pb.getPen(), (1, 0, 0, -1, b_x + shift, B)))
+pb = pathops.op(pb, rect(STEM_L - 1, STEM_L + B_W, -200, TURN_CY, L2), pathops.PathOp.DIFFERENCE)
+# The bowl's outer edge, taken as a circle: its top and bottom on a vertical line
+# through the counter, its right side at the glyph's right edge.
+_bb = bounds(b)
+_cx_b = b_x + shift + (B_STEM[1] + _bb[2]) / 2
+_g = pathops.Path()
+gs[b].draw(TransformPen(_g.getPen(), (1, 0, 0, 1, b_x + shift, 0)))
+_ys = [c.bounds for c in pathops.op(_g, rect(_cx_b - 0.5, _cx_b + 0.5, -500, 1500, (1, 0, 0, 1, 0, 0)), pathops.PathOp.INTERSECTION).contours]
+BOWL_BOTTOM = min(c[1] for c in _ys)
+BOWL_TOP = max(c[3] for c in _ys if c[1] < 600)
+BOWL_R = (BOWL_TOP - BOWL_BOTTOM) / 2
+BOWL_CX = b_x + shift + _bb[2] - BOWL_R
+BOWL_CY = (BOWL_TOP + BOWL_BOTTOM) / 2
+
+
+def disk(cx, cy, r, T, steps=180):
+    import math
+
+    d = pathops.Path()
+    pen = TransformPen(d.getPen(), T)
+    pen.moveTo((cx + r, cy))
+    for i in range(1, steps):
+        a = 2 * math.pi * i / steps
+        pen.lineTo((cx + r * math.cos(a), cy + r * math.sin(a)))
+    pen.closePath()
+    return d
+
+
+def ellipse(cx, cy, rx, ry, T, steps=240):
+    import math
+
+    d = pathops.Path()
+    pen = TransformPen(d.getPen(), T)
+    pen.moveTo((cx + rx, cy))
+    for i in range(1, steps):
+        a = 2 * math.pi * i / steps
+        pen.lineTo((cx + rx * math.cos(a), cy + ry * math.sin(a)))
+    pen.closePath()
+    return d
+
+
+def bowl_bottom_at(xx):
+    """Lowest ink of the b (line-2 x, font units) on a vertical line."""
+    cs = pathops.op(_g, rect(xx - 0.5, xx + 0.5, -500, 300, (1, 0, 0, 1, 0, 0)), pathops.PathOp.INTERSECTION).contours
+    return min(c.bounds[1] for c in cs)
+
+
+# Satoshi's bowl is flatter than a circle (a superellipse): fit its exponent so the
+# carried-on curve meets the real bottom, without a step, where it hands over.
+_right = b_x + shift + _bb[2]
+_hand = STEM_L + B_W + 90
+_target = bowl_bottom_at(_hand)
+_ax = _right - BOWL_CX  # horizontal semi-axis (centre fixed, right edge on the glyph's)
+lo, hi = 1.2, 6.0
+for _ in range(60):
+    n = (lo + hi) / 2
+    yb_ = BOWL_CY - BOWL_R * (1 - abs((_hand - BOWL_CX) / _ax) ** n) ** (1 / n)
+    if yb_ > _target:
+        lo = n  # still above the real bottom: flatter
+    else:
+        hi = n
+BOWL_N = (lo + hi) / 2
+
+
+def superellipse(cx, cy, ax, ay, n, T, steps=360):
+    import math
+
+    d = pathops.Path()
+    pen = TransformPen(d.getPen(), T)
+    for i in range(steps):
+        t = 2 * math.pi * i / steps
+        c, s_ = math.cos(t), math.sin(t)
+        pt = (cx + ax * math.copysign(abs(c) ** (2 / n), c), cy + ay * math.copysign(abs(s_) ** (2 / n), s_))
+        (pen.moveTo if i == 0 else pen.lineTo)(pt)
+    pen.closePath()
+    return d
+
+
+# The bowl's lower curve carried on under the old stem (left of the counter, below
+# the ring's centre), then cut back to leave the slit round the ring.
+# It also covers Satoshi's own notch at the b's foot (just right of the stem), and
+# never the counter.
+tail = pathops.op(superellipse(BOWL_CX, BOWL_CY, _ax, BOWL_R, BOWL_N, L2), rect(TURN_CX, _hand, -200, TURN_CY, L2), pathops.PathOp.INTERSECTION)
+_bg = pathops.Path()
+gs[b].draw(TransformPen(_bg.getPen(), (1, 0, 0, 1, b_x + shift, 0)))
+_counter_pt = (BOWL_CX, BOWL_CY)
+COUNTER = min((c for c in pathops.simplify(_bg).contours if c.contains(_counter_pt)), key=lambda c: abs(c.area))
+counter = pathops.Path()
+COUNTER.draw(TransformPen(counter.getPen(), (1, 0, 0, -1, 0, B)))
+tail = pathops.op(tail, counter, pathops.PathOp.DIFFERENCE)
+pb = pathops.op(pb, tail, pathops.PathOp.UNION)
+pb = pathops.op(pb, pathops.op(disk(TURN_CX, TURN_CY, R_OUT + SLIT, L2), rect(-9000, 9000, -500, TURN_CY, L2), pathops.PathOp.INTERSECTION), pathops.PathOp.DIFFERENCE)
+# Above the ring's centre the slit runs straight up beside the stem until it opens
+# into the counter, so the bowl hangs from the stem's top only.
+pb = pathops.op(pb, rect(STEM_L + B_W, STEM_L + B_W + SLIT, TURN_CY - 1, BOWL_CY, L2), pathops.PathOp.DIFFERENCE)
 yb = pathops.op(pathops.op(ytop, stem, pathops.PathOp.UNION), pb, pathops.PathOp.UNION)
 ligature = {"id": "yb", "d": to_svg(yb)}
 
@@ -302,4 +408,5 @@ OUT.write_text(
     f"/** The selectable text layer: font size in % of the mark's width, each line's box (line-height 1) in %. */\n"
     f"export const textLayer = {json.dumps(text_layer)} as const;\n"
 )
+
 print("viewBox", view, "shift", round(shift, 1), "b stem", B_STEM, "cut", CUT, (round(CUT_L, 1), round(CUT_R, 1)), "anchors", anchors)

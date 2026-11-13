@@ -4,7 +4,8 @@ import { useId } from "react";
  * The cat's geometry: one drawing for every state (CLAUDE.md §The cat).
  * Graphite body, lime eyes; only the pose changes. Redrawn 2026-11-13 (Iury):
  * continuous Bézier silhouettes instead of a circle + triangles + rectangle,
- * a soft rim of light along the top of each part, slit pupils that open on hover.
+ * a soft rim of light along the top of each part, wide eyes with round pupils, two
+ * catchlights and a faint lime glow (on hover the glow brightens and the ears perk).
  *
  * Parts carry `data-cat` hooks so animation code can target them without
  * knowing the markup. Pivots (SVG user units, viewBox 0 0 100 125):
@@ -12,7 +13,7 @@ import { useId } from "react";
  * legs → (41,86) and (59,86) shoulders.
  * Idle-only hooks, never touched by the clip library (so the two never fight over
  * one transform): `tail-wave` (the path itself, its shape tweened), `ear-r`
- * (twitch), `pupils` (CSS, dilate on hover) and `glow` (CSS, eyes light up on hover).
+ * (twitch), `ear-tilt-l/r` (CSS, perk on hover) and `glow` (CSS, brighter on hover).
  * `paws` are hidden by default: they show only while the cat grips the rail.
  */
 export const TAIL_REST = "M79 117 C93 118 99 107 95 95 C92 87 92 80 97 75";
@@ -78,14 +79,16 @@ export function CatFigure({ className }: { className?: string }) {
       <g data-cat="look">
         <g data-cat="head">
           <g data-cat="ears">
-            <g>
+            <g data-cat="ear-tilt-l">
               <path d="M22 31 C19.5 21 20 12 22.5 6.8 C23.4 4.9 25.6 4.6 27.2 5.9 C33 10.5 38 15 42 20.5 Z" fill={FUR} stroke={rim} strokeWidth="1" />
               <path d="M25.5 22 C24.6 16.5 25 11.8 26.4 9.4 C30 12.2 33 15.2 35.4 18.6 Z" fill="#272727" />
             </g>
             {/* The right ear twitches now and then (idle). Pivot at its base. */}
             <g data-cat="ear-r">
-              <path d="M78 31 C80.5 21 80 12 77.5 6.8 C76.6 4.9 74.4 4.6 72.8 5.9 C67 10.5 62 15 58 20.5 Z" fill={FUR} stroke={rim} strokeWidth="1" />
-              <path d="M74.5 22 C75.4 16.5 75 11.8 73.6 9.4 C70 12.2 67 15.2 64.6 18.6 Z" fill="#272727" />
+              <g data-cat="ear-tilt-r">
+                <path d="M78 31 C80.5 21 80 12 77.5 6.8 C76.6 4.9 74.4 4.6 72.8 5.9 C67 10.5 62 15 58 20.5 Z" fill={FUR} stroke={rim} strokeWidth="1" />
+                <path d="M74.5 22 C75.4 16.5 75 11.8 73.6 9.4 C70 12.2 67 15.2 64.6 18.6 Z" fill="#272727" />
+              </g>
             </g>
           </g>
           {/* Head: round crown, cheeks that widen low, a soft chin. */}
@@ -107,14 +110,17 @@ export function CatFigure({ className }: { className?: string }) {
                 <circle cx="39" cy="40" r="9" fill={glow} />
                 <circle cx="61" cy="40" r="9" fill={glow} />
               </g>
-              <ellipse cx="39" cy="40" rx="4.6" ry="4.2" transform="rotate(10 39 40)" fill="#c8f169" />
-              <ellipse cx="61" cy="40" rx="4.6" ry="4.2" transform="rotate(-10 61 40)" fill="#c8f169" />
+              <ellipse cx="39" cy="40" rx="5.2" ry="4.9" transform="rotate(8 39 40)" fill="#c8f169" />
+              <ellipse cx="61" cy="40" rx="5.2" ry="4.9" transform="rotate(-8 61 40)" fill="#c8f169" />
+              {/* Round, open pupils (Iury preferred them to slits, 2026-11-13). */}
               <g data-cat="pupils" fill="#0e0e0e">
-                <ellipse cx="39.4" cy="40" rx="1.1" ry="3.3" />
-                <ellipse cx="61.4" cy="40" rx="1.1" ry="3.3" />
+                <ellipse cx="39.5" cy="40.3" rx="2.6" ry="3.4" />
+                <ellipse cx="61.5" cy="40.3" rx="2.6" ry="3.4" />
               </g>
-              <circle cx="40.8" cy="38.4" r="0.8" fill="#f3f1eb" opacity="0.85" />
-              <circle cx="62.8" cy="38.4" r="0.8" fill="#f3f1eb" opacity="0.85" />
+              <circle cx="41.2" cy="38.2" r="1.1" fill="#f3f1eb" />
+              <circle cx="63.2" cy="38.2" r="1.1" fill="#f3f1eb" />
+              <circle cx="38.2" cy="42" r="0.5" fill="#f3f1eb" opacity="0.6" />
+              <circle cx="60.2" cy="42" r="0.5" fill="#f3f1eb" opacity="0.6" />
             </g>
           </g>
         </g>

@@ -298,22 +298,59 @@ dialog.is-closing::backdrop {
 }
 
 /*
- * The cat on hover / focus (observer in the hero, dock button): the slit pupils
- * open round and a soft lime glow rises behind the eyes. CSS only, on hooks the
- * GSAP clips never transform. Reduced motion: the global reset makes it a cut.
+ * The cat on hover / focus (observer in the hero, dock button). At rest the eyes
+ * are wide with a faint lime glow; on hover the glow brightens and the ears turn
+ * slightly forward (attentive). CSS only, on hooks the GSAP clips never transform.
+ * Reduced motion: the global reset makes it a cut.
  */
-[data-cat="pupils"] ellipse {
-  transform-box: fill-box;
-  transform-origin: center;
-  transition: transform var(--duration-base) var(--ease-out-soft);
-}
 [data-cat="glow"] {
-  opacity: 0;
+  opacity: 0.45;
   transition: opacity var(--duration-base) var(--ease-out-soft);
 }
-:is(button:hover, button:focus-visible) [data-cat="pupils"] ellipse {
-  transform: scale(2.3, 1.08);
+[data-cat="ear-tilt-l"],
+[data-cat="ear-tilt-r"] {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transition: transform var(--duration-base) var(--ease-out-soft);
 }
 :is(button:hover, button:focus-visible) [data-cat="glow"] {
   opacity: 1;
+}
+:is(button:hover, button:focus-visible) [data-cat="ear-tilt-l"] {
+  transform: rotate(-7deg) translateY(-1.5px);
+}
+:is(button:hover, button:focus-visible) [data-cat="ear-tilt-r"] {
+  transform: rotate(7deg) translateY(-1.5px);
+}
+
+/*
+ * Scrollbar (Iury, 2026-11-13): thin, on the page's own dark, a graphite thumb that
+ * lights up lime while hovered or dragged. Firefox gets the standard properties
+ * (thin + colours, no hover state there); Chromium and Safari the ::-webkit ones.
+ * Chromium 121+ would let `scrollbar-color` override the ::-webkit rules, so the
+ * standard pair is scoped to browsers without ::-webkit-scrollbar support.
+ */
+@supports not selector(::-webkit-scrollbar) {
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: #2e2e2e var(--color-ink);
+  }
+}
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-ink);
+}
+::-webkit-scrollbar-thumb {
+  background: #2e2e2e;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover,
+::-webkit-scrollbar-thumb:active {
+  background: var(--color-signal);
+}
+::-webkit-scrollbar-corner {
+  background: var(--color-ink);
 }

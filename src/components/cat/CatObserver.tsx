@@ -129,7 +129,7 @@ export function CatObserver({
           gsap.to(eyes, {
             x: idle ? 0 : k * 3,
             y: idle ? 0 : gsap.utils.clamp(-1, 1, dy / 300) * 1.5,
-            scale: next === "near" ? 1.25 : 1,
+            scale: next === "near" ? 1.12 : 1,
             duration: 0.2,
             overwrite: "auto",
           });

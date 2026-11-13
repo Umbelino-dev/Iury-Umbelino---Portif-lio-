@@ -8,7 +8,8 @@ exactly as wide as the b's stem (found by bisection on the outline, just under
 the baseline); from that cut a vertical stem of the same width runs straight
 down onto the b's stem axis. y-top ∪ stem ∪ b is one outline (boolean union),
 so there is no seam, step or double edge, and the y still reads as a y: a Y-like
-fork whose foot is the b.
+fork whose foot is the b. At the bottom, the m's last leg turns along the baseline
+like a u and rises into that stem (Satoshi's own u, cut in two; see "u-turn").
 
 The license (ITF Free Font License) allows wordmarks made with the font; the
 font file itself is never modified or committed: this script reads it in place
@@ -49,13 +50,16 @@ hbfont = hb.Font(hb.Face(hb.Blob.from_file_path(str(SRC))))
 hbfont.set_variations(AXES)
 
 
-def shape(text, track=TRACK):
+def shape(text, track=TRACK, kern=None):
+    """Glyph names and pen x positions. `kern` = (index, units): extra space before that glyph."""
     buf = hb.Buffer()
     buf.add_str(text)
     buf.guess_segment_properties()
     hb.shape(hbfont, buf, {"kern": True, "liga": False})
     x, out = 0, []
-    for info, pos in zip(buf.glyph_infos, buf.glyph_positions):
+    for i, (info, pos) in enumerate(zip(buf.glyph_infos, buf.glyph_positions)):
+        if kern and i == kern[0]:
+            x += kern[1]
         out.append((font.getGlyphName(info.codepoint), x + pos.x_offset))
         x += pos.x_advance + track
     return out
@@ -118,22 +122,53 @@ Y_AXIS = (CUT_L + CUT_R) / 2
 # Line 2 shifts so the b stem sits on the y's axis.
 shift = (y_x + Y_AXIS) - (b_x + (B_STEM[0] + B_STEM[1]) / 2)
 
-# Flush left: the stem alignment pushes "Umbelino" left of "Iury" (D units).
-# Close the gap in the spacing, split between the lines so neither looks
-# re-tracked on its own: line 1 opens (3 gaps before the y), line 2 tightens
-# (2 gaps before the b). Each unit of line-1 tracking moves the U right by 3,
-# each unit removed from line 2 by 2.
-SPLIT = float(os.environ.get("ALIGN_SPLIT", 0.6))  # share of D taken by line 1
+# The u-turn (Iury, 2026-11-13, after his reference): the m's last leg does not
+# stop at the baseline; it turns along the bottom like a "u" and rises into the
+# shared stem. The connector is Satoshi's own u, cut in two at its centre: the
+# left half sits on the m's leg, the right half on the b's stem (the u's stems are
+# exactly as wide as both). For the bowl not to look pinched, the gap between the
+# m's leg and the stem is opened to TURN_GAP (default: the m's own counters).
+m = cmap[ord("m")]
+u = cmap[ord("u")]
+M_LEG = span_at(m, 250, bounds(m)[2] - 40)  # the m's right leg
+U_L = span_at(u, 250, bounds(u)[0] + 40)  # the u's left stem
+U_R = span_at(u, 250, bounds(u)[2] - 40)  # the u's right stem
+M_COUNTER = M_LEG[0] - span_at(m, 250, (bounds(m)[0] + bounds(m)[2]) / 2)[1]
+TURN_GAP = float(os.environ.get("TURN_GAP", M_COUNTER))
+assert abs((M_LEG[1] - M_LEG[0]) - B_W) < 1 and abs((U_L[1] - U_L[0]) - B_W) < 1, (M_LEG, U_L, B_W)
+
+# Flush left: the stem alignment (and the opened m→b gap) push "Umbelino" left of
+# "Iury" (D units). Close it in the spacing, split between the lines so neither
+# looks re-tracked on its own: line 1 opens (3 gaps before the y), line 2 tightens
+# (2 gaps before the b). Each unit of line-1 tracking moves the U right by 3, each
+# unit removed from line 2 by 2. The kern and the tracking depend on each other,
+# so they are solved together (a few fixed-point rounds).
+SPLIT = float(os.environ.get("ALIGN_SPLIT", 1.0))  # share of D taken by line 1 (1.0: all of it, as in Iury's reference)
 left = lambda line, dx=0: line[0][1] + dx + bounds(line[0][0])[0]
-D = left(line1) - left(line2, shift)
-TRACK1 = TRACK + SPLIT * D / 3
-TRACK2 = TRACK - (1 - SPLIT) * D / 2
+TRACK1 = TRACK2 = TRACK
+K = 0.0
+for _ in range(40):
+    line1 = shape("Iury", TRACK1)
+    line2 = shape("Umbelino", TRACK2, (2, K))
+    _, y_x = line1[3]
+    _, m_x = line2[1]
+    _, b_x = line2[2]
+    gap = (b_x + B_STEM[0]) - (m_x + M_LEG[1])
+    K += TURN_GAP - gap
+    line2 = shape("Umbelino", TRACK2, (2, K))
+    _, b_x = line2[2]
+    shift = (y_x + Y_AXIS) - (b_x + (B_STEM[0] + B_STEM[1]) / 2)
+    D = left(line1) - left(line2, shift)
+    TRACK1 += SPLIT * D / 3
+    TRACK2 -= (1 - SPLIT) * D / 2
 line1 = shape("Iury", TRACK1)
-line2 = shape("Umbelino", TRACK2)
+line2 = shape("Umbelino", TRACK2, (2, K))
 _, y_x = line1[3]
+_, m_x = line2[1]
 _, b_x = line2[2]
 shift = (y_x + Y_AXIS) - (b_x + (B_STEM[0] + B_STEM[1]) / 2)
 assert abs(left(line1) - left(line2, shift)) < 0.5, (left(line1), left(line2, shift))
+assert abs((b_x + B_STEM[0]) - (m_x + M_LEG[1]) - TURN_GAP) < 0.5
 
 asc = max(bounds(cmap[ord(c)])[3] for c in "Iury")
 A = asc + PAD  # line 1 baseline (SVG y)
@@ -160,8 +195,54 @@ glyphs = []
 for ch, (name, x) in zip("Iury", line1):
     if ch != "y":
         glyphs.append({"id": f"l1-{ch}", "line": 1, "d": path(name, x, A)})
+TURN_H = 260  # font units: below this, the m's leg and the b's stem become the u-turn
+TURN_OVER = 24  # the u reaches this far up into the leg / stem (no seam)
+
+
+def rect(x0, x1, y0, y1, T):
+    """A rectangle given in font units, through the transform T."""
+    r = pathops.Path()
+    pen = TransformPen(r.getPen(), T)
+    pen.moveTo((x0, y0)); pen.lineTo((x1, y0)); pen.lineTo((x1, y1)); pen.lineTo((x0, y1)); pen.closePath()
+    return r
+
+
+U_MID = (U_L[1] + U_R[0]) / 2  # centre of the u's counter
+# Bottom of the u's counter (the inner edge of its bowl), on the counter's centre line.
+_g = pathops.Path()
+gs[u].draw(_g.getPen())
+_col = pathops.Path()
+_cp = _col.getPen()
+_cp.moveTo((U_MID - 0.01, -500)); _cp.lineTo((U_MID + 0.01, -500)); _cp.lineTo((U_MID + 0.01, 1500)); _cp.lineTo((U_MID - 0.01, 1500)); _cp.closePath()
+U_INNER = min(c.bounds[3] for c in pathops.op(_g, _col, pathops.PathOp.INTERSECTION).contours)
+
+
+def u_half(side, dx):
+    """One half of the u, cut at its counter's centre (with an overlap), placed at dx.
+
+    The right half also loses the notch Satoshi's u has where its bowl meets the
+    right stem: the area under the bowl, from the centre to the stem, is filled up
+    to the counter's bottom, so the bowl runs into the stem without a step."""
+    Tu = (1, 0, 0, -1, dx, B)
+    pu = pathops.Path()
+    gs[u].draw(TransformPen(pu.getPen(), Tu))
+    x0, x1 = (-500, U_MID + 40) if side == "left" else (U_MID - 40, 1500)
+    half = pathops.op(pu, rect(x0, x1, -200, TURN_H + TURN_OVER, Tu), pathops.PathOp.INTERSECTION)
+    if side == "right":
+        half = pathops.op(half, rect(U_MID, U_R[0] + 60, 0, U_INNER - 1, Tu), pathops.PathOp.UNION)
+    return half
+
+
 for ch, (name, x) in zip("Umbelino", line2):
-    if ch != "b":
+    if ch == "m":
+        # The m keeps the u's left half: its last leg turns along the bottom.
+        Tm = (1, 0, 0, -1, x + shift, B)
+        pm = pathops.Path()
+        gs[name].draw(TransformPen(pm.getPen(), Tm))
+        pm = pathops.op(pm, rect(M_LEG[0] - 1, M_LEG[1] + 1, -200, TURN_H, Tm), pathops.PathOp.DIFFERENCE)
+        pm = pathops.op(pm, u_half("left", x + shift + M_LEG[0] - U_L[0]), pathops.PathOp.UNION)
+        glyphs.append({"id": "l2-m", "line": 2, "d": to_svg(pathops.simplify(pm))})
+    elif ch != "b":
         glyphs.append({"id": f"l2-{ch}", "line": 2, "d": path(name, x + shift, B)})
 
 # The ligature: (y above the cut) ∪ stem ∪ b, as one outline.
@@ -176,9 +257,14 @@ depth = -(LINE - b_top) - OVERLAP  # font units below line 1's baseline
 stem = pathops.Path()
 sp = TransformPen(stem.getPen(), T)
 sp.moveTo((CUT_L, depth)); sp.lineTo((CUT_R, depth)); sp.lineTo((CUT_R, CUT + 2)); sp.lineTo((CUT_L, CUT + 2)); sp.closePath()
+Tb = (1, 0, 0, -1, b_x + shift, B)
 pb = pathops.Path()
-gs[b].draw(TransformPen(pb.getPen(), (1, 0, 0, -1, b_x + shift, B)))
-yb = pathops.op(pathops.op(ytop, stem, pathops.PathOp.UNION), pb, pathops.PathOp.UNION)
+gs[b].draw(TransformPen(pb.getPen(), Tb))
+# The b loses the foot of its stem (only the stem: cutting into the bowl leaves a
+# sliver); the u's right half takes its place.
+pb = pathops.op(pb, rect(B_STEM[0] - 1, B_STEM[1], -200, TURN_H, Tb), pathops.PathOp.DIFFERENCE)
+turn = u_half("right", b_x + shift + B_STEM[0] - U_R[0])
+yb = pathops.op(pathops.op(pathops.op(ytop, stem, pathops.PathOp.UNION), pb, pathops.PathOp.UNION), turn, pathops.PathOp.UNION)
 ligature = {"id": "yb", "d": to_svg(yb)}
 
 xs = []
@@ -211,10 +297,10 @@ anchors = {
 OUT.parent.mkdir(parents=True, exist_ok=True)
 OUT.write_text(
     "// Generated by scripts/lettering.py — do not edit by hand.\n"
-    f"// Satoshi {AXES}, line {LINE}, tracking {round(TRACK1, 1)} / {round(TRACK2, 1)} (flush left); y cut at {CUT} (stem {round(B_W, 1)}).\n"
+    f"// Satoshi {AXES}, line {LINE}, tracking {round(TRACK1, 1)} / {round(TRACK2, 1)} (flush left); m→b +{round(K, 1)} (u-turn gap {round(TURN_GAP, 1)}); y cut at {CUT} (stem {round(B_W, 1)}).\n"
     f"export const viewBox = {json.dumps(' '.join(str(v) for v in view))};\n"
     f"export const glyphs = {json.dumps(glyphs, indent=2)} as const;\n"
-    f"/** The y→b ligature: one outline, the y's V running into the b's stem. */\n"
+    f"/** The y→b ligature: one outline, the y's V running into the b's stem, and the m's last leg turning into it along the bottom (a u). */\n"
     f"export const ligature = {json.dumps(ligature)} as const;\n"
     f"/** Positions in % of the mark (x of width, y of height). */\n"
     f"export const anchors = {json.dumps(anchors)} as const;\n"

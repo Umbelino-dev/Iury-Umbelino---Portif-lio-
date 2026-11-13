@@ -157,6 +157,7 @@ export async function About() {
             profile: ta("galleryProfile"),
             profileUrl: contacts.find((c) => c.kind === "linkedin")?.href ?? "https://www.linkedin.com/in/iuryumbelino/",
             close: ta("galleryClose"),
+            pause: ta("galleryPause"),
           }}
         />
       </div>

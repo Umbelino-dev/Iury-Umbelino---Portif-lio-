@@ -6,7 +6,7 @@
   },
   "nav": {
     "label": "Principal",
-    "index": "Índice",
+    "index": "Início",
     "about": "Perfil",
     "projects": "Projetos",
     "contact": "Contato",
@@ -33,7 +33,8 @@
       "lead": "A curiosidade constrói",
       "rest": "o que vem",
       "accent": "a seguir."
-    }
+    },
+    "ctaContact": "Fale comigo"
   },
   "about": {
     "label": "Perfil",
@@ -61,7 +62,8 @@
     "galleryPost": "Post no LinkedIn",
     "galleryClose": "Fechar",
     "galleryTakeaways": "O que agregou",
-    "galleryProfile": "Ver perfil no LinkedIn"
+    "galleryProfile": "Ver perfil no LinkedIn",
+    "galleryPause": "Pausar fotos"
   },
   "experience": {
     "title": "Onde a curiosidade vira rotina.",

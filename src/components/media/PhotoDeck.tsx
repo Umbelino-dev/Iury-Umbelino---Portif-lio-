@@ -33,6 +33,7 @@ export interface DeckLabels {
   profile: string; // "Ver perfil no LinkedIn"
   profileUrl: string; // the LinkedIn profile, when a photo has no post
   close: string;
+  pause: string; // "Pausar"
 }
 
 /** The deck always shows at least this many cards (photos repeat until then). */
@@ -85,6 +86,9 @@ export function PhotoDeck({ photos, labels }: { photos: DeckPhoto[]; labels: Dec
   const [front, setFront] = useState(0);
   const [hovered, setHovered] = useState<number | null>(null);
   const [opened, setOpened] = useState<number | null>(null);
+  // Auto-dealing can be paused (WCAG 2.2.2) and stops for good once the visitor
+  // deals a card themselves: from then on the deck is theirs.
+  const [playing, setPlaying] = useState(true);
   const first = useRef(true);
   const paused = useRef(false);
   const visible = useRef(false);
@@ -101,6 +105,14 @@ export function PhotoDeck({ photos, labels }: { photos: DeckPhoto[]; labels: Dec
     [n],
   );
   const go = useCallback((to: number) => setFront(((to % n) + n) % n), [n]);
+  /** A deal the visitor asked for: it also ends auto-dealing. */
+  const deal = useCallback(
+    (to: number) => {
+      setPlaying(false);
+      go(to);
+    },
+    [go],
+  );
 
   // Lay the cards out for the current front card.
   useGSAP(
@@ -147,7 +159,7 @@ export function PhotoDeck({ photos, labels }: { photos: DeckPhoto[]; labels: Dec
   // Auto-deal: only while visible, motion allowed, not hovered, no card open, tab shown.
   useEffect(() => {
     const el = root.current;
-    if (!el || window.matchMedia(MQ.reduced).matches) return;
+    if (!el || !playing || window.matchMedia(MQ.reduced).matches) return;
     const io = new IntersectionObserver(([e]) => (visible.current = Boolean(e?.isIntersecting)), { threshold: 0.35 });
     io.observe(el);
     const call = gsap.delayedCall(HOLD, () => {
@@ -158,7 +170,7 @@ export function PhotoDeck({ photos, labels }: { photos: DeckPhoto[]; labels: Dec
       io.disconnect();
       call.kill();
     };
-  }, [front, go, opened]);
+  }, [front, go, opened, playing]);
 
   // The box that rises from the pointer: follows it, appears with a short rise.
   // Stable callbacks, so the memoised cards never re-render for hover or panel state.
@@ -259,12 +271,12 @@ export function PhotoDeck({ photos, labels }: { photos: DeckPhoto[]; labels: Dec
     const dx = e.clientX - d.x;
     if (Math.abs(dx) > 40) {
       d.moved = true;
-      go(front + (dx < 0 ? 1 : -1));
+      deal(front + (dx < 0 ? 1 : -1));
     }
   };
   const onKey = (e: KeyboardEvent) => {
-    if (e.key === "ArrowRight") go(front + 1);
-    else if (e.key === "ArrowLeft") go(front - 1);
+    if (e.key === "ArrowRight") deal(front + 1);
+    else if (e.key === "ArrowLeft") deal(front - 1);
     else return;
     e.preventDefault();
   };
@@ -309,24 +321,39 @@ export function PhotoDeck({ photos, labels }: { photos: DeckPhoto[]; labels: Dec
       </div>
 
       {/* The captions are the index: the one in front is ink. */}
-      <ul className="mt-[clamp(1.5rem,3vw,2.5rem)] flex justify-center gap-x-6 px-(--page-margin)">
-        {photos.map((p, i) => {
-          const active = front % photos.length === i;
-          return (
-            <li key={i}>
-              <button
-                type="button"
-                onClick={() => go(i)}
-                aria-current={active ? "true" : undefined}
-                aria-label={labels.show.replace("{caption}", p.caption)}
-                className={`min-h-11 font-display text-[1rem] font-bold tracking-[-0.01em] transition-colors duration-(--duration-base) hover:text-ink ${active ? "text-ink" : "text-gray-600"}`}
-              >
-                {p.caption}
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+      <div className="mt-[clamp(1.5rem,3vw,2.5rem)] flex flex-wrap items-center justify-center gap-x-8 gap-y-2 px-(--page-margin)">
+        <ul className="flex flex-wrap justify-center gap-x-6">
+          {photos.map((p, i) => {
+            const active = front % photos.length === i;
+            return (
+              <li key={i}>
+                <button
+                  type="button"
+                  onClick={() => deal(i)}
+                  // Pointer shortcut only: keyboard users reach the same cards (and
+                  // deal with ← →) without four extra tab stops.
+                  tabIndex={-1}
+                  aria-current={active ? "true" : undefined}
+                  aria-label={labels.show.replace("{caption}", p.caption)}
+                  className={`min-h-11 font-display text-[1rem] font-bold tracking-[-0.01em] transition-colors duration-(--duration-base) hover:text-ink ${active ? "text-ink" : "text-gray-600"}`}
+                >
+                  {p.caption}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+        {playing && (
+          <button
+            type="button"
+            onClick={() => setPlaying(false)}
+            // No auto-dealing with reduced motion, so nothing to pause.
+            className="min-h-11 font-display text-[1rem] font-bold tracking-[-0.01em] text-gray-600 underline decoration-1 underline-offset-[0.3em] transition-colors duration-(--duration-fast) hover:text-ink motion-reduce:hidden"
+          >
+            {labels.pause}
+          </button>
+        )}
+      </div>
 
       {/* The box that rises from the pointer (fine pointers only; decorative: the
           card's own label and the panel carry the same text). */}

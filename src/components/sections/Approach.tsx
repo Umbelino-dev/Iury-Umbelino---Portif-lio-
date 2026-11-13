@@ -25,13 +25,13 @@ export async function Approach() {
         <SectionTitle id="approach-title" className="pb-[clamp(2rem,3.5vw,3.5rem)]">
           {t("label")}
         </SectionTitle>
-        <div className="flex flex-wrap items-end justify-between gap-x-12 gap-y-8 pb-[clamp(3.5rem,6vw,6.5rem)]">
+        <div className="flex flex-col items-start gap-5 pb-[clamp(3.5rem,6vw,6.5rem)]">
           <div className="flex max-w-[760px] flex-[1_1_420px] flex-col gap-6">
             <p data-split className="font-display text-[clamp(1.75rem,1.25rem+2vw,3.25rem)] leading-[1.02] font-bold tracking-[-0.03em] text-balance">
               {t("title")}
             </p>
           </div>
-          <p className="max-w-[34ch] flex-[0_1_300px] text-caption text-gray-600">{t("note")}</p>
+          <p className="max-w-[44ch] text-ui text-gray-600">{t("note")}</p>
         </div>
 
         <ol className="grid grid-cols-1 items-start gap-x-[clamp(1rem,2vw,2rem)] gap-y-12 sm:grid-cols-2 lg:grid-cols-5">

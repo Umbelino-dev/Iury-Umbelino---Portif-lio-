@@ -9,6 +9,12 @@ export interface ProjectRow {
   nameLang?: string;
   /** Status mark + label, year, tags — rendered on the server. */
   meta: ReactNode;
+  /** True when `image` is a real cover (not the typographic poster). */
+  hasCover?: boolean;
+  /** One line saying what the project is (omitted when there is none). */
+  summary?: string;
+  /** The action the row performs, written out ("Ler o estudo de caso"). Only rows with a destination. */
+  action?: string;
   /** 4:3 image or placeholder — rendered on the server, reused inline and in the float. */
   image: ReactNode;
   href?: string;
@@ -123,25 +129,29 @@ export function ProjectList({ rows, label }: { rows: ProjectRow[]; label: string
           const content = (
             <>
               <span className="flex min-w-0 flex-col gap-[clamp(0.5rem,0.8vw,0.875rem)]">
-                {/* Touch: the image sits above the title. Hidden where hover exists. */}
-                <span className="relative hidden aspect-[4/3] w-full max-w-[520px] [@media(hover:none)]:block">{row.image}</span>
+                {/* Touch: a real cover sits above the title (hidden where hover exists).
+                    Posters are left out here: four "image coming soon" frames were
+                    screens of scrolling with nothing new to see. */}
+                {row.hasCover && <span className="relative hidden aspect-[4/3] w-full max-w-[520px] [@media(hover:none)]:block">{row.image}</span>}
                 <span
                   lang={row.nameLang}
                   onPointerEnter={(e) => e.pointerType === "mouse" && enter(i, e.clientX, e.clientY)}
                   onPointerLeave={(e) => e.pointerType === "mouse" && leave()}
-                  className="max-w-full self-start font-display text-[clamp(2rem,1.1rem+5.2vw,7rem)] leading-[0.94] font-bold tracking-[-0.035em] text-balance hyphens-auto [overflow-wrap:anywhere]"
+                  className="max-w-full self-start font-display text-[clamp(2rem,1.1rem+5.2vw,7rem)] leading-[0.94] font-bold tracking-[-0.035em] text-balance hyphens-none"
                 >
                   {row.name}
-                  {row.external && (
-                    <>
-                      <span aria-hidden="true" className="ml-[0.15em] inline-block text-[0.45em] align-top">
-                        ↗
-                      </span>
-                      <span className="sr-only"> ({row.externalLabel})</span>
-                    </>
-                  )}
+                  {row.external && <span className="sr-only"> ({row.externalLabel})</span>}
                 </span>
-                <span className="text-caption leading-[1.4] text-gray-600">{row.meta}</span>
+                <span id={`project-desc-${row.slug}`} className="flex flex-col gap-[clamp(0.5rem,0.8vw,0.875rem)]">
+                  <span className="text-caption leading-[1.4] text-gray-600">{row.meta}</span>
+                  {row.summary && <span className="max-w-[56ch] text-ui leading-snug text-pretty text-[#3f3d39]">{row.summary}</span>}
+                </span>
+                {/* The row's action, written out: only rows that lead somewhere have one. */}
+                {row.action && (
+                  <span className="mt-1 flex items-center gap-2 self-start font-display text-[1.0625rem] font-bold tracking-[-0.01em] underline decoration-1 underline-offset-[0.3em]">
+                    {row.action} <span aria-hidden="true">{row.external ? "↗" : "→"}</span>
+                  </span>
+                )}
               </span>
             </>
           );
@@ -154,6 +164,10 @@ export function ProjectList({ rows, label }: { rows: ProjectRow[]; label: string
                 <a
                   href={row.href}
                   data-cursor-label={row.cursorLabel}
+                  // A short name ("Koinonia. Ler o estudo de caso"); status, tags and
+                  // summary stay readable as the link's description.
+                  aria-label={`${row.name}${row.external ? ` (${row.externalLabel})` : ""}. ${row.action ?? ""}`.replace(/\.\s*$/, "")}
+                  aria-describedby={`project-desc-${row.slug}`}
                   target={row.external ? "_blank" : undefined}
                   rel={row.external ? "noopener noreferrer" : undefined}
                   className={rowClass}

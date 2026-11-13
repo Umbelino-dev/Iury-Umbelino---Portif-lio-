@@ -100,12 +100,21 @@ export async function Hero() {
             <p className="max-w-[30ch] text-[clamp(1.1875rem,1rem+0.6vw,1.5rem)] leading-[1.45] md:leading-[1.35] text-pretty text-paper">
               {t("intro")}
             </p>
-            <a
-              href="#about"
-              className="flex min-h-11 items-center gap-2.5 self-start font-display text-[1.125rem] font-bold tracking-[-0.01em] underline decoration-1 underline-offset-[0.3em] transition-colors duration-(--duration-fast) hover:text-paper-0"
-            >
-              {t("cta")} <span aria-hidden="true">↓</span>
-            </a>
+            {/* Two ways in: read about the person, or go straight to contact (recruiters). */}
+            <div className="flex flex-wrap items-center gap-x-8 gap-y-1">
+              <a
+                href="#about"
+                className="flex min-h-11 items-center gap-2.5 font-display text-[1.125rem] font-bold tracking-[-0.01em] underline decoration-1 underline-offset-[0.3em] transition-colors duration-(--duration-fast) hover:text-paper-0"
+              >
+                {t("cta")} <span aria-hidden="true">↓</span>
+              </a>
+              <a
+                href="#contact"
+                className="flex min-h-11 items-center gap-2.5 font-display text-[1.125rem] font-bold tracking-[-0.01em] text-paper-300 underline decoration-1 underline-offset-[0.3em] transition-colors duration-(--duration-fast) hover:text-paper-0"
+              >
+                {t("ctaContact")}
+              </a>
+            </div>
           </div>
         </div>
         </div>

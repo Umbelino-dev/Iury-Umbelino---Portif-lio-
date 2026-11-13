@@ -235,6 +235,10 @@ export function Timeline({ steps, labels }: { steps: TimelineStep[]; labels: Tim
       onBlur={() => setHot(null)}
       aria-expanded={open === i}
       aria-controls={`${panelId(i)} ${panelId(i)}-m`}
+      // A short name ("role, period"); the summary is its description. The whole
+      // block as a name was ~30 words for a screen reader.
+      aria-label={`${s.role}, ${s.period}`}
+      aria-describedby={`${uid}-sum-${always ? "v" : "h"}-${i}`}
       className={`group/step relative flex w-full cursor-pointer flex-col items-start gap-2 text-left transition-opacity ${ease} focus-visible:outline-ink ${quiet(i) ? "opacity-40" : ""}`}
     >
       <span className="text-note text-gray-600">
@@ -248,7 +252,7 @@ export function Timeline({ steps, labels }: { steps: TimelineStep[]; labels: Tim
       </span>
       <span className="font-display text-[clamp(1.375rem,1.1rem+0.9vw,2rem)] leading-[1.05] font-bold tracking-[-0.025em] text-balance">{s.role}</span>
       <span className="text-caption font-medium">{s.org}</span>
-      <span className="max-w-[30ch] text-ui leading-snug text-pretty text-gray-600">{s.summary}</span>
+      <span id={`${uid}-sum-${always ? "v" : "h"}-${i}`} className="max-w-[30ch] text-ui leading-snug text-pretty text-gray-600">{s.summary}</span>
       {/* More: on the line it unrolls in the free space above the role (no layout,
           nothing moves); on small screens it is part of the step. */}
       <span

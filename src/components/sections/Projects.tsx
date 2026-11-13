@@ -32,6 +32,9 @@ export async function Projects() {
       external: Boolean(live),
       externalLabel: t("visit"),
       cursorLabel: caseHref ? tc("project") : live ? tc("visit") : undefined,
+      summary: p.summary[locale] || undefined,
+      hasCover: Boolean(p.cover),
+      action: caseHref ? t("openCase") : live ? live.label[locale] : undefined,
       meta: (
         <span className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
           <StatusMark status={p.status} label={p.year ? `${status}, ${p.year}` : status} className="text-ink" />

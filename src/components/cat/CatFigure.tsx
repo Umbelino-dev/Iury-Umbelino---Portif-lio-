@@ -17,7 +17,7 @@
  */
 export function CatFigure({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 100 125" className={className} aria-hidden="true" focusable="false">
+    <svg viewBox="0 0 100 125" className={className} aria-hidden="true" focusable="false" data-cat-figure="">
       {/* Tail sweeping out and up on the right: its own group so it can swing. */}
       <g data-cat="tail">
         <path d="M78 117 C 96 118, 103 100, 94 86" fill="none" stroke="#2a2a2a" strokeWidth="6.5" strokeLinecap="round" />

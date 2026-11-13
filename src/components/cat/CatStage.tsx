@@ -134,6 +134,7 @@ export function CatStage({
     const hideActor = () => {
       gsap.killTweensOf(w);
       gsap.set(w, { autoAlpha: 0, zIndex: "auto" });
+      delete w.dataset.catAct;
       st.style.clipPath = "";
       st.style.zIndex = "";
     };
@@ -234,6 +235,7 @@ export function CatStage({
             head = { x, y: vh - 24 };
           }
           put(hide.x, hide.y, s, rotation);
+          w.dataset.catAct = kind === "left" || kind === "right" ? "peek-side" : "peek"; // read by the 3D model
           gsap.set(w, { autoAlpha: 1 });
           const half = { x: (hide.x + shown.x * 2) / 3, y: (hide.y + shown.y * 2) / 3 };
           live = true;

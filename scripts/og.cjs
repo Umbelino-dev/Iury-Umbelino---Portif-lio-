@@ -21,7 +21,7 @@ new Function("exports", read("src/components/hero/name-paths.ts").replace(/expor
 const cat = read("src/components/cat/CatFigure.tsx")
   .match(/<svg[\s\S]*?<\/svg>/)[0]
   .replace(/\{\/\*[\s\S]*?\*\/\}/g, "")
-  .replace(/ className=\{className\}| aria-hidden="true"| focusable="false"/g, "")
+  .replace(/ className=\{className\}| aria-hidden="true"| focusable="false"| data-cat-figure=""/g, "")
   .replace(/strokeWidth/g, "stroke-width")
   .replace(/strokeLinecap/g, "stroke-linecap")
   .replace(/strokeLinejoin/g, "stroke-linejoin")

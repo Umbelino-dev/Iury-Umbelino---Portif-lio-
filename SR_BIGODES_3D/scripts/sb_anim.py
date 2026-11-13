@@ -340,6 +340,141 @@ def shift_all(P, dy):
         P.place(f"CTRL_hind_paw.{t}", mirror(J["hind_ball"], s) + Vector((0, dy, 0)))
 
 
+# --------------------------------------------------- pendurado, queda, escalada
+GRIP = Vector((0.0, 0.16, 1.07))     # onde as patas seguram: o site ancora o gato por este ponto
+LEDGE = Vector((0.0, 0.03, 0.93))    # borda sob o queixo, na pose de espiar
+
+
+def _swing(point, deg):
+    """Gira um ponto em torno do apoio (GRIP), no plano frontal: o pendulo."""
+    return GRIP + Matrix.Rotation(math.radians(deg), 3, "Y") @ (Vector(point) - GRIP)
+
+
+def pose_hang(P, sway=0.0, slip=0.0, one=0.0, reach=0.0, breath=0.0, climb=None, peek=False):
+    """Pendurado pelas patas dianteiras: corpo na vertical, pernas soltas, cauda para baixo.
+
+    sway  = angulo do pendulo (graus); slip = fase das patas escorregando (rad, 0 = firme);
+    one   = 1 solta a pata direita (fica por uma pata); reach = quanto ela tenta voltar (0-1);
+    climb = fase da escalada (0-1) ou None; peek = bracos dobrados, patas na borda sob o queixo.
+    """
+    lean = -13.0 * one                      # por uma pata, o corpo pende para o lado solto
+    body = sway + lean
+    hips0 = Vector(J["hips"]) + Vector((0, 0, -0.02 * abs(math.sin(slip)) if slip else 0))
+    pull = 0.0
+    if climb is not None:                   # cada puxada sobe o corpo um pouco
+        pull = 0.035 * (0.5 - 0.5 * math.cos(2 * PI2 * climb))
+        hips0 += Vector((0, 0, pull))
+    P.rot("hips", x=-84.0, y=body)
+    P.T["hips"] = _swing(hips0, body) - P.H["hips"]
+    P.rot("spine", x=-2.0, y=0.25 * body)
+    P.rot("chest", x=-2.0 + 0.5 * breath)
+    P.scale("chest", (1.0 + 0.012 * breath, 1.0, 1.0 + 0.015 * breath))
+    P.rot_abs("neck", x=-50.0 if not peek else -44.0, y=0.4 * body)
+    P.rot_abs("head", x=-8.0 if not peek else 6.0, y=0.5 * body, z=-6.0 * one)
+    for t, s in (("L", 1), ("R", -1)):
+        ph = slip + (0 if s > 0 else math.pi)
+        if peek:
+            w = Vector((s * 0.185, LEDGE.y + 0.02, LEDGE.z - 0.01))
+        else:
+            w = Vector((s * 0.215, GRIP.y, GRIP.z - 0.02))
+            if slip:                        # a pata escorrega e volta a procurar apoio
+                w.z -= 0.04 * max(0.0, math.sin(ph))
+            if climb is not None:           # mao sobre mao
+                w.z += 0.06 * math.sin(PI2 * climb + (0 if s > 0 else math.pi))
+        hook = -35.0
+        if one and s < 0:                   # a pata direita soltou: balanca ao lado do corpo e tenta de novo
+            low = _swing((-0.17, 0.10, 0.60), body * 1.3)
+            w = low.lerp(Vector((-0.205, GRIP.y, GRIP.z - 0.10)), reach)
+            hook = 20.0 - 50.0 * reach
+        P.place(f"CTRL_front_paw.{t}", w)
+        P.rot(f"CTRL_front_paw.{t}", x=hook)
+        kick = 0.05 * math.sin(ph) if slip else 0.0
+        if climb is not None:
+            kick = 0.05 * math.sin(PI2 * climb + (math.pi if s > 0 else 0))
+        foot = _swing((s * 0.085, 0.10 - kick, 0.075 + abs(kick) * 0.8), body * 1.5)
+        P.place(f"CTRL_hind_paw.{t}", foot)
+        P.rot(f"CTRL_hind_paw.{t}", x=48.0)
+        P.rot(f"CTRL_hind_heel.{t}", x=22.0)
+        P.place(f"CTRL_hind_knee.{t}", _swing((s * 0.12, -0.30, 0.34), body))
+    whip = 22.0 * math.sin(slip * 2.0) if slip else 0.0
+    for i, pitch in enumerate((-96, -102, -106, -108, -106, -100, -92, -84)):
+        lag = i / 7.0
+        P.rot_abs(f"tail_{i + 1:02d}", x=pitch, y=body * (1.0 + 1.2 * lag) + whip * lag)
+    back = -18.0 * max(one, 1.0 if slip else 0.0)
+    P.rot("ear.L", x=back)
+    P.rot("ear.R", x=back)
+
+
+def pose_fall(P, ph=0.0):
+    """No ar, caindo: patas abertas procurando o chao, cauda para cima, orelhas para tras."""
+    w = PI2 * ph
+    P.move("hips", 0, 0, 0.0)
+    P.rot("hips", x=-10.0 + 3.0 * S2(w), y=4.0 * S2(w + 1.0))
+    P.rot("spine", x=-7.0)
+    P.rot("chest", x=-7.0)
+    P.rot_abs("neck", x=14.0)
+    P.rot_abs("head", x=-6.0)
+    f = 0.03 * S2(w)
+    paws(P, FL=(-0.09 + f, 0.03, -24.0), FR=(-0.09 - f, 0.03, -24.0), HL=(0.08 - f, 0.03, 26.0), HR=(0.08 + f, 0.03, 26.0), attached=True)
+    for t, s in (("L", 1), ("R", -1)):      # patas abertas para os lados
+        for name, rest in ((f"CTRL_front_paw.{t}", J["wrist"]), (f"CTRL_hind_paw.{t}", J["hind_ball"])):
+            P.T[name] = P.T[name] + Vector((s * 0.05, 0, 0))
+    tail_chain(P, (38, 26, 16, 8, 4, 0, -4, -6), [6.0 * S2(w - 0.5 * i) for i in range(TAIL_BONES)])
+    P.rot("ear.L", x=-24.0, y=8.0)
+    P.rot("ear.R", x=-24.0, y=-8.0)
+    P.expr(Surpreso=0.6)
+
+
+def pose_land(P, k):
+    """Pouso em chaves: 0 no ar, 1 impacto (agacha fundo), 2 rebote, 3 em pe."""
+    if k == 0:
+        pose_fall(P)
+        return
+    if k == 3:
+        pose_stand(P)
+        return
+    low = -0.15 if k == 1 else -0.045
+    P.move("hips", 0, 0.01, low)
+    P.rot("hips", x=10.0 if k == 1 else 2.0)
+    P.rot("spine", x=8.0 if k == 1 else 2.0)
+    P.rot("chest", x=6.0 if k == 1 else 1.0)
+    P.rot_abs("neck", x=30.0 if k == 1 else 14.0)
+    P.rot_abs("head", x=-4.0)
+    P.scale("spine", (1.08, 1.0, 0.94) if k == 1 else 1.0)
+    paws(P)
+    tail_chain(P, (30, 22, 12, 4, -4, -10, -12, -10) if k == 1 else (24, 16, 9, 3, -6, -12, -16, -16))
+    P.rot("ear.L", x=-14.0 if k == 1 else 0.0)
+    P.rot("ear.R", x=-14.0 if k == 1 else 0.0)
+
+
+def pose_stretch(P, k):
+    """Espreguicar: 0 em pe, 1 reverencia (frente baixa, garupa alta), 2 mais fundo, 3 dorso arqueado."""
+    if k == 0:
+        pose_stand(P)
+        return
+    if k in (1, 2):
+        deep = 1.0 if k == 2 else 0.8
+        P.move("hips", 0, 0.035 * deep, -0.02 * deep)
+        P.rot("hips", x=17.0 * deep)
+        P.rot("spine", x=7.0 * deep)
+        P.rot("chest", x=8.0 * deep)
+        P.rot_abs("neck", x=-8.0)
+        P.rot_abs("head", x=-12.0)
+        f = (-0.13 * deep, 0.0, -14.0 * deep)
+        paws(P, FL=f, FR=f)
+        tail_chain(P, (40, 26, 14, 4, -6, -14, -18, -18))
+        P.expr(Feliz=0.7 * deep)
+        return
+    P.move("hips", 0, -0.02, 0.012)
+    P.rot("hips", x=-4.0)
+    P.rot("spine", x=-11.0)
+    P.rot("chest", x=-9.0)
+    P.rot_abs("neck", x=20.0)
+    P.rot_abs("head", x=4.0)
+    paws(P, HL=(0.07, 0, 0), HR=(0.07, 0, 0))
+    tail_chain(P, (10, 4, 0, -4, -8, -10, -10, -8))
+
+
 def report_reach(P, label=""):
     """Confere se o IK alcanca os alvos (distancia do alvo ao osso final)."""
     P.apply()
@@ -422,6 +557,35 @@ def build_actions(rig):
     cycle("Deitado", 96, lambda u, f: pose_lie(P, breath=S2(PI2 * u * 2), head_yaw=8.0 * S2(PI2 * u)))
     P.reset(); pose_lie(P); report_reach(P, "deitado")
     cycle("Dormindo", 120, lambda u, f: pose_lie(P, breath=S2(PI2 * u * 2), sleep=1.0, side=-1.0), step=4)
+
+    # pendurado (firme), patas escorregando, por uma pata so, escalando, espiando por cima de uma borda
+    cycle("Pendurado", 72, lambda u, f: pose_hang(P, sway=3.5 * S2(PI2 * u), breath=S2(PI2 * u * 2)))
+    P.reset(); pose_hang(P); report_reach(P, "pendurado")
+    cycle("Pendurado_Deslizando", 16, lambda u, f: pose_hang(P, sway=6.0 * S2(PI2 * u), slip=PI2 * u + 1e-3), step=1)
+    cycle("Pendurado_UmaPata", 40, lambda u, f: pose_hang(P, sway=11.0 * S2(PI2 * u), one=1.0, reach=max(0.0, S2(PI2 * u * 2 - 0.6)) ** 2), step=2)
+    P.reset(); pose_hang(P, one=1.0); report_reach(P, "uma pata")
+    cycle("Escalando", 20, lambda u, f: pose_hang(P, sway=2.0 * S2(PI2 * u), climb=u), step=1)
+    cycle("Espiando", 96, lambda u, f: pose_hang(P, sway=1.2 * S2(PI2 * u), breath=S2(PI2 * u * 2), peek=True))
+    P.reset(); pose_hang(P, peek=True); report_reach(P, "espiando")
+
+    # queda (ciclo), pouso, espreguicar, curioso
+    cycle("Caindo", 12, lambda u, f: pose_fall(P, u), step=1)
+    A["Pousando"] = new_action(rig, "SB_Pousando", 1, 24)
+    P.reset(True)
+    for frame, k in ((1, 0), (5, 1), (12, 2), (24, 3)):
+        P.reset(); pose_land(P, k); P.key(frame)
+    A["Espreguicando"] = new_action(rig, "SB_Espreguicando", 1, 52)
+    P.reset(True)
+    for frame, k in ((1, 0), (12, 1), (24, 2), (30, 2), (42, 3), (52, 0)):
+        P.reset(); pose_stretch(P, k); P.key(frame)
+
+    def curious(u, f):
+        tilt = 16.0 * S2(PI2 * u)
+        pose_sit(P, head_roll=tilt, head_yaw=-9.0 * S2(PI2 * u + 0.8), head_pitch=-4.0, breath=S2(PI2 * u * 3))
+        P.rot("ear.L", x=5.0, z=4.0 * S2(PI2 * u * 2))
+        P.rot("ear.R", x=5.0, z=-4.0 * S2(PI2 * u * 2))
+        P.expr(Curioso=0.9)
+    cycle("Curioso", 96, curious)
 
     P.reset(); pose_sit(P)
     sit_head = P.point("head", (0.0, -0.315, 0.600))

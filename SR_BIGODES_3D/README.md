@@ -21,7 +21,7 @@ Gato preto estilizado, construído com geometria real a partir da folha de refer
 | `LIGHTING` | 5 luzes de área presas ao `LIGHT_Rig` |
 | `ENVIRONMENT` | chão de estúdio |
 
-Números da malha: 17 malhas, cerca de 50 mil vértices no total (cabeça 13,6 mil, corpo 30,7 mil), só quads na pele. 42 ossos, 43 shape keys, 8 ações.
+Números da malha: 17 malhas, cerca de 50 mil vértices no total (cabeça 13,6 mil, corpo 30,7 mil), só quads na pele. 42 ossos, 43 shape keys, 17 ações.
 
 Escala: 1 unidade = altura do gato sentado, com as orelhas. O gato olha para −Y; `.L` é a esquerda dele (+X).
 
@@ -45,6 +45,15 @@ Escala: 1 unidade = altura do gato sentado, com as orelhas. O gato olha para −
 | `SB_Deitado` | 1–97 | deitado de barriga, respirando (ciclo) |
 | `SB_Dormindo` | 1–121 | enrolado, olhos fechados (ciclo) |
 | `SB_Em_Pe` | 1 | pose em pé |
+| `SB_Pendurado` | 1–73 | pendurado pelas patas dianteiras, balançando (ciclo) |
+| `SB_Pendurado_Deslizando` | 1–17 | as patas escorregam e procuram apoio (ciclo) |
+| `SB_Pendurado_UmaPata` | 1–41 | por uma pata, a outra tenta voltar (ciclo) |
+| `SB_Escalando` | 1–21 | sobe mão sobre mão (ciclo) |
+| `SB_Espiando` | 1–97 | queixo e patas numa borda (ciclo) |
+| `SB_Caindo` | 1–13 | no ar, patas abertas (ciclo) |
+| `SB_Pousando` | 1–24 | absorve o impacto e levanta |
+| `SB_Espreguicando` | 1–52 | reverência e dorso arqueado |
+| `SB_Curioso` | 1–97 | sentado, inclina a cabeça e olha em volta (ciclo) |
 
 24 fps. As ações têm *fake user*, então não se perdem ao salvar.
 
@@ -73,6 +82,7 @@ Também roda sem o Blender instalado, com `pip install bpy pillow` e `python bui
 | `build_sr_bigodes.py` | junta tudo e salva o `.blend` |
 | `render_sr_bigodes.py` | renders de apresentação |
 | `make_sheet.py` | folha de apresentação |
+| `export_glb.py` | exporta o personagem para o site (`public/models/sr-bigodes.glb`): malhas com skin, materiais, morph targets e todas as ações; depois `npx @gltf-transform/cli meshopt` comprime |
 | `render_turntable.py` | giro 360° para o Lab do portfólio: escreve o pôster e a folha de 36 quadros em `assets/media/` (depois rode `npm run images` na raiz) |
 
 Para mudar proporções, edite os números no topo de `sb_model.py` (dicionário `J`, `build_field`, `EYE_R`, `ear_surface`) e reconstrua.

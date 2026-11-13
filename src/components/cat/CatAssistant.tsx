@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useCallback, useEffect, useId, useReducer, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import { gsap, MQ } from "@/lib/gsap";
 import { CatFigure } from "./CatFigure";
@@ -37,6 +38,9 @@ export interface AssistantUI {
 }
 
 type Message = { from: "cat" | "you"; text: string };
+
+/** The real-time 3D cat: its own chunk, client only, mounted after the first paint. */
+const CatScene = dynamic(() => import("@/components/cat3d/CatScene"), { ssr: false });
 
 const MOBILE = "(max-width: 767px)";
 /**
@@ -117,6 +121,20 @@ export function CatAssistant({
   const small = context === "case";
   const rail = useSyncExternalStore(subscribeRail, () => context === "home" && window.matchMedia(RAIL).matches, () => false);
   const isRail = () => context === "home" && window.matchMedia(RAIL).matches;
+
+  // The 3D model mounts once the page has settled, and only where WebGL exists.
+  const [webgl, setWebgl] = useState(false);
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      try {
+        const probe = document.createElement("canvas");
+        if (probe.getContext("webgl2") || probe.getContext("webgl")) setWebgl(true);
+      } catch {
+        /* no WebGL: the 2D figure stays */
+      }
+    }, 700);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   const reduced = () => window.matchMedia(MQ.reduced).matches;
   const mobile = () => window.matchMedia(MOBILE).matches;
@@ -251,6 +269,7 @@ export function CatAssistant({
       if (next === level || !p) return;
       const from = level;
       level = next;
+      d.dataset.catGrip = String(next); // read by the 3D model (resolve.ts)
       stopSlipping();
       if (next === 1) {
         // a firm grip again
@@ -323,6 +342,7 @@ export function CatAssistant({
       if (!p) return;
       busy = true;
       level = 1;
+      d.dataset.catGrip = "4";
       stopSlipping();
       const drop = -base - m.offset; // px down to the corner
       const tl = gsap.timeline({
@@ -330,12 +350,15 @@ export function CatAssistant({
           busy = false;
           recovery = null;
           lastY = window.scrollY;
+          d.dataset.catGrip = "1";
         },
       });
       recovery = tl;
       tl.add(falling(p, 0.12), 0)
         .to(m, { offset: -base, duration: clamp(0.22, 0.62, 0.2 + Math.abs(drop) / 1400), ease: "power2.in", onUpdate: () => setY(base + m.offset) }, 0)
+        .add(() => (d.dataset.catGrip = "land"))
         .add(land(p))
+        .add(() => (d.dataset.catGrip = "sit"), "+=0.75")
         .to(p.eyes, { scale: 1, duration: 0.2 }, "<")
         .to(p.ears, { y: 0, duration: 0.2 }, "<")
         // dazed: a shake of the head
@@ -344,7 +367,8 @@ export function CatAssistant({
       if (Math.random() < 0.5) tl.add(pretend(p), "+=0.15");
       // back up the rail, hand over hand
       const climb = { n: 0 };
-      tl.set(p.paws, { opacity: 1 }, "+=0.2")
+      tl.add(() => (d.dataset.catGrip = "climb"), "+=0.2")
+        .set(p.paws, { opacity: 1 }, "<")
         .set(pawEls, { opacity: 1, y: 0 }, "<")
         .to(
           m,
@@ -407,6 +431,7 @@ export function CatAssistant({
       gsap.killTweensOf(m);
       recovery?.kill();
       stopSlipping();
+      delete d.dataset.catGrip;
       if (p) {
         climbRest(p);
         gsap.set(pawEls, { opacity: 1, y: 0 });
@@ -989,7 +1014,8 @@ export function CatAssistant({
   const catSize = small ? "w-[26px]" : rail ? "w-[30px]" : "w-10";
 
   return (
-    <div ref={root} data-cat-assistant={state}>
+    <div ref={root} data-cat-assistant={state} {...(rail ? { "data-cat-rail": "" } : {})}>
+      {webgl && <CatScene />}
       {/* Scrim: dims the page on mobile, catches outside clicks everywhere. */}
       <div
         ref={scrim}

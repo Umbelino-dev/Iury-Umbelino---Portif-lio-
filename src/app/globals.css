@@ -284,3 +284,14 @@ html.has-cursor :is(input, textarea, select, [contenteditable="true"]) {
   opacity: 0.16;
   translate: 0 12px;
 }
+
+/* The real-time 3D cat (components/cat3d) is up: the 2D figures stay in the DOM as
+   buttons and measured boxes, but they are not painted, and the corner button
+   loses its paper disc (the model sits there instead). */
+html[data-cat3d="on"] [data-cat-figure] {
+  opacity: 0 !important;
+}
+html[data-cat3d="on"] [data-cat-dock] button {
+  background-color: transparent;
+  border-color: transparent;
+}

@@ -1,0 +1,33 @@
+{
+  "sitHeight": 1.0,
+  "hangGrip": [
+    0.0,
+    0.16,
+    1.07
+  ],
+  "peekLedge": [
+    0.0,
+    0.03,
+    0.93
+  ],
+  "fps": 24,
+  "clips": {
+    "Andando": 1.333,
+    "Caindo": 0.5,
+    "Correndo": 0.583,
+    "Curioso": 4.0,
+    "Deitado": 4.0,
+    "Dormindo": 5.0,
+    "Em_Pe": 0.0,
+    "Escalando": 0.833,
+    "Espiando": 4.0,
+    "Espreguicando": 2.125,
+    "Olhando_Lados": 5.0,
+    "Pendurado": 3.0,
+    "Pendurado_Deslizando": 0.667,
+    "Pendurado_UmaPata": 1.667,
+    "Pousando": 0.958,
+    "Pulando": 2.458,
+    "Sentado_Idle": 4.0
+  }
+}

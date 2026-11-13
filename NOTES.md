@@ -124,6 +124,13 @@ Temporary progress log. Permanent rules live in `CLAUDE.md`.
   - Tested in Playwright (1440 rail, 1280 dock, iPhone 13, reduced motion): every behaviour triggered, states in order, no console errors. Not tested on a physical phone or with a real trackpad: the `FAST` threshold may want tuning by feel.
   - Reading of the brief I was least sure of: "words falling because of him" is done on the name's letters only, not on body copy.
 
+- [x] **R13: autonomous cat** (2026-11-12, Iury's addendum 14–22): behaviour director, edge peeks, title walk with falling letters, pointer chase, portals between pictures, small events, gradual sleep/waking, four grip levels on the rail. Tested scene by scene in Playwright (scenes triggered through `cat:play`), no console errors.
+- [x] **R14: the real 3D cat** (2026-11-12, "use the exact Blender model"): GLB exported from the .blend (geometry, rig, 43 morph targets, 17 clips; 9 new clips authored on the rig: hanging, paws sliding, one paw, climbing, peeking, falling, landing, stretching, curious), rendered live with three + R3F in place of the 2D figure.
+  - Compared with the Blender render: same geometry, proportions, eyes and silhouette. Differences, from glTF limits: the fur's procedural noise and the sheen edge do not export (flat graphite + three's sheen), the iris gradient is baked to a texture, eyelids and brows lose their Solidify / Subdivision (needed to keep their shape keys).
+  - Tested in Playwright with SwiftShader (software WebGL): hero walk, rail hanging, each grip level (forced), fall/land/sit/climb, sleep and stretch, peek, title walk, dock, open panel, phone, reduced motion. Frame rate on real GPUs not measured; real-speed scroll thresholds not verifiable here (the software renderer is too slow to scroll fast).
+  - Open: tune sizes and thresholds by feel on a real device; retopology of the skin would cut the 1.1 MB model further.
+- LinkedIn (Iury asked to retry, 2026-11-12): www.linkedin.com added to the environment's allowed hosts; LinkedIn answers 429 to automated requests, so the profile and posts still cannot be read from here. The PhotoDeck posts still need the links from Iury.
+
 ## Still open
 - Deploy (Iury): Cloudflare account, connect the repo, set `NEXT_PUBLIC_SITE_URL` (build variable), custom domain — steps in README.
 - Optional later: a real screenshot of the Care Radar (Fig. 04), Via Hebraica case study, real Lab experiments, field CWV after deploy, test on physical phones.

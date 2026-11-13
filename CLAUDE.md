@@ -97,6 +97,7 @@ Paint budget (measured 2026-11-13, headless Chromium): avoid large blur radii (b
 - `npm run typecheck` (runs `next typegen` first) · `npm run lint` · `npm run build` (writes `./out`) · `npm run check` (all three) · `npm run copy:check`.
 - `scripts/lettering.py` regenerates the name mark (needs `fonttools`, `brotli`, `uharfbuzz`, `skia-pathops` in a venv; dev-only). After a change, regenerate `public/og-image.png` too.
 - `npm run preview` serves `./out` (note: `serve` does not apply `_redirects`).
+- **Publishing (Iury, 2026-11-13, testing phase: only he sees the site):** after a change passes `npm run check` and the visual check, fast-forward it to `main` (`git push origin HEAD:main`) without asking; Cloudflare Workers Builds deploys every push to `main`. Watch the build until it reports success. Revisit when the site is announced.
 - `npm run deploy` = build + `wrangler deploy` (needs Cloudflare auth — Iury's step). Full deploy guide in `README.md`; `NEXT_PUBLIC_SITE_URL` must be set **at build time** (canonical, hreflang, OG, sitemap, JSON-LD).
 - SEO: per-page metadata (canonical + hreflang + OG/Twitter with `public/og-image.png`), `src/app/sitemap.ts` and `robots.ts` (`dynamic = "force-static"`), `src/app/icon.svg`, `PersonJsonLd` (verified facts only). `public/_headers` sets security + cache headers.
 - Cloud sessions: no integrated preview. Validate by serving `out/` and driving Playwright (pre-installed Chromium) at 390/768/1440 with and without reduced motion.

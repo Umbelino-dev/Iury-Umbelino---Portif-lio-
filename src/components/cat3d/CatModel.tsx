@@ -6,7 +6,7 @@ import * as THREE from "three";
 import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import type { CatState } from "@/components/cat/states";
-import { MQ } from "@/lib/gsap";
+import { gsap, MQ } from "@/lib/gsap";
 import { CatAnimationController } from "./CatAnimationController";
 import { fitCamera } from "./CatCamera";
 import { CatInteractionController } from "./CatInteractionController";
@@ -19,6 +19,13 @@ const GRIP = 1.07; // where the front paws hold on, in the hanging clips
 const LEDGE = 0.93; // the edge under the chin, in the peeking clip
 /** How big the model is next to the 2D figure's box, per place (model units per box height). */
 const SIZE = { hero: 1.12, rail: 2.6, dock: 1.4, actor: 1.3 };
+
+/** Shown: not hidden and not faded out (GSAP's autoAlpha on the element itself). */
+const shown = (el: Element | null | undefined): el is HTMLElement => {
+  if (!el) return false;
+  const cs = getComputedStyle(el);
+  return cs.visibility !== "hidden" && parseFloat(cs.opacity) > 0.05;
+};
 
 interface Rig {
   root: THREE.Group;
@@ -44,7 +51,7 @@ interface Rig {
 export function CatModel() {
   const scene = useThree((s) => s.scene);
   const rig = useRef<Rig | null>(null);
-  const quality = useRef({ frames: 0, time: 0, dpr: 1 });
+  const quality = useRef<{ frames: number; time: number; dpr: number; fixed?: number }>({ frames: 0, time: 0, dpr: 1 });
   const motion = useRef({ x: 0, y: 0, vx: 0, vy: 0, unit: 0, yaw: 0, seen: false, place: "", w: 0, h: 0 });
 
   useEffect(() => {
@@ -52,17 +59,13 @@ export function CatModel() {
     const root = new THREE.Group();
     root.visible = false;
     scene.add(root);
-    // Studio light in the spirit of the Blender scene: a soft key from the upper
-    // left, sky/ground fill, and two rim lights from behind that draw the black
-    // silhouette on dark surfaces.
-    const sun = (color: number, intensity: number, x: number, y: number, z: number) => {
-      const light = new THREE.DirectionalLight(color, intensity);
-      light.position.set(x, y, z);
-      return light;
-    };
-    const lights = [new THREE.HemisphereLight(0xf3f1eb, 0x26262a, 1.25), sun(0xfff7ee, 2.6, -0.5, 0.8, 1), sun(0xeef2ff, 3.4, -1, 0.55, -0.9), sun(0xfff4e6, 2.8, 1, 0.45, -0.8)];
-    lights.forEach((l) => scene.add(l));
-
+    // Neutral base light only, so the model's own materials can be seen at all
+    // (a lit material with no light renders black): a soft sky/ground fill and one
+    // light from the front. No shadows, rims, reflections or effects.
+    const fill = new THREE.HemisphereLight(0xffffff, 0x404040, 1.6);
+    const front = new THREE.DirectionalLight(0xffffff, 1.6);
+    front.position.set(0, 0.4, 1);
+    scene.add(fill, front);
     const loader = new GLTFLoader();
     loader.setMeshoptDecoder(MeshoptDecoder);
     loader.load(
@@ -98,7 +101,7 @@ export function CatModel() {
       rig.current?.anim.dispose();
       rig.current = null;
       scene.remove(root);
-      lights.forEach((l) => scene.remove(l));
+      scene.remove(fill, front);
       delete document.documentElement.dataset.cat3d;
     };
   }, [scene]);
@@ -107,13 +110,24 @@ export function CatModel() {
     const r = rig.current;
     if (!r) return;
     // Adaptive quality: when frames run long the canvas renders at a lower pixel
-    // ratio (down to 0.5), and climbs back when there is headroom again.
+    // ratio (down to 0.75), and climbs back when there is headroom again.
     const q = quality.current;
     q.time += delta;
-    if (++q.frames >= 24) {
+    if (q.fixed === undefined) {
+      // Dev / QA: `localStorage.setItem("cat3d-dpr", "2")` pins the pixel ratio.
+      let pinned = NaN;
+      try {
+        pinned = Number(window.localStorage.getItem("cat3d-dpr"));
+      } catch {
+        /* storage blocked: adaptive */
+      }
+      q.fixed = pinned > 0 ? pinned : 0;
+      if (q.fixed) setDpr(q.fixed);
+    }
+    if (!q.fixed && ++q.frames >= 24) {
       const avg = q.time / q.frames;
       const max = Math.min(window.devicePixelRatio || 1, 1.75);
-      const next = avg > 0.034 ? Math.max(0.5, q.dpr * 0.75) : avg < 0.014 ? Math.min(max, q.dpr * 1.2) : q.dpr;
+      const next = avg > 0.034 ? Math.max(0.75, q.dpr * 0.8) : avg < 0.014 ? Math.min(max, q.dpr * 1.2) : q.dpr;
       if (Math.abs(next - q.dpr) > 0.01) {
         q.dpr = next;
         setDpr(next);
@@ -139,36 +153,54 @@ export function CatModel() {
     const state = host.dataset.catAssistant as CatState;
     const railMode = host.dataset.catRail !== undefined;
 
-    // Which 2D figure is "the cat" right now: the roaming actor, the hero slot, or its docked place.
+    // Which 2D figure is "the cat" right now: whichever is on show. The roaming
+    // actor first (a scene), then its docked place (also while it leaps there and
+    // back), then the hero slot.
+    const slot = Array.from(document.querySelectorAll<HTMLElement>('[data-cat-root="observer"]')).find((n) => n.offsetParent !== null);
+    const slotSvg = slot?.querySelector("svg");
+    const dockSvg = dock?.querySelector<SVGSVGElement>("svg");
+    const inner = dock?.firstElementChild as HTMLElement | null | undefined;
     let el: Element | null = null;
     let place: Moment["place"] = "dock";
-    const actorOn = !!wrap && (wrap.style.visibility === "inherit" || wrap.style.visibility === "visible") && parseFloat(wrap.style.opacity || "1") > 0.05;
-    if (actorOn && wrap) {
+    if (wrap && (wrap.style.visibility === "inherit" || wrap.style.visibility === "visible") && parseFloat(wrap.style.opacity || "1") > 0.05) {
       el = wrap.querySelector("svg");
       place = "actor";
-    } else if (state === "observer") {
-      const slot = Array.from(document.querySelectorAll<HTMLElement>('[data-cat-root="observer"]')).find((n) => n.offsetParent !== null);
-      el = slot?.querySelector("svg") ?? null;
+    } else if (shown(dock) && dockSvg && dockSvg.style.visibility !== "hidden") {
+      el = dockSvg;
+    } else if (shown(slot) && slotSvg) {
+      el = slotSvg;
       place = "hero";
-    } else {
-      const svg = dock?.querySelector<SVGSVGElement>("svg") ?? null;
-      // the docked figure is hidden while the cat is away (inside the pictures)
-      el = svg && svg.style.visibility !== "hidden" ? svg : null;
     }
     const box = el?.getBoundingClientRect();
-    if (!box || box.width < 2) {
+    if (!box || box.width < 1) {
       r.root.visible = false;
       motion.current.seen = false;
       return;
     }
 
     const m = motion.current;
-    const k = place === "hero" ? SIZE.hero : place === "actor" ? SIZE.actor : railMode ? SIZE.rail : SIZE.dock;
-    const unitTarget = box.height * k;
-    const fresh = !m.seen || m.place !== place;
-    m.unit = fresh ? unitTarget : m.unit + (unitTarget - m.unit) * (1 - Math.exp(-dt * 10));
+    // Size: per place; while the docked figure is scaled (the leap from the hero
+    // and back, the phone's magic) the model follows that scale, so it never pops.
+    let unitTarget: number;
+    if (place === "dock") {
+      const k = railMode ? SIZE.rail : SIZE.dock;
+      const s = inner ? Number(gsap.getProperty(inner, "scale")) || 1 : 1;
+      const plain = box.height / Math.max(s, 0.001);
+      unitTarget = plain * k;
+      if (s > 1.02 && slotSvg) {
+        const s0 = slotSvg.getBoundingClientRect().height / plain;
+        const t = s0 > 1.05 ? THREE.MathUtils.clamp((s - 1) / (s0 - 1), 0, 1) : 1;
+        unitTarget = plain * (k + t * (s0 * SIZE.hero - k));
+      } else if (s < 0.98) {
+        unitTarget = plain * k * Math.max(0, s);
+      }
+    } else {
+      unitTarget = box.height * (place === "hero" ? SIZE.hero : SIZE.actor);
+    }
+    if (!m.seen) m.unit = unitTarget;
+    else m.unit += (unitTarget - m.unit) * (still ? 1 : 1 - Math.exp(-dt * 14));
     const cx = box.left + box.width / 2;
-    if (fresh) {
+    if (!m.seen) {
       m.vx = m.vy = 0;
     } else if (dt > 0) {
       m.vx += ((cx - m.x) / dt - m.vx) * 0.3;
@@ -178,6 +210,10 @@ export function CatModel() {
     m.y = box.bottom;
     m.seen = true;
     m.place = place;
+    if (m.unit < 1) {
+      r.root.visible = false;
+      return;
+    }
 
     const pose = resolvePose({ state, place, rail: railMode, grip: dock?.dataset.catGrip, act: wrap?.dataset.catAct, vx: m.vx, vy: m.vy, unit: m.unit });
     if (r.anim.has(pose.clip)) r.anim.play(pose.clip, { once: pose.once, speed: pose.speed, fade: still ? 0 : pose.clip === "Caindo" ? 0.12 : 0.26 });

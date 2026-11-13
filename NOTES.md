@@ -131,6 +131,8 @@ Temporary progress log. Permanent rules live in `CLAUDE.md`.
   - Open: tune sizes and thresholds by feel on a real device; retopology of the skin would cut the 1.1 MB model further.
 - LinkedIn (Iury asked to retry, 2026-11-12): www.linkedin.com added to the environment's allowed hosts; LinkedIn answers 429 to automated requests, so the profile and posts still cannot be read from here. The PhotoDeck posts still need the links from Iury.
 
+- [x] **R15: the 3D cat in its place** (2026-11-13): tried shadows on the page, contact shadow, surface-dependent light and grain; Iury asked for no lighting, shadow or light effects on the cat, so all of it was removed. What stayed: a neutral base light only (the fur is black again, close to the Blender render), size continuity during the leap and the phone's magic (no more pop), the figure picked by what is actually on show (no teleport on the way back to the hero), peeks only over the bottom edge in 3D. Tested: hero, leap back, all grip levels, dock and panel, phone, reduced motion; no console errors.
+
 ## Still open
 - Deploy (Iury): Cloudflare account, connect the repo, set `NEXT_PUBLIC_SITE_URL` (build variable), custom domain — steps in README.
 - Optional later: a real screenshot of the Care Radar (Fig. 04), Via Hebraica case study, real Lab experiments, field CWV after deploy, test on physical phones.

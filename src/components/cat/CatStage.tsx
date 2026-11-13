@@ -194,7 +194,10 @@ export function CatStage({
       when: (m) => m.calm > 3500 && m.idle < DROWSY_MS && !m.away,
       run: (done) => {
         type Kind = "eyes" | "paws" | "chin" | "left" | "right";
-        const kinds: Kind[] = phone ? ["eyes", "paws", "chin"] : rail ? ["eyes", "paws", "chin", "left"] : ["eyes", "paws", "chin", "left", "right"];
+        // Over the bottom edge only: the 3D model peeks over a ledge (Espiando); the
+        // side peeks ("left" / "right") stay for the 2D figure, without WebGL.
+        const flat = document.documentElement.dataset.cat3d !== "on";
+        const kinds: Kind[] = phone || !flat ? ["eyes", "paws", "chin"] : rail ? ["eyes", "paws", "chin", "left"] : ["eyes", "paws", "chin", "left", "right"];
         const s = phone ? 1.5 : 1.9;
         let tl: gsap.core.Timeline | null = null;
         let wait: gsap.core.Tween | null = null;

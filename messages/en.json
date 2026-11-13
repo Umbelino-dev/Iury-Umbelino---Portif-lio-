@@ -7,9 +7,8 @@
   "nav": {
     "label": "Primary",
     "index": "Index",
-    "about": "About",
+    "about": "Profile",
     "projects": "Projects",
-    "lab": "Lab",
     "contact": "Contact",
     "switchLocale": "View in Portuguese",
     "home": "Iury Umbelino, home",
@@ -37,7 +36,7 @@
     }
   },
   "about": {
-    "label": "About",
+    "label": "Profile",
     "lead": "Most of what I make starts as a question I can't let go of. This is where I show what I found.",
     "traits": [
       {
@@ -102,15 +101,6 @@
     "openCase": "Read the case study",
     "pending": "image coming soon",
     "indexLabel": "Pick a project"
-  },
-  "lab": {
-    "label": "Experimental lab",
-    "title": "Lab",
-    "intro": "Small things, built to answer one question each. Not products yet.",
-    "meta": "{count} entries, in progress. Updated November 2026.",
-    "drop": "media coming soon",
-    "hesitation": "hesitation",
-    "playhead": "“why does it”"
   },
   "approach": {
     "label": "Approach",

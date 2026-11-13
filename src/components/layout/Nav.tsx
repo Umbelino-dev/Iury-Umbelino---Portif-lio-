@@ -10,7 +10,6 @@ const ITEMS = [
   { id: "hero", key: "index" },
   { id: "about", key: "about" },
   { id: "projects", key: "projects" },
-  { id: "lab", key: "lab" },
   { id: "contact", key: "contact" },
 ] as const;
 

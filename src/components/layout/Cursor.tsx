@@ -18,7 +18,7 @@ const dotScale = (m: Mode) => (m === "default" || m === "label" ? 1 : m === "lin
  * - default: 8px dot · link/button: the dot grows to 18px
  * - `data-cursor-label="…"`: a small labelled pill appears beside the dot ("ver projeto")
  * - over text it stays a dot (no I-beam) · form fields: the native cursor (custom one hidden)
- * - `data-cursor="none"`: hidden (the element draws its own pointer, e.g. Lab frames)
+ * - `data-cursor="none"`: hidden (the element draws its own pointer)
  * - press: the dot compresses for 120ms.
  * It is `pointer-events: none` and `aria-hidden`, so it never blocks clicks, text
  * selection or keyboard focus. Touch devices keep the native cursor and never mount it.

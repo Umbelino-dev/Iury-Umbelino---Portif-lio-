@@ -7,9 +7,8 @@
   "nav": {
     "label": "Principal",
     "index": "Índice",
-    "about": "Sobre",
+    "about": "Perfil",
     "projects": "Projetos",
-    "lab": "Lab",
     "contact": "Contato",
     "switchLocale": "Ver em inglês",
     "home": "Iury Umbelino, início",
@@ -37,7 +36,7 @@
     }
   },
   "about": {
-    "label": "Sobre",
+    "label": "Perfil",
     "lead": "Quase tudo que faço começa com uma pergunta que não me larga. Aqui eu mostro o que encontrei.",
     "traits": [
       {
@@ -102,15 +101,6 @@
     "openCase": "Ler o estudo de caso",
     "pending": "imagem em breve",
     "indexLabel": "Escolha um projeto"
-  },
-  "lab": {
-    "label": "Laboratório experimental",
-    "title": "Lab",
-    "intro": "Coisas pequenas, feitas para responder uma pergunta cada. Ainda não são produtos.",
-    "meta": "{count} entradas, em andamento. Atualizado em novembro de 2026.",
-    "drop": "mídia em breve",
-    "hesitation": "hesitação",
-    "playhead": "“por que ele”"
   },
   "approach": {
     "label": "Abordagem",

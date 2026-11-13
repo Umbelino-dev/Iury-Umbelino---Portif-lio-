@@ -10,9 +10,8 @@
  * inside `observer` (CatObserver). Greeting at Contact is a one-shot clip, not a
  * state either.
  *
- * "cling" has two places (CatAssistant): the R03 rail from 1440px with a fine pointer
- * (home only), where the right page margin can hold the cat; otherwise the docked,
- * awake cat in the bottom-right corner (the dock R03 uses on mobile).
+ * "cling" is the docked, awake cat: a round button in the bottom-right corner
+ * (the rail was removed, Iury 2026-11-13).
  */
 
 export type CatState = "observer" | "jump" | "cling" | "sleep" | "waking" | "awaken";

@@ -3,7 +3,7 @@ import { contacts, education, educationEarlier, experience, plain, skills, type 
 import { gallery } from "@/content/gallery";
 import type { Locale } from "@/i18n/routing";
 import { Emphasis } from "@/components/layout/Emphasis";
-import { SectionTitle } from "@/components/layout/SectionTitle";
+import { SectionTitle, sectionTitleClass } from "@/components/layout/SectionTitle";
 import { PhotoDeck } from "@/components/media/PhotoDeck";
 import { SkillPills } from "./SkillPills";
 import { Timeline } from "./Timeline";
@@ -86,17 +86,13 @@ export async function About() {
           {ta("label")}
         </SectionTitle>
 
-        {/* Who, in brief: the facts first, at reading-display size. */}
-        <div className="col-span-4 flex flex-col gap-6 md:col-span-12 lg:col-span-6">
-          <p data-split className="font-display text-[clamp(1.5rem,1.1rem+1.4vw,2.375rem)] leading-[1.1] font-bold tracking-[-0.025em] text-pretty">
-            {t("lead")}
+        {/* Who, in brief: the current role, clean and large. The story of how he got
+            here is the career path below (Iury, 2026-11-13: no lead paragraph). */}
+        <div className="col-span-4 flex flex-col gap-2 md:col-span-12 lg:col-span-6">
+          <p className="font-display text-[clamp(1.75rem,1.3rem+1.6vw,2.75rem)] leading-[1.05] font-bold tracking-[-0.025em]">{experience.role[locale]}</p>
+          <p className="text-note text-gray-600">
+            {experience.employer} · {experience.period[locale]}
           </p>
-          <div className="flex flex-col gap-1">
-            <p className="font-display text-title font-bold tracking-[-0.01em]">{experience.role[locale]}</p>
-            <p className="text-note text-gray-600">
-              {experience.employer}, {experience.period[locale]}
-            </p>
-          </div>
         </div>
 
         {/* What he has done: every line is a CV bullet. */}
@@ -105,8 +101,8 @@ export async function About() {
           <ul className="flex flex-col gap-5">
             {experience.highlights.map((h, i) => (
               <li key={i} className="flex max-w-[60ch] gap-3.5 text-[clamp(1rem,0.97rem+0.15vw,1.0625rem)] leading-[1.6] text-pretty">
-                {/* A thin dash leads each line: scannable without a coloured bullet. */}
-                <span aria-hidden="true" className="mt-[0.8em] h-[1.5px] w-3 shrink-0 bg-ink/35" />
+                {/* A small graphite dot leads each line (Iury, 2026-11-13). */}
+                <span aria-hidden="true" className="mt-[0.68em] size-[5px] shrink-0 rounded-full bg-ink/70" />
                 <span>
                   <Emphasis text={h[locale]} />
                 </span>
@@ -127,7 +123,7 @@ export async function About() {
           <ul className="flex flex-col gap-4">{education.map(course)}</ul>
           {/* Earlier courses wait behind a native disclosure: no JS, keyboard ready. */}
           <details className="group mt-2">
-            <summary className="flex min-h-11 w-fit cursor-pointer list-none items-center font-display text-[0.9375rem] font-bold underline decoration-1 underline-offset-[0.3em] hover:text-gray-600 [&::-webkit-details-marker]:hidden">
+            <summary className="flex min-h-11 w-fit cursor-pointer list-none items-center font-display text-[max(0.9375rem,13px)] font-bold underline decoration-1 underline-offset-[0.3em] hover:text-gray-600 [&::-webkit-details-marker]:hidden">
               <span className="group-open:hidden">{t("earlierShow")}</span>
               <span className="hidden group-open:inline">{t("earlierHide")}</span>
             </summary>
@@ -170,7 +166,6 @@ export async function About() {
             pause: ta("galleryPause"),
             prev: ta("galleryPrev"),
             next: ta("galleryNext"),
-            bring: ta("galleryBring"),
           }}
         />
       </div>
@@ -178,7 +173,7 @@ export async function About() {
       {/* The career path, full width. */}
       <div className="page-grid mt-(--section-space)">
         <div className="col-span-full flex flex-col gap-[clamp(2.5rem,5vw,4.5rem)]">
-          <h3 className="font-display text-headline-m font-bold tracking-[-0.02em]">{t("path")}</h3>
+          <h3 className={sectionTitleClass}>{t("path")}</h3>
           <Timeline steps={steps} labels={timelineLabels} />
         </div>
       </div>

@@ -62,6 +62,8 @@ export function Nav({ variant = "home" }: { variant?: "home" | "case" }) {
         if (s.getBoundingClientRect().top < mid) current = s.dataset.navId ?? current;
       });
       setLight(surface === "light");
+      // The page scrollbar's track follows the same surface (globals.css).
+      document.documentElement.dataset.scrollSurface = surface;
       setActive(alias ?? current);
     };
     const onScroll = () => {
@@ -131,7 +133,7 @@ export function Nav({ variant = "home" }: { variant?: "home" | "case" }) {
       href={`#${id}`}
       aria-current={active === id ? "location" : undefined}
       onClick={() => setOpen(false)}
-      className={`flex min-h-11 items-center rounded-pill px-3.5 text-[0.8125rem] font-medium transition-opacity duration-(--duration-base) hover:opacity-100 ${active === id ? "opacity-100" : "opacity-65"} ${focusRing} ${extra}`}
+      className={`flex min-h-11 items-center rounded-pill px-3.5 text-[max(0.8125rem,12px)] font-medium transition-opacity duration-(--duration-base) hover:opacity-100 ${active === id ? "opacity-100" : "opacity-65"} ${focusRing} ${extra}`}
     >
       {t(key)}
     </a>
@@ -160,7 +162,7 @@ export function Nav({ variant = "home" }: { variant?: "home" | "case" }) {
             // Case study: one pill back to the index (Case Study R01; 44px tall on mobile).
             <Link
               href="/#projects"
-              className={`flex min-h-11 items-center gap-2.5 rounded-pill border px-4 text-[0.8125rem] whitespace-nowrap sm:px-4.5 font-medium ${glass} ${glassBlur} ${transition} ${focusRing}`}
+              className={`flex min-h-11 items-center gap-2.5 rounded-pill border px-4 text-[max(0.8125rem,12px)] whitespace-nowrap sm:px-4.5 font-medium ${glass} ${glassBlur} ${transition} ${focusRing}`}
             >
               <span aria-hidden="true">←</span>
               <span className="sm:hidden">{t("projectsShort")}</span>
@@ -190,7 +192,7 @@ export function Nav({ variant = "home" }: { variant?: "home" | "case" }) {
             aria-expanded={open}
             aria-controls={menuId}
             onClick={() => setOpen((v) => !v)}
-            className={`${variant === "case" ? "!hidden" : ""} flex min-h-11 items-center rounded-pill border px-4 text-[0.8125rem] font-medium md:hidden ${glass} ${glassBlur} ${transition} ${focusRing}`}
+            className={`${variant === "case" ? "!hidden" : ""} flex min-h-11 items-center rounded-pill border px-4 text-[max(0.8125rem,12px)] font-medium md:hidden ${glass} ${glassBlur} ${transition} ${focusRing}`}
           >
             {t("menu")}
           </button>

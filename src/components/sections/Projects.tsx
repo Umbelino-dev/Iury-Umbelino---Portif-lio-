@@ -5,6 +5,7 @@ import type { Locale } from "@/i18n/routing";
 import { StatusMark } from "@/components/layout/StatusMark";
 import { ProjectImage } from "@/components/media/ProjectImage";
 import { ProjectList, type ProjectRow } from "./ProjectList";
+import { Approach } from "./Approach";
 
 /**
  * Projects — light editorial. Projects are evidence, so they sit in daylight.
@@ -58,14 +59,16 @@ export async function Projects() {
       data-nav-id="projects"
       data-surface="light"
       aria-labelledby="projects-title"
-      className="surface-light pt-[clamp(4rem,7vw,7.5rem)] pb-(--section-space)"
+      className="surface-light pt-(--section-space) pb-(--section-space)"
     >
       <div className="mx-auto max-w-(--container-page) px-(--page-margin)">
         <div className="flex flex-col gap-6 pb-[clamp(2.5rem,5vw,5rem)]">
           <SectionTitle id="projects-title">{t("label")}</SectionTitle>
-          <p className="max-w-[34ch] text-[0.9375rem] leading-normal text-gray-600 md:self-end md:mr-[8.33%]">{t("note")}</p>
+          <p className="max-w-[34ch] text-[max(0.9375rem,13px)] leading-normal text-gray-600 md:self-end md:mr-[8.33%]">{t("note")}</p>
         </div>
         <ProjectList rows={rows} label={t("listLabel")} />
+        {/* Second part: how the work is made (Approach lives inside Projects). */}
+        <Approach />
       </div>
     </section>
   );

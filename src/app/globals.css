@@ -1,7 +1,5 @@
 @import "tailwindcss";
 
-/* Rail mode: the cat rides a rail in the right page margin (CatAssistant RAIL). */
-@custom-variant rail (@media (min-width: 1440px) and (hover: hover) and (pointer: fine));
 
 /*
  * Design tokens — source: Claude Design "Direção Criativa R01" (02 — Design system).
@@ -47,13 +45,13 @@
   --text-numeral--letter-spacing: -0.04em;
   --text-lead: clamp(1.1875rem, 1.121rem + 0.2817vw, 1.375rem);
   --text-lead--line-height: 1.5;
-  --text-body: clamp(1rem, 0.978rem + 0.0939vw, 1.0625rem);
+  --text-body: max(14px, clamp(1rem, 0.978rem + 0.0939vw, 1.0625rem));
   --text-body--line-height: 1.62;
-  --text-ui: 0.9375rem;
+  --text-ui: max(13px, 0.9375rem);
   --text-ui--line-height: 1.2;
-  --text-caption: 0.8125rem;
+  --text-caption: max(12px, 0.8125rem);
   --text-caption--line-height: 1.5;
-  --text-label: 0.75rem;
+  --text-label: max(11px, 0.75rem);
   --text-label--line-height: 1.2;
   --text-label--letter-spacing: 0.1em;
 
@@ -87,6 +85,18 @@
     }
   }
 
+  /*
+   * Global scale (Iury, 2026-11-13): on desktop with a mouse the whole site reads
+   * at the proportion it had at 75% browser zoom. Everything sized in rem (type,
+   * spacing, the grid's max width) follows; media queries do not (they use the
+   * browser's initial size). Reading text keeps a floor (the max() in the type
+   * tokens) so nothing drops below legible. Touch screens stay at 100%.
+   */
+  @media (min-width: 64rem) and (hover: hover) and (pointer: fine) {
+    html {
+      font-size: 75%;
+    }
+  }
   html {
     background: var(--color-ink);
     color: var(--color-paper);
@@ -155,7 +165,7 @@
   font-family: var(--font-display);
   font-style: normal;
   font-weight: 500;
-  font-size: 1rem;
+  font-size: max(13px, 1rem);
   line-height: 1.35;
   letter-spacing: -0.005em;
 }
@@ -341,32 +351,37 @@ dialog.is-closing::backdrop {
 }
 
 /*
- * Page scrollbar hidden (Iury, 2026-11-13): the cat's rail is the page's scroll
- * marker, and the dark native bar read as a black strip on the light sections.
- * Scrolling is unchanged (wheel, trackpad, keys, touch). Only the page's own bar
- * goes; inner scrollers (the photo panel's text) keep the thin bar below.
+ * Scrollbar (Iury, 2026-11-13, third pass): visible again, so the page always says
+ * where you are. Thin, a rounded translucent grey thumb that turns lime on hover
+ * and drag. The track takes the colour of the surface under the nav (Nav sets
+ * `data-scroll-surface` on <html>), so it never draws a dark strip beside a light
+ * section (a transparent track would show the html background, which is ink).
+ * Firefox reads the standard pair; Chromium 121+ would let it override the
+ * ::-webkit rules, so it is scoped to browsers without them.
  */
 html {
-  scrollbar-width: none;
+  --scroll-track: var(--color-ink);
+  --scroll-thumb: rgba(146, 146, 146, 0.45);
 }
-html::-webkit-scrollbar {
-  display: none;
+html[data-scroll-surface="light"] {
+  --scroll-track: var(--color-paper);
+  --scroll-thumb: rgba(94, 92, 87, 0.4);
 }
-
-/*
- * Inner scrollers: thin, a graphite thumb that lights up lime while hovered or
- * dragged. Chromium 121+ would let the standard properties override these
- * ::-webkit rules, so elements that set `scrollbar-width` themselves keep theirs.
- */
+@supports not selector(::-webkit-scrollbar) {
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scroll-thumb) var(--scroll-track);
+  }
+}
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--color-ink);
+  background: var(--scroll-track);
 }
 ::-webkit-scrollbar-thumb {
-  background: #2e2e2e;
+  background: var(--scroll-thumb);
   border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover,
@@ -374,5 +389,5 @@ html::-webkit-scrollbar {
   background: var(--color-signal);
 }
 ::-webkit-scrollbar-corner {
-  background: var(--color-ink);
+  background: var(--scroll-track);
 }

@@ -26,8 +26,7 @@
     "live": "No ar"
   },
   "hero": {
-    "intro": "Construo produtos com IA. Cada um começa com uma pergunta.",
-    "cta": "Conheça a pessoa",
+    "cta": "Me conheça",
     "stack": "Assistente de TI. SQL, PL/SQL, IA e produtos.",
     "tagline": {
       "lead": "A curiosidade constrói",
@@ -53,12 +52,10 @@
     "galleryProfile": "Ver perfil no LinkedIn",
     "galleryPause": "Pausar fotos",
     "galleryPrev": "Foto anterior",
-    "galleryNext": "Próxima foto",
-    "galleryBring": "Clique para trazer à frente"
+    "galleryNext": "Próxima foto"
   },
   "experience": {
     "title": "Onde a curiosidade vira rotina.",
-    "lead": "Dois anos e meio no Giassi Supermercados. Comecei como Jovem Aprendiz no Centro de Distribuição e hoje atuo na TI da Matriz, cuidando de sistemas internos com dados e usuários reais.",
     "highlights": "O que faço",
     "path": "Trajetória",
     "stack": "Uso no dia a dia",
@@ -102,27 +99,83 @@
   "approach": {
     "label": "Abordagem",
     "title": "Como uma pergunta vira uma coisa.",
-    "note": "Cinco passos, nessa ordem. O último devolve ao primeiro.",
+    "hint": "Passe o mouse ou clique em cada passo para ver as técnicas.",
+    "stepsLabel": "Os cinco passos",
+    "stepOf": "Passo {n} de {total}",
+    "next": "Próximo passo",
+    "restart": "Voltar a Observar",
+    "loop": "O último passo alimenta o primeiro",
+    "techniques": "Técnicas",
     "steps": [
       {
         "title": "Observar",
-        "text": "Ver o que as pessoas fazem, não o que dizem que fazem."
+        "text": "Ver o que as pessoas fazem, não o que dizem que fazem.",
+        "techniques": [
+          {
+            "name": "Shadowing e imersão na operação",
+            "text": "Acompanhar o usuário real no dia a dia para identificar gargalos invisíveis."
+          },
+          {
+            "name": "Análise de logs e dados reais",
+            "text": "Investigar registros no banco e chamados recorrentes (Softdesk) antes de tirar conclusões."
+          }
+        ]
       },
       {
         "title": "Entender",
-        "text": "Achar a pergunta real por baixo do pedido."
+        "text": "Achar a pergunta real por baixo do pedido.",
+        "techniques": [
+          {
+            "name": "5 Porquês e causa raiz",
+            "text": "Ir além do sintoma pedido pelo usuário para descobrir o problema estrutural."
+          },
+          {
+            "name": "Mapeamento de fluxo (As-Is)",
+            "text": "Desenhar cada etapa atual do processo para encontrar onde ele trava ou gera retrabalho."
+          }
+        ]
       },
       {
         "title": "Experimentar",
-        "text": "Construir a menor coisa capaz de provar que estou errado."
+        "text": "Construir a menor coisa capaz de provar que estou errado.",
+        "techniques": [
+          {
+            "name": "MVP e protótipo rápido",
+            "text": "Validar a ideia com o mínimo de código ou interface antes de investir semanas de desenvolvimento."
+          },
+          {
+            "name": "Teste de hipótese com usuários",
+            "text": "Colocar o protótipo na mão de quem opera o processo e medir se realmente economiza tempo."
+          }
+        ]
       },
       {
         "title": "Construir",
-        "text": "Transformar o que sobreviveu em algo que dá para usar."
+        "text": "Transformar o que sobreviveu em algo que dá para usar.",
+        "techniques": [
+          {
+            "name": "Arquitetura limpa e automação",
+            "text": "Desenvolver com foco em estabilidade, regras de negócio claras (SQL, Pascal Script, React/IA) e manutenção simples."
+          },
+          {
+            "name": "Entregas incrementais",
+            "text": "Colocar em produção por partes para gerar valor rápido sem parar a operação."
+          }
+        ]
       },
       {
         "title": "Melhorar",
-        "text": "Entregar, observar, ajustar. E olhar de novo."
+        "text": "Entregar, observar, ajustar. E olhar de novo.",
+        "techniques": [
+          {
+            "name": "Monitoramento contínuo",
+            "text": "Acompanhar métricas de uso, erros e feedbacks reais após a entrega."
+          },
+          {
+            "name": "Iteração cíclica",
+            "text": "Usar os novos aprendizados para alimentar novamente a etapa de Observar."
+          }
+        ]
       }
     ]
   },

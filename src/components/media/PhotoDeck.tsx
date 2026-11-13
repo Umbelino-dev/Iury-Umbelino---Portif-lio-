@@ -36,7 +36,6 @@ export interface DeckLabels {
   pause: string; // "Pausar"
   prev: string; // "Foto anterior"
   next: string; // "Próxima foto"
-  bring: string; // "Clique para trazer à frente"
 }
 
 /** The deck always shows at least this many cards (photos repeat until then). */
@@ -74,8 +73,8 @@ function pose(o: number, n: number) {
  * Each card: rounded portrait, a rim of light, and a dark gradient at the base
  * under the white caption (painted once, then moved as a texture).
  *
- * Clicking a card beside the front one brings it forward; clicking the front
- * card opens it. Arrow buttons under the deck deal too.
+ * Mouse and keyboard: clicking any card opens it (its details). Touch: tapping a
+ * card beside the front one brings it forward; tapping the front card opens it. Arrow buttons under the deck deal too.
  *
  * - GSAP tweens only when the front card changes (transform + opacity), no loop.
  * - Swipe / drag sideways or ← → on the deck deal the next / previous card.
@@ -219,10 +218,10 @@ export function PhotoDeck({ photos, labels }: { photos: DeckPhoto[]; labels: Dec
     };
   };
   const open = useCallback(
-    (i: number, el: HTMLElement) => {
-      // A card beside the front one comes forward first (and ends auto-dealing);
-      // only the front card opens its panel.
-      if (offset(i, frontRef.current) !== 0) {
+    (i: number, el: HTMLElement, touch: boolean) => {
+      // Touch: a card beside the front one comes forward first (and ends
+      // auto-dealing); only the front card opens. Mouse / keyboard open any card.
+      if (touch && offset(i, frontRef.current) !== 0) {
         deal(i);
         return;
       }
@@ -281,9 +280,9 @@ export function PhotoDeck({ photos, labels }: { photos: DeckPhoto[]; labels: Dec
   };
 
   // Drag / swipe: a horizontal flick deals the next or previous card.
-  const drag = useRef<{ x: number; id: number; moved: boolean } | null>(null);
+  const drag = useRef<{ x: number; id: number; moved: boolean; type: string } | null>(null);
   const onDown = (e: PointerEvent) => {
-    drag.current = { x: e.clientX, id: e.pointerId, moved: false };
+    drag.current = { x: e.clientX, id: e.pointerId, moved: false, type: e.pointerType };
   };
   const onUp = (e: PointerEvent) => {
     const d = drag.current;
@@ -302,7 +301,6 @@ export function PhotoDeck({ photos, labels }: { photos: DeckPhoto[]; labels: Dec
   };
 
   const shown = shownIdx !== null ? cards[shownIdx] : undefined;
-  const isFront = shownIdx !== null && offset(shownIdx, front) === 0;
   const story = opened !== null ? photos[opened] : undefined;
 
   return (
@@ -407,7 +405,7 @@ export function PhotoDeck({ photos, labels }: { photos: DeckPhoto[]; labels: Dec
             <>
               <p className="font-display text-[1.0625rem] leading-tight font-bold tracking-[-0.01em]">{shown.caption}</p>
               <p className="mt-1.5 text-caption leading-snug text-gray-600">{shown.summary ?? labels.pending}</p>
-              <p className="mt-3 font-display text-[0.875rem] font-bold underline decoration-1 underline-offset-[0.3em]">{isFront ? labels.hint : labels.bring}</p>
+              <p className="mt-3 font-display text-[max(0.875rem,12.5px)] font-bold underline decoration-1 underline-offset-[0.3em]">{labels.hint}</p>
             </>
           )}
         </div>
@@ -523,8 +521,8 @@ const DeckCard = memo(function DeckCard({
   i: number;
   copy: boolean;
   more: string;
-  dragRef: RefObject<{ x: number; id: number; moved: boolean } | null>;
-  onOpen: (i: number, el: HTMLElement) => void;
+  dragRef: RefObject<{ x: number; id: number; moved: boolean; type: string } | null>;
+  onOpen: (i: number, el: HTMLElement, touch: boolean) => void;
   onEnter: (i: number, x: number, y: number) => void;
   onMove: (x: number, y: number) => void;
   onLeave: (i: number) => void;
@@ -542,8 +540,10 @@ const DeckCard = memo(function DeckCard({
             dragRef.current = null;
             return;
           }
+          // Keyboard clicks have no pointerdown: they count as "not touch".
+          const touch = Boolean(dragRef.current && dragRef.current.type !== "mouse");
           dragRef.current = null;
-          onOpen(i, e.currentTarget);
+          onOpen(i, e.currentTarget, touch);
         }}
         onPointerEnter={(e) => e.pointerType === "mouse" && onEnter(i, e.clientX, e.clientY)}
         onPointerMove={(e) => e.pointerType === "mouse" && onMove(e.clientX, e.clientY)}
@@ -572,7 +572,7 @@ const DeckCard = memo(function DeckCard({
             <span className="font-display text-[clamp(1.125rem,1rem+0.5vw,1.5rem)] leading-tight font-bold tracking-[-0.015em] text-balance">
               {p.caption}
             </span>
-            <span className="font-display text-[0.9375rem] font-medium opacity-85">{more}</span>
+            <span className="font-display text-[max(0.9375rem,13px)] font-medium opacity-85">{more}</span>
           </span>
           {/* Rim light: a bright edge and a soft inner glow. */}
           <span

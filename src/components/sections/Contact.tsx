@@ -24,12 +24,12 @@ export async function Contact() {
       data-nav-id="contact"
       data-surface="dark"
       aria-labelledby="contact-title"
-      className="relative isolate overflow-hidden bg-ink pt-[clamp(7rem,10vw,11.25rem)] pb-8 text-paper"
+      className="relative isolate overflow-hidden bg-ink pt-(--section-space) pb-8 text-paper"
     >
       <div aria-hidden="true" className="pointer-events-none absolute -top-30 left-[10%] -z-10 h-[520px] w-[70%] bg-[radial-gradient(ellipse_50%_50%_at_50%_50%,rgba(243,241,235,0.07),transparent_72%)]" />
       <div className="mx-auto flex max-w-(--container-page) flex-col gap-[clamp(3.5rem,6vw,7rem)] px-(--page-margin)">
         <div className="flex flex-col gap-5">
-          <SectionTitle id="contact-title">{t("label")}</SectionTitle>
+          <SectionTitle id="contact-title" dark>{t("label")}</SectionTitle>
           <p className="text-note text-[1.375rem] text-paper-300">{t("open")}</p>
         </div>
 

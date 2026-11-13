@@ -135,12 +135,9 @@ export async function Hero() {
             <HeroSocial label={t("social")} newTab={t("newTab")} column className="hidden md:block" />
             <HeroPortrait locale={locale} profileLabel={t("cta")} className="w-24 md:w-[clamp(9.25rem,11vw,11rem)]" />
           </div>
-          {/* Visible from the first paint (no fade): this is the mobile LCP text. */}
+          {/* Visible from the first paint (no fade): the role line is the mobile LCP text. */}
           <div className="flex max-w-[36rem] flex-col gap-4">
             <p className="text-note text-[1.25rem] text-gray-500">{t("stack")}</p>
-            <p className="max-w-[30ch] text-[clamp(1.1875rem,1rem+0.6vw,1.5rem)] leading-[1.45] md:leading-[1.35] text-pretty text-paper">
-              {t("intro")}
-            </p>
             {/* Two ways in: read about the person, or go straight to contact (recruiters). */}
             <div className="flex flex-wrap items-center gap-x-8 gap-y-1">
               <a

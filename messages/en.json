@@ -26,8 +26,7 @@
     "live": "Live"
   },
   "hero": {
-    "intro": "I build products with AI. Each one starts with a question.",
-    "cta": "Meet the person",
+    "cta": "Get to know me",
     "stack": "IT Assistant. SQL, PL/SQL, AI and products.",
     "tagline": {
       "lead": "Curiosity builds",
@@ -53,12 +52,10 @@
     "galleryProfile": "View profile on LinkedIn",
     "galleryPause": "Pause photos",
     "galleryPrev": "Previous photo",
-    "galleryNext": "Next photo",
-    "galleryBring": "Click to bring it forward"
+    "galleryNext": "Next photo"
   },
   "experience": {
     "title": "Where curiosity becomes routine.",
-    "lead": "Two and a half years at Giassi Supermercados. I started as an apprentice at the Distribution Centre. Now I work in IT at head office, looking after internal systems with real data and real users.",
     "highlights": "What I do",
     "path": "Path",
     "stack": "Daily tools",
@@ -102,27 +99,83 @@
   "approach": {
     "label": "Approach",
     "title": "How a question becomes a thing.",
-    "note": "Five steps, in this order. The last one leads back to the first.",
+    "hint": "Hover or click each step to see the techniques.",
+    "stepsLabel": "The five steps",
+    "stepOf": "Step {n} of {total}",
+    "next": "Next step",
+    "restart": "Back to Observe",
+    "loop": "The last step feeds the first",
+    "techniques": "Techniques",
     "steps": [
       {
         "title": "Observe",
-        "text": "See what people do, not what they say they do."
+        "text": "See what people do, not what they say they do.",
+        "techniques": [
+          {
+            "name": "Shadowing and immersion in the operation",
+            "text": "Following real users through their day to spot the bottlenecks nobody sees."
+          },
+          {
+            "name": "Reading logs and real data",
+            "text": "Digging into database records and recurring tickets (Softdesk) before drawing conclusions."
+          }
+        ]
       },
       {
         "title": "Understand",
-        "text": "Find the real question under the request."
+        "text": "Find the real question under the request.",
+        "techniques": [
+          {
+            "name": "5 Whys and root cause",
+            "text": "Going past the symptom the user asks about to find the structural problem."
+          },
+          {
+            "name": "Process mapping (as-is)",
+            "text": "Drawing every current step of the process to find where it stalls or causes rework."
+          }
+        ]
       },
       {
         "title": "Experiment",
-        "text": "Build the smallest thing that could prove me wrong."
+        "text": "Build the smallest thing that could prove me wrong.",
+        "techniques": [
+          {
+            "name": "MVP and quick prototype",
+            "text": "Testing the idea with as little code or interface as possible before investing weeks of work."
+          },
+          {
+            "name": "Hypothesis testing with users",
+            "text": "Putting the prototype in the hands of the people who run the process and measuring whether it really saves time."
+          }
+        ]
       },
       {
         "title": "Build",
-        "text": "Turn what survived into something people can use."
+        "text": "Turn what survived into something people can use.",
+        "techniques": [
+          {
+            "name": "Clean architecture and automation",
+            "text": "Building for stability, clear business rules (SQL, Pascal Script, React/AI) and simple maintenance."
+          },
+          {
+            "name": "Incremental delivery",
+            "text": "Shipping in parts to deliver value quickly without stopping the operation."
+          }
+        ]
       },
       {
         "title": "Improve",
-        "text": "Ship, watch, adjust. Then look again."
+        "text": "Ship, watch, adjust. Then look again.",
+        "techniques": [
+          {
+            "name": "Continuous monitoring",
+            "text": "Following usage metrics, errors and real feedback after delivery."
+          },
+          {
+            "name": "Cyclical iteration",
+            "text": "Feeding what was learned back into the Observe step."
+          }
+        ]
       }
     ]
   },

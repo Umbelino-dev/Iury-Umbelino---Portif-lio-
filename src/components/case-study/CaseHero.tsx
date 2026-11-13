@@ -21,7 +21,7 @@ export async function CaseHero({
   const ts = await getTranslations("status");
   const tt = await getTranslations("tags");
   const key = "text-note text-[1.0625rem] text-gray-600";
-  const value = "text-[0.9375rem] font-medium";
+  const value = "text-[max(0.9375rem,13px)] font-medium";
 
   return (
     <header className="flex flex-col gap-[clamp(2rem,4vw,4rem)] px-(--page-margin) pt-[clamp(7rem,12vw,12.5rem)] pb-[clamp(2.5rem,4vw,4rem)] max-md:pr-12">

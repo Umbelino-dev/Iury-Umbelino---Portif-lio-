@@ -13,7 +13,7 @@ import type { Locale } from "@/i18n/routing";
  *
  * At rest the photo is black and white; on hover it takes its colour back and gets a
  * thin signal rim. The card links to the Profile section, but stays out of the tab
- * order: "Conheça a pessoa" is the same destination for keyboard users.
+ * order: "Me conheça" is the same destination for keyboard users.
  */
 const ICONS: Partial<Record<ContactLink["kind"], ReactNode>> = {
   // Lucide-style outline glyphs, inlined (no icon dependency for three marks).

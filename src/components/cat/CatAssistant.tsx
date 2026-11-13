@@ -1,10 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useId, useReducer, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
+import { useCallback, useEffect, useId, useReducer, useRef, useState, type FormEvent } from "react";
 import { gsap, MQ } from "@/lib/gsap";
 import { CatFigure } from "./CatFigure";
-import { airborne, catParts, crouch, falling, grab, greet, land, prime, settle, wake, type CatParts } from "./clips";
-import { SectionRail } from "./SectionRail";
+import { catParts, greet, prime, settle, wake, type CatParts } from "./clips";
 import { CAT_OPEN, HERO_LEFT_AT, IDLE_MS, transition, type CatEvent, type CatState } from "./states";
 
 export interface AssistantChip {
@@ -36,18 +35,6 @@ export interface AssistantUI {
 type Message = { from: "cat" | "you"; text: string };
 
 const MOBILE = "(max-width: 767px)";
-/**
- * Rail mode (home only): the cat rides a hairline rail in the right page margin.
- * From 1440px the margin is wide enough (≥50px) to hold the 44px cat without
- * covering copy; below that it keeps the bottom-right dock.
- */
-const RAIL = "(min-width: 1440px) and (hover: hover) and (pointer: fine)";
-const READING_LINE = 0.4; // the rail cat holds 40% of the viewport height
-const subscribeRail = (cb: () => void) => {
-  const mq = window.matchMedia(RAIL);
-  mq.addEventListener("change", cb);
-  return () => mq.removeEventListener("change", cb);
-};
 const REPLY_MS = 650;
 
 const reducer = (s: CatState, e: CatEvent) => transition(s, e);
@@ -55,9 +42,10 @@ const normalize = (s: string) => s.toLowerCase().normalize("NFD").replace(/\p{Di
 
 /**
  * The cat, states S2–S5 (Cat Journey R03). On the home page it starts as the hero's
- * observer (CatObserver) and jumps when the hero leaves: onto the rail from 1440px
- * (it hangs there, riding the reading line, and slides down to curl up when idle),
- * or to the bottom-right dock below that. On a case study it starts docked. The docked cat is the closed assistant button; opening grows a
+ * observer (CatObserver); when the hero leaves it glides straight to the
+ * bottom-right dock (one smooth move, no leap) and becomes a small round button.
+ * Back in the hero it glides home to its seat on the "o". On a case study it
+ * starts docked. The docked cat is the closed assistant button; opening grows a
  * glass panel out of it (desktop) or slides a bottom sheet up (mobile). It never
  * opens by itself.
  */
@@ -98,8 +86,6 @@ export function CatAssistant({
   const titleId = useId();
   const open = state === "awaken";
   const small = context === "case";
-  const rail = useSyncExternalStore(subscribeRail, () => context === "home" && window.matchMedia(RAIL).matches, () => false);
-  const isRail = () => context === "home" && window.matchMedia(RAIL).matches;
 
   const reduced = () => window.matchMedia(MQ.reduced).matches;
   const mobile = () => window.matchMedia(MOBILE).matches;
@@ -145,72 +131,6 @@ export function CatAssistant({
     gsap.to(p.tail, { rotation: 0, duration: d ? d * 1.4 : 0, ease: "elastic.out(1, 0.4)" });
     gsap.to(p.paws, { opacity: gripping ? 1 : 0, duration: d * 0.3 });
   };
-  /** Dock offset (px) that puts the cat's centre on the reading line. */
-  const railY = () => {
-    const d = dock.current;
-    if (!d) return 0;
-    const r = d.getBoundingClientRect();
-    const base = r.top + r.height / 2 - (Number(gsap.getProperty(d, "y")) || 0);
-    return window.innerHeight * READING_LINE - base;
-  };
-
-  // Leaving rail mode (resize): the cat goes back to the corner.
-  useEffect(() => {
-    if (!rail && dock.current) gsap.set(dock.current, { y: 0 });
-  }, [rail]);
-
-  // ── S3 on the rail: hang, ride the page, climb back to the reading line ──
-  useEffect(() => {
-    if (!rail || state !== "cling") return;
-    const d = dock.current;
-    if (!d) return;
-    const { eyes, tail } = parts();
-    const base = railY();
-    const rm = reduced();
-    // Climb up (from the corner after sleep) or settle after the jump.
-    gsap.to(d, { y: base, duration: rm ? 0 : 0.4, ease: "power2.out" });
-    // Eyes turn toward the text, to the left of the rail.
-    if (eyes) gsap.to(eyes, { x: -2.5, duration: rm ? 0 : 0.3 });
-    if (rm) {
-      return () => {
-        if (eyes) gsap.set(eyes, { x: 0 });
-      };
-    }
-    // Scrolling drags the cat with the page; it then climbs back to the line
-    // (lerp 0.12). The rAF runs only while it is still moving.
-    const span = window.innerHeight * 0.25;
-    const setY = gsap.quickSetter(d, "y", "px");
-    let offset = 0;
-    let lastY = window.scrollY;
-    let frame = 0;
-    const tick = () => {
-      offset += (0 - offset) * 0.12;
-      setY(base + offset);
-      if (tail) gsap.set(tail, { rotation: gsap.utils.clamp(-30, 30, offset * 0.3), svgOrigin: "80 118" });
-      if (Math.abs(offset) > 0.5) {
-        frame = requestAnimationFrame(tick);
-      } else {
-        frame = 0;
-        setY(base);
-        if (tail) gsap.to(tail, { rotation: 0, duration: 0.5, ease: "elastic.out(1, 0.4)" });
-      }
-    };
-    const onScroll = () => {
-      const y = window.scrollY;
-      gsap.killTweensOf(d, "y");
-      offset = gsap.utils.clamp(-span, span, offset - (y - lastY));
-      lastY = y;
-      if (!frame) frame = requestAnimationFrame(tick);
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      cancelAnimationFrame(frame);
-      gsap.killTweensOf(d, "y");
-      if (eyes) gsap.to(eyes, { x: 0, duration: 0.2 });
-    };
-  }, [rail, state]);
-
   // ── Hero visibility drives S1 ⇄ S2 (home only) ───────────────────────────
   useEffect(() => {
     if (context !== "home") return;
@@ -322,8 +242,6 @@ export function CatAssistant({
       // Opened from the hero slot: the cat moves to the dock first, instantly.
       gsap.set(fromHero, { autoAlpha: 0 });
     }
-    // Opened from the rail: the cat drops to the corner, where the panel grows from it.
-    const lift = Number(gsap.getProperty(d, "y")) || 0;
     gsap.set(d, { autoAlpha: 1, y: 0 });
     gsap.set(p, { autoAlpha: 1, yPercent: 0, y: 0, clipPath: "none" });
     gsap.set(scrim.current, { autoAlpha: 1 });
@@ -333,7 +251,6 @@ export function CatAssistant({
     panelTl.current?.kill();
     const tl = gsap.timeline({ onComplete: () => title.current?.focus() });
     panelTl.current = tl;
-    if (lift && !rm) tl.fromTo(inner, { y: lift }, { y: 0, duration: 0.24, ease: "power2.in" }, 0);
 
     if (rm) {
       tl.fromTo([p, scrim.current], { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.16 }).set(inner, { y: perchY });
@@ -420,20 +337,17 @@ export function CatAssistant({
     if (!p) return;
     const ctx = gsap.context(() => {
       const hero = heroCat();
-      const gripping = isRail() && state === "cling";
 
       // Awake states settle into the rest pose (the jump, sleep and wake-up drive their own).
-      if (state === "cling" || state === "awaken" || state === "observer") awakePose(p, gripping, rm ? 0 : 0.3);
+      if (state === "cling" || state === "awaken" || state === "observer") awakePose(p, false, rm ? 0 : 0.3);
 
-      // S1 → S2: JUMP (crouch, take-off, apex) → FALL (gravity, legs dangling)
-      // → GRAB the rail (squash, damped swing) or LAND in the dock.
+      // S1 → S2: the cat glides straight from its seat in the hero to the dock,
+      // shrinking into the round button on the way (one eased move, no leap).
       if (state === "jump") {
-        // Rail mode: the landing spot is on the rail, at the reading line.
-        if (isRail()) gsap.set(d, { y: railY() });
         if (first || !hero) {
           gsap.set(d, { autoAlpha: 1 });
           if (hero) gsap.set(hero, { autoAlpha: 0 });
-          awakePose(p, isRail(), 0);
+          awakePose(p, false, 0);
           landed();
           return;
         }
@@ -441,26 +355,19 @@ export function CatAssistant({
         const dr = inner.getBoundingClientRect();
         const dx = hr.left + hr.width / 2 - (dr.left + dr.width / 2);
         const dy = hr.top + hr.height / 2 - (dr.top + dr.height / 2);
-        gsap.set(d, { autoAlpha: 1 });
+        awakePose(p, false, 0);
         if (rm) {
           gsap.to(hero, { autoAlpha: 0, duration: 0.16 });
-          awakePose(p, isRail(), 0);
           gsap.fromTo(d, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.16, onComplete: landed });
           return;
         }
         gsap.set(hero, { autoAlpha: 0 });
-        // Apex above both ends of the leap, but never above the visible page (under the nav).
-        const apex = Math.max(Math.min(dy, 0) - 70, 90 - dr.top);
-        const tl = gsap.timeline({ onComplete: landed });
-        tl.set(inner, { x: dx, y: dy, scale: hr.width / dr.width })
-          .add(crouch(p, 0.1))
-          .addLabel("air")
-          .add(airborne(p, 0.2), "air")
-          .to(inner, { x: 0, scale: 1, duration: 0.5, ease: "power1.inOut" }, "air")
-          .to(inner, { y: apex, duration: 0.22, ease: "power2.out" }, "air")
-          .add(falling(p, 0.22), "air+=0.22")
-          .to(inner, { y: 0, duration: 0.28, ease: "power2.in" }, "air+=0.22")
-          .add(isRail() ? grab(p) : land(p), "air+=0.5");
+        gsap.set(d, { autoAlpha: 1 });
+        gsap.fromTo(
+          inner,
+          { x: dx, y: dy, scale: hr.width / dr.width },
+          { x: 0, y: 0, scale: 1, duration: 0.6, ease: "power3.inOut", onComplete: landed },
+        );
         return;
       }
 
@@ -500,31 +407,18 @@ export function CatAssistant({
         if (hero) gsap.set(hero, { autoAlpha: 0 });
       }
 
-      // S4 · SLEEP. On the rail: eyes close, it lets go and FALLS down the rail,
-      // lands in the corner, then curls up (settle). In the dock: it just curls up.
+      // S4 · SLEEP: it curls up in the dock.
       if (state === "sleep") {
         if (rm) {
-          gsap.set(d, { y: 0 });
           settle(p).progress(1).pause();
           return;
         }
-        const lifted = (Number(gsap.getProperty(d, "y")) || 0) < -1;
-        const tl = gsap.timeline();
-        if (lifted) {
-          tl.to(p.eyes, { scaleY: 0.1, duration: 0.2 }, 0)
-            .set(p.paws, { opacity: 0 }, 0.2)
-            .add(falling(p, 0.2), 0.2)
-            .to(d, { y: 0, duration: 0.45, ease: "power2.in" }, 0.2)
-            .add(land(p), 0.65)
-            .add(settle(p), 0.8);
-        } else {
-          tl.add(settle(p), 0);
-        }
+        settle(p);
         return;
       }
 
       // WAKING: an ear twitch, eyes open, it rises and stretches; then it is awake
-      // (cling), and on the rail it climbs back up to the reading line.
+      // (cling).
       if (state === "waking") {
         if (rm) {
           awakePose(p, false, 0);
@@ -671,8 +565,8 @@ export function CatAssistant({
     else gsap.to(panel.current, { y: 0, duration: 0.2 });
   };
 
-  const disc = small || rail ? "size-11" : "size-14";
-  const catSize = small ? "w-[26px]" : rail ? "w-[30px]" : "w-10";
+  const disc = small ? "size-11" : "size-14";
+  const catSize = small ? "w-[26px]" : "w-10";
 
   return (
     <div ref={root} data-cat-assistant={state}>
@@ -684,13 +578,11 @@ export function CatAssistant({
         className="invisible fixed inset-0 z-[60] bg-transparent opacity-0 max-md:bg-ink/40"
       />
 
-      {rail && <SectionRail shown={state !== "observer"} />}
-
-      {/* The dock: the curled cat is the closed assistant button (S3/S4). In rail mode it sits on the rail. */}
+      {/* The dock: the round button in the bottom-right corner (S3/S4). */}
       <div
         ref={dock}
         data-cat-dock
-        className={`invisible fixed z-[70] opacity-0 ${rail ? "right-1 bottom-4" : "right-[max(1rem,env(safe-area-inset-right))] bottom-[calc(1rem+env(safe-area-inset-bottom))]"}`}
+        className="invisible fixed right-[max(1.5rem,env(safe-area-inset-right))] bottom-[calc(1.5rem+env(safe-area-inset-bottom))] z-[70] opacity-0"
       >
         <div ref={dockInner} className="relative">
           <button
@@ -706,7 +598,7 @@ export function CatAssistant({
             {/* Zzz — only while asleep */}
             <span
               aria-hidden="true"
-              className={`pointer-events-none text-note absolute -top-4 -left-1 text-[0.9375rem] text-gray-500 ${state === "sleep" ? "" : "hidden"}`}
+              className={`pointer-events-none text-note absolute -top-4 -left-1 text-[max(0.9375rem,13px)] text-gray-500 ${state === "sleep" ? "" : "hidden"}`}
             >
               <span className="cat-z">z</span>
               <span className="cat-z [animation-delay:600ms]">z</span>
@@ -766,12 +658,12 @@ export function CatAssistant({
         <div role="log" aria-label={ui.log} aria-live="polite" className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-5 py-4">
           {messages.map((m, i) => (
             <div key={i} className={`flex max-w-[92%] flex-col gap-1 ${m.from === "you" ? "self-end text-right" : ""}`}>
-              <span className="text-note text-[0.9375rem] text-gray-500">{m.from === "cat" ? ui.cat : ui.you}</span>
-              <p className={`text-[0.9375rem] leading-normal text-pretty ${m.from === "you" ? "text-paper-300" : ""}`}>{m.text}</p>
+              <span className="text-note text-[max(0.9375rem,13px)] text-gray-500">{m.from === "cat" ? ui.cat : ui.you}</span>
+              <p className={`text-[max(0.9375rem,13px)] leading-normal text-pretty ${m.from === "you" ? "text-paper-300" : ""}`}>{m.text}</p>
             </div>
           ))}
           {typing && (
-            <p className="text-note text-[0.9375rem] text-gray-500" aria-live="off">
+            <p className="text-note text-[max(0.9375rem,13px)] text-gray-500" aria-live="off">
               {ui.thinking}
             </p>
           )}
@@ -785,7 +677,7 @@ export function CatAssistant({
               type="button"
               onClick={() => ask(c.label, c)}
               disabled={typing}
-              className="min-h-11 shrink-0 rounded-pill border border-paper/20 px-4 text-[0.875rem] font-medium whitespace-nowrap transition-colors duration-(--duration-fast) hover:bg-paper/10 disabled:opacity-50"
+              className="min-h-11 shrink-0 rounded-pill border border-paper/20 px-4 text-[max(0.875rem,12.5px)] font-medium whitespace-nowrap transition-colors duration-(--duration-fast) hover:bg-paper/10 disabled:opacity-50"
             >
               {c.label}
             </button>
